@@ -10,15 +10,18 @@ controller Controller1;
 
 //////////// Drive Train Motors ////////////
 
-motor R1 = motor(PORT9, ratio6_1, true);
-motor R2 = motor(PORT3, ratio6_1, true);
-motor L1 = motor(PORT10, ratio6_1, false);
-motor L2 = motor(PORT4, ratio6_1, false);
+motor LFT = motor(PORT9, ratio6_1, false);
+motor LFB = motor(PORT7, ratio6_1, true);
+motor LBB = motor(PORT8, ratio6_1, true);
+motor LBT = motor(PORT10, ratio6_1, false);
 
+motor RFT = motor(PORT4, ratio6_1, true);
+motor RFB = motor(PORT1, ratio6_1, false);
+motor RBB = motor(PORT3, ratio6_1, false);
+motor RBT = motor(PORT2, ratio6_1, true);
 ///////////////////////////////////////////
 
 //////////// Odometry Sensors ////////////
-//TODO: CHANGE THE NAMES OF THESE
 rotation rotation1 = rotation(PORT18);
 rotation rotation2 = rotation(PORT17);
 
@@ -29,3 +32,21 @@ rotation rotation2 = rotation(PORT17);
 inertial inertial1 = inertial(PORT20);
 
 /////////////////////////////////////////
+
+motor intakeL = motor(PORT5, ratio6_1, true);
+motor intakeR = motor(PORT6, ratio6_1, false);
+motor colorSort = motor(PORT19, ratio18_1, true);
+motor bottomStage = motor(PORT20, ratio6_1, false);
+motor topStage = motor(PORT18, ratio6_1, false); //not always spinning
+
+motor_group mainIntake = motor_group(intakeL, intakeR, bottomStage);
+
+//Pistons
+digital_out matchLoadLeft = digital_out(Brain.ThreeWirePort.A);
+digital_out matchLoadRight = digital_out(Brain.ThreeWirePort.B);
+digital_out intakeLiftLeft = digital_out(Brain.ThreeWirePort.C);
+digital_out intakeLiftRight = digital_out(Brain.ThreeWirePort.D);
+digital_out intakeFlap = digital_out(Brain.ThreeWirePort.E);
+
+//Color Sort Opticals
+optical bottomColorSort = optical(PORT11);

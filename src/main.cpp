@@ -11,6 +11,7 @@
 #include "screen.h"
 #include "util.h"
 #include "Drive.h"
+#include "images.h"
 
 using namespace vex;
 
@@ -24,19 +25,24 @@ using namespace vex;
   bool isInAuton = false;
   int lastPressed = 0;
 
+  //Prototypes
+  void toggleLift();
+  void toggleIntakeFlap();
+
+
   // Define Values for the Chassis here:
   Drive chassis
   (
-    motor_group(L1, L2), // Left drive train motors
-    motor_group(R1, R2), // Right drive train motors
+    motor_group(LFT, LFB, LBB, LBT), // Left drive train motors
+    motor_group(RFT, RFB, RBB, RBT), // Right drive train motors
     PORT20,               // Inertial Sensor Port
-    3.25,              // The diameter size of the wheel in inches
+    2.75,              // The diameter size of the wheel in inches
     1,                   // 
-    6,                   // The maximum amount of the voltage used in the drivebase (1 - 12)
+    12,                   // The maximum amount of the voltage used in the drivebase (1 - 12)
     odomType,
     2,                  //Odometry wheel diameter (set to zero if no odom)
-    -1.0,               //Odom pod1 offset 
-    -1.0                //Odom pod1 offset
+    -4.0,               //Odom pod1 offset 
+    -4.0                //Odom pod1 offset
   );
 
 //////////////////////////////////////////////////////////////////////
@@ -119,7 +125,9 @@ void preAuton()
 
 /// @brief Runs during the Autonomous Section of the Competition
 void autonomous() 
-{
+{  
+  drawSponsors();
+
   isInAuton = true;
   rotation1.resetPosition();
   rotation2.resetPosition();
@@ -168,15 +176,102 @@ void autonomous()
 /// @brief Runs during the UserControl section of the competition
 void usercontrol() 
 {
+  drawSponsors();
+
   // User control code here, inside the loop
+  bool flapState = false;
+  bool isColorSorting = true;
+  int teamColor = 0; //red = 0, blue = 1
+  int lastSeen = teamColor;
+
+  mainIntake.setVelocity(100, percent);
+  colorSort.setVelocity(100, percent);
+  topStage.setVelocity(100, percent);
+
+  Controller1.ButtonL1.pressed(toggleLift);
+  Controller1.ButtonUp.pressed(toggleIntakeFlap);
+
+  bottomColorSort.setLight(ledState::on);
   while (1) {
-
-
     chassis.arcade();
-    wait(20, msec); // Sleep the task for a short amount of time to
+
+    if(bottomColorSort.color() == vex::color::red){
+      lastSeen = 0;
+      std::cout << "red" << std::endl;
+    }else if(bottomColorSort.color() == vex::color::blue){
+      lastSeen = 1;
+      std::cout << "blue" << std::endl;
+    }
+
+    if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
+      mainIntake.spin(forward);
+      if(flapState){
+        topStage.spin(forward);
+      }else{
+        topStage.stop();
+      }
+      if(lastSeen == teamColor){
+        colorSort.spin(forward);
+        std::cout << "COLORSORT FWD" << std::endl;
+      }else{
+        colorSort.spin(reverse);
+        std::cout << "COLORSORT REV" << std::endl;
+
+      }
+    }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
+      mainIntake.spin(reverse);
+      topStage.spin(reverse);
+      colorSort.spin(reverse);
+    }else if(Controller1.ButtonL2.pressing()){
+      matchLoadLeft.set(true);
+      matchLoadRight.set(true);
+      mainIntake.spin(forward);
+      if(lastSeen == teamColor){
+        colorSort.spin(forward);
+        std::cout << "COLORSORT FWD" << std::endl;
+      }else{
+        colorSort.spin(reverse);
+        std::cout << "COLORSORT REV" << std::endl;
+      }
+    }else if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
+      mainIntake.spin(forward);
+      topStage.spin(forward);
+      flapState = true;
+      if(lastSeen == teamColor){
+        colorSort.spin(forward);
+        std::cout << "COLORSORT FWD" << std::endl;
+      }else{
+        colorSort.spin(reverse);
+        std::cout << "COLORSORT REV" << std::endl;
+      }
+    }else{
+      matchLoadLeft.set(false);
+      matchLoadRight.set(false);
+      mainIntake.stop();
+      colorSort.stop();
+      topStage.stop();
+    }
+    if(!Controller1.ButtonR1.pressing()){
+      flapState = false;
+    }
+    intakeFlap.set(flapState);
+
+    wait(20, msec);
   }
 }
 
+void toggleLift(){
+  static bool liftState = false;
+  liftState = !liftState;
+  intakeLiftLeft.set(liftState); 
+  intakeLiftRight.set(liftState); 
+}
+
+void toggleIntakeFlap(){
+  static bool flapState = false;
+  flapState = !flapState;
+  intakeFlap.set(flapState);
+}
 
 int main() 
 {
@@ -221,6 +316,11 @@ void setDriveTrainConstants()
     
 }
 
+
+
+
+
+//Auton Route Functions
 /// @brief Auton Slot 1 - Write code for route within this function.
 void Auton_1()
 {
