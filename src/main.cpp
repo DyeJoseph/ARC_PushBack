@@ -126,7 +126,7 @@ void preAuton()
 /// @brief Runs during the Autonomous Section of the Competition
 void autonomous() 
 {  
-  drawSponsors();
+  //drawSponsors();
 
   isInAuton = true;
   rotation1.resetPosition();
@@ -136,8 +136,8 @@ void autonomous()
   setDriveTrainConstants();
   chassis.setPosition(0,0,0);
 
-  chassis.bezierTurn(0,0,5,5,2,12,7);
-  // chassis.driveDistanceWithOdom(24);
+  //chassis.bezierTurn(0,0,5,5,2,12,7);
+  chassis.driveDistanceWithOdom(24);
   // chassis.moveToPosition(24,24);
   // chassis.turnToAngle(45);
 
@@ -176,7 +176,9 @@ void autonomous()
 /// @brief Runs during the UserControl section of the competition
 void usercontrol() 
 {
-  drawSponsors();
+  //drawSponsors();
+ 
+  
 
   // User control code here, inside the loop
   bool flapState = false;
@@ -194,6 +196,7 @@ void usercontrol()
   bottomColorSort.setLight(ledState::on);
   while (1) {
     chassis.arcade();
+    
 
     if(bottomColorSort.color() == vex::color::red){
       lastSeen = 0;
@@ -221,10 +224,9 @@ void usercontrol()
     }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
       mainIntake.spin(reverse);
       topStage.spin(reverse);
-      colorSort.spin(reverse);
+      colorSort.spin(fwd,10,pct);
     }else if(Controller1.ButtonL2.pressing()){
-      matchLoadLeft.set(true);
-      matchLoadRight.set(true);
+      matchLoad.set(true);
       mainIntake.spin(forward);
       if(lastSeen == teamColor){
         colorSort.spin(forward);
@@ -245,8 +247,7 @@ void usercontrol()
         std::cout << "COLORSORT REV" << std::endl;
       }
     }else{
-      matchLoadLeft.set(false);
-      matchLoadRight.set(false);
+      matchLoad.set(false);
       mainIntake.stop();
       colorSort.stop();
       topStage.stop();
@@ -256,6 +257,17 @@ void usercontrol()
     }
     intakeFlap.set(flapState);
 
+
+
+
+    Brain.Screen.clearScreen();
+    Brain.Screen.setCursor(1,1);
+    Brain.Screen.print("Axis3: %d", Controller1.Axis3.position());
+    Brain.Screen.newLine();
+    Brain.Screen.print("Axis1: %d", Controller1.Axis1.position());
+    Brain.Screen.newLine();
+    Brain.Screen.print("color: ", isColorSorting);
+
     wait(20, msec);
   }
 }
@@ -263,8 +275,7 @@ void usercontrol()
 void toggleLift(){
   static bool liftState = false;
   liftState = !liftState;
-  intakeLiftLeft.set(liftState); 
-  intakeLiftRight.set(liftState); 
+  intakeLift.set(liftState);
 }
 
 void toggleIntakeFlap(){
@@ -296,10 +307,10 @@ void setDriveTrainConstants()
 {
     // Set the Drive PID values for the DriveTrain
     chassis.setDriveConstants(
-        0.4,  // Kp - Proportion Constant
-        0.0, // Ki - Integral Constant
-        0.1, // Kd - Derivative Constant
-        0.5, // Settle Error
+        0.27f,  // Kp - Proportion Constant
+        0.0f, // Ki - Integral Constant
+        0.1f, // Kd - Derivative Constant
+        0.5f, // Settle Error
         300, // Time to Settle
         5000 // End Time
     );
@@ -324,7 +335,8 @@ void setDriveTrainConstants()
 /// @brief Auton Slot 1 - Write code for route within this function.
 void Auton_1()
 {
-    Brain.Screen.print("Auton 1 running.");
+    Brain.Screen.print("PID Test");
+    chassis.driveDistanceWithOdom(24);
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.
@@ -337,6 +349,13 @@ void Auton_2()
 void Auton_3()
 {
     Brain.Screen.print("Auton 3 running.");
+
+
+    
+    //KEEGAN WRITE HERE
+
+
+
 }
 
 /// @brief Auton Slot 4 - Write code for route within this function.

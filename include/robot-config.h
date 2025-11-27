@@ -35,10 +35,9 @@ extern motor topStage;
 
 extern motor_group mainIntake;
 
-extern digital_out matchLoadLeft;
-extern digital_out matchLoadRight;
-extern digital_out intakeLiftLeft;
-extern digital_out intakeLiftRight;
+
+extern digital_out matchLoad;
 extern digital_out intakeFlap;
+extern digital_out intakeLift;
 
 extern optical bottomColorSort;
