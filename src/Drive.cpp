@@ -450,14 +450,16 @@ void Drive::driveDistanceWithOdom(float distance){
         linearOutput  = clamp(linearOutput,  -driveMaxVoltage, driveMaxVoltage);
         angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
 
+        std::cout << "X,Y: " << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << std::endl;
+
         driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
 
         // ---------- SAFETY: encoder-based cutoff ----------
         float encTraveled = getCurrentMotorPosition() - startEncPos;
         // stop once we've gone at least the requested distance (+ a tiny buffer)
-        if (fabs(encTraveled) >= fabs(distance) + 0.5f) {
-            break;
-        }
+        // if (fabs(encTraveled) >= fabs(distance) + 0.5f) {
+        //     break;
+        // }
         // --------------------------------------------------
 
         // Optional debug prints (keep if useful)
@@ -475,6 +477,7 @@ void Drive::driveDistanceWithOdom(float distance){
         Brain.Screen.newLine();
         Brain.Screen.print(rotation2.position(degrees));
 
+        updatePosition();
         wait(10, msec);
     }
 

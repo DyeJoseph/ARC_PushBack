@@ -42,9 +42,9 @@ using namespace vex;
     1,                   // 
     12,                   // The maximum amount of the voltage used in the drivebase (1 - 12)
     odomType,
-    2,                  //Odometry wheel diameter (set to zero if no odom)
-    -4.0,               //Odom pod1 offset 
-    -4.0                //Odom pod1 offset
+    1.93,                  //Odometry wheel diameter (set to zero if no odom)
+    -3.687,               //Odom pod1 offset 
+    -3.867                //Odom pod2 offset
   );
 
 //////////////////////////////////////////////////////////////////////
@@ -160,6 +160,8 @@ void autonomous()
 
 
   chassis.setPosition(0,0,0);
+  //chassis.driveDistance(24);
+  //chassis.driveDistanceWithOdom(24);
 
   //chassis.bezierTurn(0,0,5,5,2,12,7);
   //chassis.driveDistanceWithOdom(24);
@@ -333,12 +335,12 @@ void setDriveTrainConstants()
 {
     // Set the Drive PID values for the DriveTrain
     chassis.setDriveConstants(
-        0.32,  // Kp - Proportion Constant
+        0.35,  // Kp - Proportion Constant
         0.0003, // Ki - Integral Constant
-        0.18, // Kd - Derivative Constant
-        0.4, // Settle Error
-        250, // Time to Settle
-        5000 // End Time 5000
+        0.17, // Kd - Derivative Constant
+        .5, // Settle Error
+        300, // Time to Settle
+        3000 // End Time 5000
     );
 
     // Set the Turn PID values for the DriveTrain

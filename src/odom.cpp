@@ -191,7 +191,7 @@ void Odom::updatePositionTwoAt45(float currentLeftDegrees, float currentRightDeg
 
     //Gives answer in radians
     float deltaY = (deltaLeft + deltaRight) / sqrt(2.0);
-    float deltaX = (deltaLeft - deltaRight) / sqrt(2.0) * -1;
+    float deltaX = (deltaLeft - deltaRight) / sqrt(2.0) * -1.0;
 
     //Update x and y positions and heading
     float avgHeading = degToRad(getHeading()+deltaHeading/2.0);
