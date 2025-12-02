@@ -151,7 +151,11 @@ void autonomous()
   chassis.setPosition(0,0,0);
 
   //chassis.bezierTurn(0,0,5,5,2,12,7);
-  chassis.driveDistanceWithOdom(24);
+  //chassis.driveDistanceWithOdom(24);
+  // chassis.setTurnMaxVoltage(8);
+  // chassis.turnToAngle(90);
+  //chassis.moveToPosition(12,24);
+  //chassis.turnToPosition(24,24);
 
  
 
@@ -321,17 +325,17 @@ void setDriveTrainConstants()
 {
     // Set the Drive PID values for the DriveTrain
     chassis.setDriveConstants(
-        0.32f,  // Kp - Proportion Constant
-        0.0003f, // Ki - Integral Constant
-        0.18f, // Kd - Derivative Constant
-        0.4f, // Settle Error
+        0.32,  // Kp - Proportion Constant
+        0.0003, // Ki - Integral Constant
+        0.18, // Kd - Derivative Constant
+        0.4, // Settle Error
         250, // Time to Settle
         5000 // End Time 5000
     );
 
     // Set the Turn PID values for the DriveTrain
     chassis.setTurnConstants(
-        0.3,    // Kp - Proportion Constant
+        0.30,    // Kp - Proportion Constant
         0,      // Ki - Integral Constant
         0,      // Kd - Derivative Constant 
         0.5,    // Settle Error
@@ -349,13 +353,16 @@ void setDriveTrainConstants()
 /// @brief Auton Slot 1 - Write code for route within this function.
 void Auton_1()
 {
-    Brain.Screen.print("PID Test");
+    Brain.Screen.print("Skills 1 running.");
+    chassis.setTurnMaxVoltage(8);
+    chassis.setPosition(-47,15,90);
+
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.
 void Auton_2()
 {
-    Brain.Screen.print("Auton 2 running.");
+    Brain.Screen.print("Skills 2 running.");
 }
 
 /// @brief Auton Slot 3 - Write code for route within this function.
