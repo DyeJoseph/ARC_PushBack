@@ -24,6 +24,8 @@ using namespace vex;
 
   bool isInAuton = false;
   int lastPressed = 0;
+  int teamColor = 0; //red = 0, blue = 1
+  int driver = 0; //Elliot = 0, Jacob = 1
 
   //Prototypes
   void toggleLift();
@@ -88,21 +90,27 @@ void preAuton()
   buttons[0].setChosen(true);
 
   Text selectionLabel;
-  Button selectionButton;
-  createPreAutonScreen(selectionButton, selectionLabel);
+  Text configLabel;
+  Button startScreenButtons[5];
+  createPreAutonScreen(startScreenButtons, selectionLabel, configLabel);
   
-  //int lastPressed = 0;
   int temp;
 
   Controller1.Screen.print(buttons[lastPressed].getName().c_str());
 
   while(!isInAuton){
-    showPreAutonScreen(selectionButton, selectionLabel, buttons[lastPressed].getName());
+    showPreAutonScreen(startScreenButtons, selectionLabel, configLabel, buttons[lastPressed].getName(), teamColor, driver);
     while(currentScreen == START_SCREEN){
       if(Brain.Screen.pressing()){
-        if(checkPreAutonButton(selectionButton)){
+        if(checkPreAutonButtons(startScreenButtons, teamColor, driver, configLabel)){
           currentScreen = SELECTION_SCREEN;
         }
+        Controller1.Screen.clearLine();
+        Controller1.Screen.setCursor(1, 1);
+        std::string colorString = teamColor ? "Blue" : "Red";
+        std::string driverString = driver ? "Jacob" : "Elliot";
+        std::string controllerPrint = buttons[lastPressed].getName() + " - " + colorString + " - " + driverString;
+        Controller1.Screen.print(controllerPrint.c_str());
       }
       wait(10, msec);
     }
@@ -115,7 +123,10 @@ void preAuton()
           lastPressed = temp;
           Controller1.Screen.clearLine();
           Controller1.Screen.setCursor(1, 1);
-          Controller1.Screen.print(buttons[lastPressed].getName().c_str());
+          std::string colorString = teamColor ? "Blue" : "Red";
+          std::string driverString = driver ? "Jacob" : "Elliot";
+          std::string controllerPrint = buttons[lastPressed].getName() + " - " + colorString + " - " + driverString;
+          Controller1.Screen.print(controllerPrint.c_str());
         }
       }
       if(temp == 8)
@@ -197,7 +208,6 @@ void usercontrol()
   // User control code here, inside the loop
   bool flapState = false;
   bool isColorSorting = true;
-  int teamColor = 0; //red = 0, blue = 1
   int lastSeen = teamColor;
 
   mainIntake.setVelocity(100, percent);
@@ -214,10 +224,8 @@ void usercontrol()
 
     if(bottomColorSort.color() == vex::color::red){
       lastSeen = 0;
-      std::cout << "red" << std::endl;
     }else if(bottomColorSort.color() == vex::color::blue){
       lastSeen = 1;
-      std::cout << "blue" << std::endl;
     }
 
     if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
