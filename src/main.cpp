@@ -377,10 +377,73 @@ void Auton_2()
 void Auton_3()
 {
     Brain.Screen.print("Auton 3 running.");
-
-
-    
     //KEEGAN WRITE HERE
+
+    //SETUP
+    chassis.setPosition(-46,10.5,180);
+    chassis.setTurnMaxVoltage(8);
+    
+
+    //MOVE FORWARD AND INTAKE 2 RED
+    chassis.moveToPosition(-46, 0.5);
+    wait(1, sec);
+    
+    //GRAB 8 FROM MATCH LOADER 2
+    chassis.driveDistanceWithOdom(-10);
+    chassis.driveDistanceWithOdom(-36.2);
+    chassis.moveToPosition(-58, 46.7);
+    wait(1, sec);
+
+    //LOAD 7 INTO LONG GOAL 1 (5RED, THEN 2BLUE)
+    chassis.driveDistanceWithOdom(-5);
+    chassis.moveToPosition(-32, 46.7);
+    wait(-1, sec);
+
+    //GRAB 2 BLUE AT TOP
+    chassis.driveDistanceWithOdom(-14);
+    chassis.moveToPosition(-46, 62.5);
+    wait(1, sec);
+
+    //GRAB 4 FROM START
+    chassis.driveDistanceWithOdom(-10);
+    chassis.moveToPosition(-30,0);
+    chassis.moveToPosition(-46,0);
+    wait(1, sec);
+
+    //LOAD INTO UPPER GOAL
+    chassis.driveDistanceWithOdom(-10);
+    chassis.moveToPosition(-17.5, 18.5);
+    chassis.moveToPosition(-13, 13.5);
+    wait(-1, sec);
+
+    //BLOCK LOWER MIDDLE GOAL
+    chassis.driveDistanceWithOdom(-10);
+    chassis.moveToPosition(-19.6, -4.9);
+    chassis.turnToAngle(140);
+
+    //GRAB 8 FROM MATCH LOADER
+    chassis.moveToPosition(-47, -47);
+    chassis.moveToPosition(-58, -47);
+    wait(1, sec);
+
+    //GRAB 2 BLUE FROM BOTTOM
+    chassis.driveDistanceWithOdom(-11);
+    chassis.moveToPosition(-47, -62.5);
+    wait(1, sec);
+
+    //LOAD IN TO BOTTOM LONG GOAL 2
+    chassis.driveDistanceWithOdom(-15.5);
+    chassis.moveToPosition(-31.7, -47);
+    wait(-1, sec);
+
+    //RAM INTO PARK ZONE
+    chassis.driveDistanceWithOdom(-20);
+    chassis.moveToPosition(-63.8, -8.2);
+
+
+
+
+  
 
 
 
