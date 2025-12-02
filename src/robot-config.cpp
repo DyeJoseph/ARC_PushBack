@@ -22,14 +22,14 @@ motor RBT = motor(PORT2, ratio6_1, true);
 ///////////////////////////////////////////
 
 //////////// Odometry Sensors ////////////
-rotation rotation1 = rotation(PORT18);
-rotation rotation2 = rotation(PORT17);
+rotation rotation1 = rotation(PORT13);
+rotation rotation2 = rotation(PORT12);
 
 /////////////////////////////////////////
 
 //////////// Inertial Sensors ////////////
 
-inertial inertial1 = inertial(PORT20);
+inertial inertial1 = inertial(PORT14);
 
 /////////////////////////////////////////
 
@@ -42,11 +42,11 @@ motor topStage = motor(PORT18, ratio6_1, false); //not always spinning
 motor_group mainIntake = motor_group(intakeL, intakeR, bottomStage);
 
 //Pistons
-digital_out matchLoadLeft = digital_out(Brain.ThreeWirePort.A);
-digital_out matchLoadRight = digital_out(Brain.ThreeWirePort.B);
-digital_out intakeLiftLeft = digital_out(Brain.ThreeWirePort.C);
-digital_out intakeLiftRight = digital_out(Brain.ThreeWirePort.D);
-digital_out intakeFlap = digital_out(Brain.ThreeWirePort.E);
+digital_out matchLoad = digital_out(Brain.ThreeWirePort.H);
+digital_out intakeFlap = digital_out(Brain.ThreeWirePort.A);
+digital_out intakeLift = digital_out(Brain.ThreeWirePort.D);
+
+
 
 //Color Sort Opticals
 optical bottomColorSort = optical(PORT11);

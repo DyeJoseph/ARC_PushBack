@@ -83,18 +83,38 @@ void Drive::setTurnConstants(float Kp, float Ki, float Kd, float settleError, fl
 
 void Drive::arcade()
 {
-    int leftY = Controller1.Axis3.position(percent);
-    int rightX = Controller1.Axis1.position(percent);
+    int leftY = 0;
+    int rightX = 0;
+    if(Controller1.Axis3.position(percent) >= 0)
+        leftY = pow(Controller1.Axis3.position(percent),2)/100;
+    else
+        leftY = pow(Controller1.Axis3.position(percent),2)/-100;
+    
+    if(Controller1.Axis1.position(percent) >= 0)
+        rightX = pow(Controller1.Axis1.position(percent),2)/100;
+    else
+        rightX = pow(Controller1.Axis1.position(percent),2)/-100;
+
     leftDrive.spin(forward, leftY+rightX, percent);
     rightDrive.spin(forward, leftY-rightX, percent);
 }
 
 
 void Drive::tank(){
-    int leftY = Controller1.Axis3.position(percent);
-    int rightY = Controller1.Axis2.position(percent);
+    int leftY = 0;
+    int rightX = 0;
+    if(Controller1.Axis3.position(percent) >= 0)
+        leftY = pow(Controller1.Axis3.position(percent),2)/100;
+    else
+        leftY = pow(Controller1.Axis3.position(percent),2)/-100;
+    
+    if(Controller1.Axis2.position(percent) >= 0)
+        rightX = pow(Controller1.Axis2.position(percent),2)/100;
+    else
+        rightX = pow(Controller1.Axis2.position(percent),2)/-100;
+
     leftDrive.spin(forward, leftY, percent);
-    rightDrive.spin(forward, rightY, percent);
+    rightDrive.spin(forward, rightX, percent);
 }
 
 /// @brief Gets the current position of the drive base
@@ -313,49 +333,142 @@ void Drive::moveToPosition(float desX, float desY){
     updatePosition();
 }
 
+//Original
+// void Drive::driveDistanceWithOdom(float distance){
+//     // Creates PID objects for linear and angular output
+//     //float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime
+//     PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime);
+//     PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
+    
+//     updatePosition();
+//     // Sets the starting variables for the Position and Heading
+//     float xToGo = cos(degToRad(inertial1.heading()))* distance;
+//     float yToGo = sin(degToRad(inertial1.heading()))* distance;
+//     float startHeading = inertial1.heading();
+
+//     float targetX = chassisOdometry.getXPosition() + xToGo;
+//     float targetY = chassisOdometry.getYPosition() + yToGo;
+
+//     //  Loops while the linear PID has not yet settled
+//     while(!linearPID.isSettled())
+//     {
+//         updatePosition();
+//         // Updates the Error for the linear values and the angular values
+//         float linearError = sqrt(pow(targetX - chassisOdometry.getXPosition(), 2.0) + pow(targetY - chassisOdometry.getYPosition(), 2.0));
+
+        
+//         float angularError = degTo180(startHeading - inertial1.heading());
+
+//         xToGo = cos(degToRad(inertial1.heading())) * linearError;
+//         yToGo = sin(degToRad(inertial1.heading())) * linearError;
+
+//         // Sets the linear output and angular output to the output of the error passed through the PID compute functions
+//         float linearOutput = linearPID.compute(linearError);
+//         float angularOutput = angularPID.compute(angularError);
+
+//         // Clamps the values of the output to fit within the -12 to 12 volt limit of the vex motors
+//         linearOutput = clamp(linearOutput, -driveMaxVoltage, driveMaxVoltage);
+//         angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
+
+//         // Drives motors according to the linear Output and includes the linear Output to keep the robot in a straight path relative to is start heading
+//         driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
+
+//         Brain.Screen.clearScreen();
+//         Brain.Screen.setCursor(1,1);
+//         Brain.Screen.print(linearOutput);
+
+//         wait(10, msec);
+//     }
+//     // Stops the motors once PID has settled
+//     brake();
+//     updatePosition();
+// }
+
+//Modified
 void Drive::driveDistanceWithOdom(float distance){
     // Creates PID objects for linear and angular output
-    //float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime
     PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime);
     PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
-    
+
     updatePosition();
-    // Sets the starting variables for the Position and Heading
-    float xToGo = cos(degToRad(inertial1.heading()))* distance;
-    float yToGo = sin(degToRad(inertial1.heading()))* distance;
-    float startHeading = inertial1.heading();
 
-    float targetX = chassisOdometry.getXPosition() + xToGo;
-    float targetY = chassisOdometry.getYPosition() + yToGo;
+    // --- Starting pose (field coordinates & heading) ---
+    float startHeadingDeg = inertial1.heading();
+    float startHeadingRad = degToRad(startHeadingDeg);
 
-    //  Loops while the linear PID has not yet settled
-    while(!linearPID.isSettled())
+    // Unit forward direction based on starting heading
+    float dirX = sin(startHeadingRad);
+    float dirY = cos(startHeadingRad);
+
+    // Starting position in field coordinates
+    float startX = chassisOdometry.getXPosition();
+    float startY = chassisOdometry.getYPosition();
+
+    // Target point in field coordinates (distance along starting heading)
+    float targetX = startX + dirX * distance;
+    float targetY = startY + dirY * distance;
+
+    // --- Encoder-based safety fallback ---
+    float startEncPos = getCurrentMotorPosition();   // inches at start
+
+    while (!linearPID.isSettled())
     {
         updatePosition();
-        // Updates the Error for the linear values and the angular values
-        float linearError = sqrt(pow(targetX - chassisOdometry.getXPosition(), 2.0) + pow(targetY - chassisOdometry.getYPosition(), 2.0));
-        float angularError = degTo180(startHeading - inertial1.heading());
 
-        xToGo = cos(degToRad(inertial1.heading())) * linearError;
-        yToGo = sin(degToRad(inertial1.heading())) * linearError;
+        // Odom-based pose
+        float curX = chassisOdometry.getXPosition();
+        float curY = chassisOdometry.getYPosition();
 
-        // Sets the linear output and angular output to the output of the error passed through the PID compute functions
-        float linearOutput = linearPID.compute(linearError);
+        float dx = targetX - curX;
+        float dy = targetY - curY;
+
+        // Signed error along the original heading:
+        // >0 => target is in front, <0 => target is behind
+        float linearError  = dx * dirX + dy * dirY;
+        float angularError = degTo180(startHeadingDeg - inertial1.heading());
+
+        float linearOutput  = linearPID.compute(linearError);
         float angularOutput = angularPID.compute(angularError);
 
-        // Clamps the values of the output to fit within the -12 to 12 volt limit of the vex motors
-        linearOutput = clamp(linearOutput, -driveMaxVoltage, driveMaxVoltage);
+        linearOutput  = clamp(linearOutput,  -driveMaxVoltage, driveMaxVoltage);
         angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
 
-        // Drives motors according to the linear Output and includes the linear Output to keep the robot in a straight path relative to is start heading
         driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
+
+        // ---------- SAFETY: encoder-based cutoff ----------
+        float encTraveled = getCurrentMotorPosition() - startEncPos;
+        // stop once we've gone at least the requested distance (+ a tiny buffer)
+        if (fabs(encTraveled) >= fabs(distance) + 0.5f) {
+            break;
+        }
+        // --------------------------------------------------
+
+        // Optional debug prints (keep if useful)
+        Brain.Screen.clearScreen();
+        Brain.Screen.setCursor(1,1);
+        Brain.Screen.print(linearOutput);
+        Brain.Screen.newLine();
+        Brain.Screen.print(linearError);
+        Brain.Screen.newLine();
+        Brain.Screen.print(chassisOdometry.getXPosition());
+        Brain.Screen.newLine();
+        Brain.Screen.print(chassisOdometry.getYPosition());
+        Brain.Screen.newLine();
+        Brain.Screen.print(rotation1.position(degrees));
+        Brain.Screen.newLine();
+        Brain.Screen.print(rotation2.position(degrees));
 
         wait(10, msec);
     }
-    // Stops the motors once PID has settled
-    //brake();
+
+    // Make absolutely sure we stop
+    brake();
+    driveMotors(0, 0);
     updatePosition();
 }
+
+
+
 
 void Drive::turnToPosition(float desX, float desY){
     updatePosition();
@@ -427,6 +540,40 @@ void Drive::updatePosition(){
     }
 }
 
+// void Drive::setPosition(float x, float y, float heading){
+//     chassisOdometry.setPosition(x, y, heading);
+// }
+
+
 void Drive::setPosition(float x, float y, float heading){
+    // Reset odom pose
     chassisOdometry.setPosition(x, y, heading);
+
+    // Sync odom encoder baselines with the actual sensors
+    switch (odomType) {
+        case NO_ODOM:
+            // Using drive motors as odom
+            chassisOdometry.setForwardRightDegrees(rightDrive.position(degrees));
+            chassisOdometry.setForwardLeftDegrees(leftDrive.position(degrees));
+            chassisOdometry.setLateralDegrees(0);
+            break;
+
+        case HORIZONTAL_AND_VERTICAL:
+            // Using rotation1 and rotation2
+            chassisOdometry.setForwardLeftDegrees(rotation1.position(degrees));
+            chassisOdometry.setLateralDegrees(rotation2.position(degrees));
+            // If you have a second forward sensor, set it here too
+            break;
+
+        case TWO_AT_45:
+            // Whatever sensors you're using in this mode
+            // Example (if both are vertical tracking wheels):
+            chassisOdometry.setForwardRightDegrees(rotation1.position(degrees));
+            chassisOdometry.setForwardLeftDegrees(rotation2.position(degrees));
+            chassisOdometry.setLateralDegrees(0);
+            break;
+
+        default:
+            break;
+    }
 }
