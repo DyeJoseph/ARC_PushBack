@@ -66,6 +66,10 @@ void Auton_8();
 void preAuton() 
 {
   setDriveTrainConstants();
+
+  chassis.brake(coast);       // make sure they aren’t holding weirdly
+  chassis.driveMotors(0, 0);  
+
   enum preAutonStates{START_SCREEN = 0, SELECTION_SCREEN = 1};
   int currentScreen = START_SCREEN;
   int lastPressed = 0;
@@ -132,14 +136,24 @@ void autonomous()
   rotation1.resetPosition();
   rotation2.resetPosition();
   inertial1.resetHeading();
+  wait(100, msec);
 
   setDriveTrainConstants();
+
+
+ 
+  // Tiny forward preload to take up slack
+  chassis.driveMotors(2, 2); // 2 volts forward for a moment
+  wait(100, msec);
+  chassis.brake(hold);
+
+
   chassis.setPosition(0,0,0);
 
   //chassis.bezierTurn(0,0,5,5,2,12,7);
   chassis.driveDistanceWithOdom(24);
-  // chassis.moveToPosition(24,24);
-  // chassis.turnToAngle(45);
+
+ 
 
   // switch (lastPressed) 
   // {
@@ -307,12 +321,12 @@ void setDriveTrainConstants()
 {
     // Set the Drive PID values for the DriveTrain
     chassis.setDriveConstants(
-        0.27f,  // Kp - Proportion Constant
-        0.0f, // Ki - Integral Constant
-        0.1f, // Kd - Derivative Constant
-        0.5f, // Settle Error
-        300, // Time to Settle
-        5000 // End Time
+        0.32f,  // Kp - Proportion Constant
+        0.0003f, // Ki - Integral Constant
+        0.18f, // Kd - Derivative Constant
+        0.4f, // Settle Error
+        250, // Time to Settle
+        5000 // End Time 5000
     );
 
     // Set the Turn PID values for the DriveTrain
@@ -336,7 +350,6 @@ void setDriveTrainConstants()
 void Auton_1()
 {
     Brain.Screen.print("PID Test");
-    chassis.driveDistanceWithOdom(24);
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.

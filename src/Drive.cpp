@@ -387,19 +387,18 @@ void Drive::moveToPosition(float desX, float desY){
 //Modified
 void Drive::driveDistanceWithOdom(float distance){
     // Creates PID objects for linear and angular output
-    //float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime
     PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime);
     PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
-    
+
     updatePosition();
-    // Sets the starting variables for the Position and Heading
-    // --- Starting pose ---
-    float startHeading    = inertial1.heading();
-    float startHeadingRad = degToRad(startHeading);
+
+    // --- Starting pose (field coordinates & heading) ---
+    float startHeadingDeg = inertial1.heading();
+    float startHeadingRad = degToRad(startHeadingDeg);
 
     // Unit forward direction based on starting heading
-    float dirX = cos(startHeadingRad);
-    float dirY = sin(startHeadingRad);
+    float dirX = sin(startHeadingRad);
+    float dirY = cos(startHeadingRad);
 
     // Starting position in field coordinates
     float startX = chassisOdometry.getXPosition();
@@ -409,68 +408,65 @@ void Drive::driveDistanceWithOdom(float distance){
     float targetX = startX + dirX * distance;
     float targetY = startY + dirY * distance;
 
-    //  Loops while the linear PID has not yet settled
-        //  Loops while the linear PID has not yet settled
-bool directionChecked = false;
+    // --- Encoder-based safety fallback ---
+    float startEncPos = getCurrentMotorPosition();   // inches at start
 
-while (!linearPID.isSettled())
-{
-    updatePosition();
+    while (!linearPID.isSettled())
+    {
+        updatePosition();
 
-    float curX = chassisOdometry.getXPosition();
-    float curY = chassisOdometry.getYPosition();
+        // Odom-based pose
+        float curX = chassisOdometry.getXPosition();
+        float curY = chassisOdometry.getYPosition();
 
-    float dx = targetX - curX;
-    float dy = targetY - curY;
+        float dx = targetX - curX;
+        float dy = targetY - curY;
 
-    // signed error: >0 = target in front, <0 = target behind
-    float linearError = dx * dirX + dy * dirY;
-    float angularError = degTo180(startHeading - inertial1.heading());
+        // Signed error along the original heading:
+        // >0 => target is in front, <0 => target is behind
+        float linearError  = dx * dirX + dy * dirY;
+        float angularError = degTo180(startHeadingDeg - inertial1.heading());
 
-    // 🔐 One-time safety: make sure we start moving the correct way
-    if (!directionChecked) {
-        directionChecked = true;
+        float linearOutput  = linearPID.compute(linearError);
+        float angularOutput = angularPID.compute(angularError);
 
-        // If we asked for positive distance but error is negative (or vice versa), flip direction
-        if ((distance > 0 && linearError < 0) ||
-            (distance < 0 && linearError > 0))
-        {
-            // Flip our assumption of "forward"
-            dirX = -dirX;
-            dirY = -dirY;
+        linearOutput  = clamp(linearOutput,  -driveMaxVoltage, driveMaxVoltage);
+        angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
 
-            // Recompute target based on flipped direction
-            targetX = startX + dirX * distance;
-            targetY = startY + dirY * distance;
+        driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
 
-            // Recompute error with new direction
-            dx = targetX - curX;
-            dy = targetY - curY;
-            linearError = dx * dirX + dy * dirY;
+        // ---------- SAFETY: encoder-based cutoff ----------
+        float encTraveled = getCurrentMotorPosition() - startEncPos;
+        // stop once we've gone at least the requested distance (+ a tiny buffer)
+        if (fabs(encTraveled) >= fabs(distance) + 0.5f) {
+            break;
         }
+        // --------------------------------------------------
+
+        // Optional debug prints (keep if useful)
+        Brain.Screen.clearScreen();
+        Brain.Screen.setCursor(1,1);
+        Brain.Screen.print(linearOutput);
+        Brain.Screen.newLine();
+        Brain.Screen.print(linearError);
+        Brain.Screen.newLine();
+        Brain.Screen.print(chassisOdometry.getXPosition());
+        Brain.Screen.newLine();
+        Brain.Screen.print(chassisOdometry.getYPosition());
+        Brain.Screen.newLine();
+        Brain.Screen.print(rotation1.position(degrees));
+        Brain.Screen.newLine();
+        Brain.Screen.print(rotation2.position(degrees));
+
+        wait(10, msec);
     }
 
-    float linearOutput  = linearPID.compute(linearError);
-    float angularOutput = angularPID.compute(angularError);
-
-    linearOutput  = clamp(linearOutput,  -driveMaxVoltage, driveMaxVoltage);
-    angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
-
-    driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
-
-    Brain.Screen.clearScreen();
-    Brain.Screen.setCursor(1,1);
-    Brain.Screen.print(linearOutput);
-    Brain.Screen.newLine();
-    Brain.Screen.print(linearError);
-
-    wait(10, msec);
+    // Make absolutely sure we stop
+    brake();
+    driveMotors(0, 0);
+    updatePosition();
 }
 
-brake();
-updatePosition();
-
-}
 
 
 
@@ -544,6 +540,40 @@ void Drive::updatePosition(){
     }
 }
 
+// void Drive::setPosition(float x, float y, float heading){
+//     chassisOdometry.setPosition(x, y, heading);
+// }
+
+
 void Drive::setPosition(float x, float y, float heading){
+    // Reset odom pose
     chassisOdometry.setPosition(x, y, heading);
+
+    // Sync odom encoder baselines with the actual sensors
+    switch (odomType) {
+        case NO_ODOM:
+            // Using drive motors as odom
+            chassisOdometry.setForwardRightDegrees(rightDrive.position(degrees));
+            chassisOdometry.setForwardLeftDegrees(leftDrive.position(degrees));
+            chassisOdometry.setLateralDegrees(0);
+            break;
+
+        case HORIZONTAL_AND_VERTICAL:
+            // Using rotation1 and rotation2
+            chassisOdometry.setForwardLeftDegrees(rotation1.position(degrees));
+            chassisOdometry.setLateralDegrees(rotation2.position(degrees));
+            // If you have a second forward sensor, set it here too
+            break;
+
+        case TWO_AT_45:
+            // Whatever sensors you're using in this mode
+            // Example (if both are vertical tracking wheels):
+            chassisOdometry.setForwardRightDegrees(rotation1.position(degrees));
+            chassisOdometry.setForwardLeftDegrees(rotation2.position(degrees));
+            chassisOdometry.setLateralDegrees(0);
+            break;
+
+        default:
+            break;
+    }
 }

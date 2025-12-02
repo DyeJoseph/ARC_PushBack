@@ -181,7 +181,7 @@ void Odom::updatePositionTwoAt45(float currentLeftDegrees, float currentRightDeg
     float deltaRight = currentRightPosition - oldRightPosition;
     float deltaLeft = currentLeftPosition - oldLeftPosition;
 
-    float deltaHeading = headingGyro - heading;
+    float deltaHeading = degTo180(headingGyro - heading);
 
     if(fabs(deltaHeading) > 0.01){
         //THIS MAY NEED TO BE += INSTEAD
