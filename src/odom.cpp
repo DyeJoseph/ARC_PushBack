@@ -104,7 +104,7 @@ void Odom::updatePositionTwoForward(float currentForwardRightDegrees, float curr
     float deltaX;
     float deltaHeading = (deltaForwardLeft-deltaForwardRight)/(forwardLeftRotationDistance+forwardRightRotationDistance);
     
-    if(deltaHeading==0.0){
+    if(deltaHeading < 0.01){
         deltaX=deltaLateral;
         deltaY=deltaForwardRight;
     }else{
