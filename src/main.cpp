@@ -375,6 +375,61 @@ void Auton_3()
 void Auton_4()
 {
     Brain.Screen.print("Auton 4 running.");
+    chassis.setTurnMaxVoltage(8);
+
+    ///////// SETTING UP FOR UNDER LONG GOAL PART /////////
+    chassis.setPosition(-55.5, -17, 180); // starting position
+    chassis.driveDistanceWithOdom(2); // to get away from park zone
+    chassis.moveToPosition(-29.5, -60);
+
+    ///////// GETTING 2 RED UNDER LONG GOAL /////////
+    chassis.moveToPosition(-7.5, -60);
+    chassis.moveToPosition(-7.5, -56);
+    wait(1, sec); // grabs 2 red  
+
+    ///////// GETTING 2 BLUE UNDER LONG GOAL /////////
+    chassis.driveDistanceWithOdom(-4);
+    chassis.moveToPosition(7.5, -60);
+    chassis.moveToPosition(7.5, -56);
+    wait(1, sec); // grabs 2 blue
+
+    ///////// SETTING UP FOR MATCH LOADER PART /////////
+    chassis.driveDistanceWithOdom(-4);
+    chassis.moveToPosition(33, -60);
+
+    ///////// GETTING 3 BLUE FROM MATCH LOADER /////////
+    chassis.moveToPosition(51, -47);
+    chassis.moveToPosition(57.5, -47);
+    wait(1, sec); // intakes 3 blue
+
+    ///////// SCORING INTO LONG GOAL /////////
+    chassis.moveToPosition(32, -47);
+    wait(1, sec); // scores 2 red, and 5 blue
+    
+    ///////// GETTING 3 RED FROM MATCH LOADER /////////
+    chassis.moveToPosition(57.5, -47);
+    wait(1, sec); // intakes 3 red
+    chassis.driveDistanceWithOdom(-6.5);
+
+    ///////// GETTING 4 RED FROM BLUE PARKING ZONE /////////
+    chassis.moveToPosition(41, 0.5);
+    chassis.moveToPosition(46, 0.5);
+    wait(1, sec); // intakes 4 red
+    chassis.driveDistanceWithOdom(-5);
+
+    ///////// SCORING 7 RED  IN BOTTOM X /////////
+    chassis.moveToPosition(20,21);
+    chassis.moveToPosition(17.5, 18);
+    wait(1, sec); // scores 7 red in bottom X
+    
+
+
+
+
+
+
+
+
 }
 
 /// @brief Auton Slot 5 - Write code for route within this function.
