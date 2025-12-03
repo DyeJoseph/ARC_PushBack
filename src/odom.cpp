@@ -199,11 +199,11 @@ void Odom::updatePositionTwoAt45(float currentLeftDegrees, float currentRightDeg
     // float deltaX = (deltaLeft - deltaRight) / 1.462708 * -1.0;
 
     float deltaY = (deltaLeft + deltaRight) / 1.3382612;
-    float deltaX = (deltaLeft - deltaRight) / 1.4862896 * -1.0;
+    float deltaX = (deltaLeft - deltaRight) / 1.4862896;
 
     //Update x and y positions and heading
     float avgHeading = degToRad(getHeading()+deltaHeading/2.0);
-    float globalDeltaX = deltaX * cos(avgHeading) - deltaY * sin(avgHeading);
+    float globalDeltaX = deltaX * cos(avgHeading) + deltaY * sin(avgHeading);
     float globalDeltaY = deltaX * sin(avgHeading) + deltaY * cos(avgHeading);
     setPosition((globalDeltaX+getXPosition()), (globalDeltaY+getYPosition()), headingGyro);
     

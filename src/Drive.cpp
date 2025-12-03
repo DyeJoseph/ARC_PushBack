@@ -425,8 +425,7 @@ void Drive::driveDistanceWithOdom(float distance){
     float targetX = startX + dirX * distance;
     float targetY = startY + dirY * distance;
 
-    // --- Encoder-based safety fallback ---
-    float startEncPos = getCurrentMotorPosition();   // inches at start
+
 
     int i =0;
 
@@ -438,7 +437,7 @@ void Drive::driveDistanceWithOdom(float distance){
         float curX = chassisOdometry.getXPosition();
         float curY = chassisOdometry.getYPosition();
 
-        float dx = targetX + curX;
+        float dx = targetX - curX;
         float dy = targetY - curY;
 
         // Signed error along the original heading:
@@ -451,7 +450,6 @@ void Drive::driveDistanceWithOdom(float distance){
         linearOutput  = clamp(linearOutput,  -driveMaxVoltage, driveMaxVoltage);
         angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
 
-        //std::cout << "X,Y: " << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << std::endl;
 
         driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
 
@@ -472,6 +470,8 @@ void Drive::driveDistanceWithOdom(float distance){
         //std::cout << "Target X: " << targetX << std::endl;
         if(i%10==0){
             //std::cout << "CurX, CurY: " << curX << ", " << curY << std::endl;
+            std::cout << "X,Y: " << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << std::endl;
+
             std::cout << "Linear Error: " << linearError << std::endl;
         }
         

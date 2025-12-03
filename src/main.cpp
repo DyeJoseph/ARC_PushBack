@@ -159,18 +159,18 @@ void autonomous()
   chassis.brake(hold);
 
 
-  chassis.setPosition(0,0,0);
-  //chassis.driveDistance(24);
-  //chassis.driveDistanceWithOdom(48);
-  chassis.driveDistanceWithOdom(10);
+  // chassis.setPosition(0,0,0);
+  // // chassis.driveDistance(72);
+  // // chassis.driveDistanceWithOdom(48);
+  chassis.driveDistanceWithOdom(12);
   chassis.turnToAngle(90);
   //wait(5, sec);
-  chassis.driveDistanceWithOdom(10);
-  // chassis.turnToAngle(180);
-  // chassis.driveDistanceWithOdom(72);
-  // chassis.turnToAngle(270);
-  // chassis.driveDistanceWithOdom(48);
-  //chassis.turnToAngle(0);
+  chassis.driveDistanceWithOdom(12);
+  chassis.turnToAngle(180);
+  chassis.driveDistanceWithOdom(12);
+  chassis.turnToAngle(270);
+  chassis.driveDistanceWithOdom(12);
+  chassis.turnToAngle(0);
   //chassis.moveable();
 
   //chassis.brake(hold);
