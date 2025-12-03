@@ -228,7 +228,7 @@ void usercontrol()
   bool isColorSorting = true;
   int lastSeen = teamColor;
 
-  mainIntake.setVelocity(100, percent);
+  mainIntake.setVelocity(85, percent);
   colorSort.setVelocity(100, percent);
   topStage.setVelocity(100, percent);
 
@@ -236,9 +236,12 @@ void usercontrol()
   Controller1.ButtonUp.pressed(toggleIntakeFlap);
 
   bottomColorSort.setLight(ledState::on);
+  bottomColorSort.integrationTime(20);
   while (1) {
-    chassis.arcade();
-    
+    if(driver)
+      chassis.tank();
+    else
+      chassis.arcade();
 
     if(bottomColorSort.color() == vex::color::red){
       lastSeen = 0;
@@ -255,25 +258,20 @@ void usercontrol()
       }
       if(lastSeen == teamColor){
         colorSort.spin(forward);
-        std::cout << "COLORSORT FWD" << std::endl;
       }else{
         colorSort.spin(reverse);
-        std::cout << "COLORSORT REV" << std::endl;
-
       }
     }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
       mainIntake.spin(reverse);
       topStage.spin(reverse);
-      colorSort.spin(fwd,10,pct);
+      colorSort.spin(forward, 25, percent);
     }else if(Controller1.ButtonL2.pressing()){
       matchLoad.set(true);
       mainIntake.spin(forward);
       if(lastSeen == teamColor){
         colorSort.spin(forward);
-        std::cout << "COLORSORT FWD" << std::endl;
       }else{
         colorSort.spin(reverse);
-        std::cout << "COLORSORT REV" << std::endl;
       }
     }else if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
       mainIntake.spin(forward);
@@ -281,10 +279,8 @@ void usercontrol()
       flapState = true;
       if(lastSeen == teamColor){
         colorSort.spin(forward);
-        std::cout << "COLORSORT FWD" << std::endl;
       }else{
         colorSort.spin(reverse);
-        std::cout << "COLORSORT REV" << std::endl;
       }
     }else{
       matchLoad.set(false);
@@ -306,7 +302,7 @@ void usercontrol()
     Brain.Screen.newLine();
     Brain.Screen.print("Axis1: %d", Controller1.Axis1.position());
     Brain.Screen.newLine();
-    Brain.Screen.print("color: ", isColorSorting);
+    Brain.Screen.print("color: ", lastSeen);
 
     wait(20, msec);
   }
