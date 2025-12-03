@@ -13,6 +13,7 @@
 #include "Drive.h"
 #include "images.h"
 
+
 using namespace vex;
 
 ////////////////////////// GLOBAL VARIABLES //////////////////////////
@@ -38,11 +39,11 @@ using namespace vex;
     motor_group(LFT, LFB, LBB, LBT), // Left drive train motors
     motor_group(RFT, RFB, RBB, RBT), // Right drive train motors
     PORT20,               // Inertial Sensor Port
-    2.75,              // The diameter size of the wheel in inches
+    2.66,              // The diameter size of the wheel in inches
     1,                   // 
     12,                   // The maximum amount of the voltage used in the drivebase (1 - 12)
     odomType,
-    1.93,                  //Odometry wheel diameter (set to zero if no odom)
+    1.955,                  //Odometry wheel diameter (set to zero if no odom) (1.96 robot behind by .2)
     -3.687,               //Odom pod1 offset 
     -3.867                //Odom pod2 offset
   );
@@ -142,7 +143,6 @@ void preAuton()
 void autonomous() 
 {  
   //drawSponsors();
-
   isInAuton = true;
   rotation1.resetPosition();
   rotation2.resetPosition();
@@ -154,14 +154,26 @@ void autonomous()
 
  
   // Tiny forward preload to take up slack
-  chassis.driveMotors(2, 2); // 2 volts forward for a moment
-  wait(100, msec);
+  // chassis.driveMotors(2, 2); // 2 volts forward for a moment
+  // wait(100, msec);
   chassis.brake(hold);
 
 
   chassis.setPosition(0,0,0);
   //chassis.driveDistance(24);
-  //chassis.driveDistanceWithOdom(24);
+  //chassis.driveDistanceWithOdom(48);
+  chassis.driveDistanceWithOdom(10);
+  chassis.turnToAngle(90);
+  //wait(5, sec);
+  chassis.driveDistanceWithOdom(10);
+  // chassis.turnToAngle(180);
+  // chassis.driveDistanceWithOdom(72);
+  // chassis.turnToAngle(270);
+  // chassis.driveDistanceWithOdom(48);
+  //chassis.turnToAngle(0);
+  //chassis.moveable();
+
+  //chassis.brake(hold);
 
   //chassis.bezierTurn(0,0,5,5,2,12,7);
   //chassis.driveDistanceWithOdom(24);
@@ -335,10 +347,10 @@ void setDriveTrainConstants()
 {
     // Set the Drive PID values for the DriveTrain
     chassis.setDriveConstants(
-        0.35,  // Kp - Proportion Constant
+        0.7,  // Kp - Proportion Constant
         0.0003, // Ki - Integral Constant
-        0.17, // Kd - Derivative Constant
-        .5, // Settle Error
+        0.01, // Kd - Derivative Constant was 0.17
+        .2, // Settle Error
         300, // Time to Settle
         3000 // End Time 5000
     );

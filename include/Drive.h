@@ -55,6 +55,14 @@ class Drive
     void driveDistance(float distance, float maxVoltage);
     void driveDistanceWithOdom(float distance);
 
+
+
+    void moveable();
+
+
+
+
+
     void setMaxVoltage(float volts);
     float getMaxVoltage();
 

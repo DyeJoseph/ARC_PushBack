@@ -284,7 +284,7 @@ void Drive::turnToAngle(float angle, float maxVoltage)
         driveMotors(-output, output);
         task::sleep(10);
     }while(!turnPID.isSettled());
-    driveMotors(0,0);
+    brake();
     updatePosition();
 }
 
@@ -428,6 +428,8 @@ void Drive::driveDistanceWithOdom(float distance){
     // --- Encoder-based safety fallback ---
     float startEncPos = getCurrentMotorPosition();   // inches at start
 
+    int i =0;
+
     while (!linearPID.isSettled())
     {
         updatePosition();
@@ -436,11 +438,10 @@ void Drive::driveDistanceWithOdom(float distance){
         float curX = chassisOdometry.getXPosition();
         float curY = chassisOdometry.getYPosition();
 
-        float dx = targetX - curX;
+        float dx = targetX + curX;
         float dy = targetY - curY;
 
         // Signed error along the original heading:
-        // >0 => target is in front, <0 => target is behind
         float linearError  = dx * dirX + dy * dirY;
         float angularError = degTo180(startHeadingDeg - inertial1.heading());
 
@@ -450,32 +451,31 @@ void Drive::driveDistanceWithOdom(float distance){
         linearOutput  = clamp(linearOutput,  -driveMaxVoltage, driveMaxVoltage);
         angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
 
-        std::cout << "X,Y: " << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << std::endl;
+        //std::cout << "X,Y: " << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << std::endl;
 
         driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
 
-        // ---------- SAFETY: encoder-based cutoff ----------
-        float encTraveled = getCurrentMotorPosition() - startEncPos;
-        // stop once we've gone at least the requested distance (+ a tiny buffer)
-        // if (fabs(encTraveled) >= fabs(distance) + 0.5f) {
-        //     break;
-        // }
-        // --------------------------------------------------
 
         // Optional debug prints (keep if useful)
         Brain.Screen.clearScreen();
         Brain.Screen.setCursor(1,1);
-        Brain.Screen.print(linearOutput);
-        Brain.Screen.newLine();
-        Brain.Screen.print(linearError);
-        Brain.Screen.newLine();
         Brain.Screen.print(chassisOdometry.getXPosition());
         Brain.Screen.newLine();
         Brain.Screen.print(chassisOdometry.getYPosition());
         Brain.Screen.newLine();
+        Brain.Screen.print(targetX);
+        Brain.Screen.newLine();
         Brain.Screen.print(rotation1.position(degrees));
         Brain.Screen.newLine();
         Brain.Screen.print(rotation2.position(degrees));
+        
+        //std::cout << "Target X: " << targetX << std::endl;
+        if(i%10==0){
+            //std::cout << "CurX, CurY: " << curX << ", " << curY << std::endl;
+            std::cout << "Linear Error: " << linearError << std::endl;
+        }
+        
+        i++;
 
         updatePosition();
         wait(10, msec);
@@ -487,6 +487,24 @@ void Drive::driveDistanceWithOdom(float distance){
     updatePosition();
 }
 
+void Drive::moveable(){
+    //updates odom and printx x and y position
+    while (true) {
+        brake(coast);
+        updatePosition();
+        float x = chassisOdometry.getXPosition();
+        float y = chassisOdometry.getYPosition();
+        std::cout << "X: " << x << ", Y: " << y << std::endl;
+        Brain.Screen.clearScreen();
+        Brain.Screen.setCursor(1,1);
+        Brain.Screen.print("X: ");
+        Brain.Screen.print(x);
+        Brain.Screen.newLine();
+        Brain.Screen.print("Y: ");
+        Brain.Screen.print(y);
+        wait(50, msec); 
+    }
+}
 
 
 
