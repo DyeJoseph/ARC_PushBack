@@ -501,6 +501,30 @@ void Auton_4()
     chassis.moveToPosition(20,21);
     chassis.moveToPosition(17.5, 18);
     wait(1, sec); // scores 7 red in bottom X
+
+    ///////// GETTING 2 RED FROM WALL /////////
+    chassis.driveDistanceWithOdom(-4);
+    chassis.moveToPosition(46.5, 47);
+    chassis.moveToPosition(46.5, 59.5);
+    wait(1, sec); // intakes two red
+
+    ///////// GETTING ALL BALLS FROM MATCH LOADER /////////
+    chassis.driveDistanceWithOdom(-12.5);
+    chassis.moveToPosition(57.5, 47);
+    wait(1, sec); // intakes 3 blue and 3 red
+
+    ///////// SCORING INTO LONG GOAL /////////
+    chassis.driveDistanceWithOdom(-4.5);
+    chassis.moveToPosition(32, 47);
+    wait(1, sec); // scores 2 red, 3 blue, and 3 red into long goal
+
+    ///////// PARK TIME /////////
+    chassis.driveDistanceWithOdom(-4);
+    chassis.moveToPosition(32, 34.5);
+    chassis.moveToPosition(-60, 34.5);
+    // chassis.turnToAngle(180);
+    chassis.moveToPosition(-62, 7.5);
+
     
 
 
