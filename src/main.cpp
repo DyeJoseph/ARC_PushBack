@@ -24,6 +24,8 @@ using namespace vex;
 
   bool isInAuton = false;
   int lastPressed = 0;
+  int teamColor = 0; //red = 0, blue = 1
+  int driver = 0; //Elliot = 0, Jacob = 1
 
   //Prototypes
   void toggleLift();
@@ -40,9 +42,9 @@ using namespace vex;
     1,                   // 
     12,                   // The maximum amount of the voltage used in the drivebase (1 - 12)
     odomType,
-    2,                  //Odometry wheel diameter (set to zero if no odom)
-    -4.0,               //Odom pod1 offset 
-    -4.0                //Odom pod1 offset
+    1.93,                  //Odometry wheel diameter (set to zero if no odom)
+    -3.687,               //Odom pod1 offset 
+    -3.867                //Odom pod2 offset
   );
 
 //////////////////////////////////////////////////////////////////////
@@ -88,21 +90,27 @@ void preAuton()
   buttons[0].setChosen(true);
 
   Text selectionLabel;
-  Button selectionButton;
-  createPreAutonScreen(selectionButton, selectionLabel);
+  Text configLabel;
+  Button startScreenButtons[5];
+  createPreAutonScreen(startScreenButtons, selectionLabel, configLabel);
   
-  //int lastPressed = 0;
   int temp;
 
   Controller1.Screen.print(buttons[lastPressed].getName().c_str());
 
   while(!isInAuton){
-    showPreAutonScreen(selectionButton, selectionLabel, buttons[lastPressed].getName());
+    showPreAutonScreen(startScreenButtons, selectionLabel, configLabel, buttons[lastPressed].getName(), teamColor, driver);
     while(currentScreen == START_SCREEN){
       if(Brain.Screen.pressing()){
-        if(checkPreAutonButton(selectionButton)){
+        if(checkPreAutonButtons(startScreenButtons, teamColor, driver, configLabel)){
           currentScreen = SELECTION_SCREEN;
         }
+        Controller1.Screen.clearLine();
+        Controller1.Screen.setCursor(1, 1);
+        std::string colorString = teamColor ? "Blue" : "Red";
+        std::string driverString = driver ? "Jacob" : "Elliot";
+        std::string controllerPrint = buttons[lastPressed].getName() + " - " + colorString + " - " + driverString;
+        Controller1.Screen.print(controllerPrint.c_str());
       }
       wait(10, msec);
     }
@@ -115,7 +123,10 @@ void preAuton()
           lastPressed = temp;
           Controller1.Screen.clearLine();
           Controller1.Screen.setCursor(1, 1);
-          Controller1.Screen.print(buttons[lastPressed].getName().c_str());
+          std::string colorString = teamColor ? "Blue" : "Red";
+          std::string driverString = driver ? "Jacob" : "Elliot";
+          std::string controllerPrint = buttons[lastPressed].getName() + " - " + colorString + " - " + driverString;
+          Controller1.Screen.print(controllerPrint.c_str());
         }
       }
       if(temp == 8)
@@ -149,9 +160,15 @@ void autonomous()
 
 
   chassis.setPosition(0,0,0);
+  //chassis.driveDistance(24);
+  //chassis.driveDistanceWithOdom(24);
 
   //chassis.bezierTurn(0,0,5,5,2,12,7);
-  chassis.driveDistanceWithOdom(24);
+  //chassis.driveDistanceWithOdom(24);
+  // chassis.setTurnMaxVoltage(8);
+  // chassis.turnToAngle(90);
+  //chassis.moveToPosition(12,24);
+  //chassis.turnToPosition(24,24);
 
  
 
@@ -197,7 +214,6 @@ void usercontrol()
   // User control code here, inside the loop
   bool flapState = false;
   bool isColorSorting = true;
-  int teamColor = 0; //red = 0, blue = 1
   int lastSeen = teamColor;
 
   mainIntake.setVelocity(100, percent);
@@ -214,10 +230,8 @@ void usercontrol()
 
     if(bottomColorSort.color() == vex::color::red){
       lastSeen = 0;
-      std::cout << "red" << std::endl;
     }else if(bottomColorSort.color() == vex::color::blue){
       lastSeen = 1;
-      std::cout << "blue" << std::endl;
     }
 
     if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
@@ -321,17 +335,17 @@ void setDriveTrainConstants()
 {
     // Set the Drive PID values for the DriveTrain
     chassis.setDriveConstants(
-        0.32f,  // Kp - Proportion Constant
-        0.0003f, // Ki - Integral Constant
-        0.18f, // Kd - Derivative Constant
-        0.4f, // Settle Error
-        250, // Time to Settle
-        5000 // End Time 5000
+        0.35,  // Kp - Proportion Constant
+        0.0003, // Ki - Integral Constant
+        0.17, // Kd - Derivative Constant
+        .5, // Settle Error
+        300, // Time to Settle
+        3000 // End Time 5000
     );
 
     // Set the Turn PID values for the DriveTrain
     chassis.setTurnConstants(
-        0.3,    // Kp - Proportion Constant
+        0.30,    // Kp - Proportion Constant
         0,      // Ki - Integral Constant
         0,      // Kd - Derivative Constant 
         0.5,    // Settle Error
@@ -349,23 +363,89 @@ void setDriveTrainConstants()
 /// @brief Auton Slot 1 - Write code for route within this function.
 void Auton_1()
 {
-    Brain.Screen.print("PID Test");
+    Brain.Screen.print("Skills 1 running.");
+    chassis.setTurnMaxVoltage(8);
+    chassis.setPosition(-47,15,90);
+
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.
 void Auton_2()
 {
-    Brain.Screen.print("Auton 2 running.");
+    Brain.Screen.print("Skills 2 running.");
 }
 
 /// @brief Auton Slot 3 - Write code for route within this function.
 void Auton_3()
 {
     Brain.Screen.print("Auton 3 running.");
-
-
-    
     //KEEGAN WRITE HERE
+
+    //SETUP
+    chassis.setPosition(-46,10.5,180);
+    chassis.setTurnMaxVoltage(8);
+    
+
+    //MOVE FORWARD AND INTAKE 2 RED
+    chassis.moveToPosition(-46, 0.5);
+    wait(1, sec);
+    
+    //GRAB 8 FROM MATCH LOADER 2
+    chassis.driveDistanceWithOdom(-10);
+    chassis.driveDistanceWithOdom(-36.2);
+    chassis.moveToPosition(-58, 46.7);
+    wait(1, sec);
+
+    //LOAD 7 INTO LONG GOAL 1 (5RED, THEN 2BLUE)
+    chassis.driveDistanceWithOdom(-5);
+    chassis.moveToPosition(-32, 46.7);
+    wait(-1, sec);
+
+    //GRAB 2 BLUE AT TOP
+    chassis.driveDistanceWithOdom(-14);
+    chassis.moveToPosition(-46, 62.5);
+    wait(1, sec);
+
+    //GRAB 4 FROM START
+    chassis.driveDistanceWithOdom(-10);
+    chassis.moveToPosition(-30,0);
+    chassis.moveToPosition(-46,0);
+    wait(1, sec);
+
+    //LOAD INTO UPPER GOAL
+    chassis.driveDistanceWithOdom(-10);
+    chassis.moveToPosition(-17.5, 18.5);
+    chassis.moveToPosition(-13, 13.5);
+    wait(-1, sec);
+
+    //BLOCK LOWER MIDDLE GOAL
+    chassis.driveDistanceWithOdom(-10);
+    chassis.moveToPosition(-19.6, -4.9);
+    chassis.turnToAngle(140);
+
+    //GRAB 8 FROM MATCH LOADER
+    chassis.moveToPosition(-47, -47);
+    chassis.moveToPosition(-58, -47);
+    wait(1, sec);
+
+    //GRAB 2 BLUE FROM BOTTOM
+    chassis.driveDistanceWithOdom(-11);
+    chassis.moveToPosition(-47, -62.5);
+    wait(1, sec);
+
+    //LOAD IN TO BOTTOM LONG GOAL 2
+    chassis.driveDistanceWithOdom(-15.5);
+    chassis.moveToPosition(-31.7, -47);
+    wait(-1, sec);
+
+    //RAM INTO PARK ZONE
+    chassis.driveDistanceWithOdom(-20);
+    chassis.moveToPosition(-63.8, -8.2);
+
+
+
+
+  
 
 
 
