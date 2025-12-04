@@ -317,9 +317,9 @@ void setDriveTrainConstants()
     chassis.setDriveConstants(
         0.5,  // Kp - Proportion Constant
         0.0001, // Ki - Integral Constant
-        0.9, // Kd - Derivative Constant was 0.17
+        0.9, // Kd - Derivative Constant
         .1, // Settle Error
-        300, // Time to Settle
+        100, // Time to Settle
         2000 // End Time 5000
     );  
 
@@ -330,7 +330,7 @@ void setDriveTrainConstants()
         1.3,      // Kd - Derivative Constant 
         0.2,    // Settle Error
         300,    // Time to Settle
-        3000    // End Time
+        1000    // End Time
     );
     
 }
@@ -346,6 +346,12 @@ void Auton_1()
     Brain.Screen.print("Skills 1 running.");
     chassis.setTurnMaxVoltage(8);
     chassis.setPosition(-47,15,90);
+
+
+    // //test
+    // chassis.driveDistanceWithOdom(72);
+    // chassis.turnToAngle(180);
+    // chassis.driveDistanceWithOdom(24);
   
     //Starting Square
     chassis.driveDistanceWithOdom(16);
@@ -353,7 +359,32 @@ void Auton_1()
     chassis.driveDistanceWithOdom(10);
     chassis.turnToAngle(270);
     chassis.driveDistanceWithOdom(15);
+    //drop down bar
+    chassis.driveDistanceWithOdom(-6);
+    chassis.turnToAngle(0);
+    chassis.driveDistanceWithOdom(39);
+    chassis.turnToAngle(270);
+    chassis.driveDistanceWithOdom(19);
+    //is now lined up with match loader
+    //pincers grab match loads
+
+
+    //going to score on long goal
+    chassis.driveDistanceWithOdom(-10);
+    chassis.turnToAngle(90);
+    //lift outake
+    chassis.driveDistanceWithOdom(19);
+    //outake all
+
+
+    //goes for wall balls
+    chassis.driveDistanceWithOdom(-17);
+    chassis.turnToAngle(0);
+    chassis.driveDistanceWithOdom(13); //may be to close
+    //drop bar down
     
+
+
 
 }
 
