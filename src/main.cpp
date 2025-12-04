@@ -159,26 +159,37 @@ void autonomous()
   chassis.brake(hold);
 
 
-  // chassis.setPosition(0,0,0);
+  chassis.setPosition(24,24,0);
+  chassis.moveToPosition(0,0);
+  chassis.moveToPosition(0,0);
+
   // // chassis.driveDistance(72);
   // // chassis.driveDistanceWithOdom(48);
-  chassis.driveDistanceWithOdom(12);
-  chassis.turnToAngle(90);
-  //wait(5, sec);
-  chassis.driveDistanceWithOdom(12);
-  chassis.turnToAngle(180);
-  chassis.driveDistanceWithOdom(12);
-  chassis.turnToAngle(270);
-  chassis.driveDistanceWithOdom(12);
-  chassis.turnToAngle(0);
+  // chassis.driveDistanceWithOdom(12);
+  // chassis.turnToAngle(90);
+  // //wait(5, sec);
+  // chassis.driveDistanceWithOdom(12);
+  // chassis.turnToAngle(180);
+  // chassis.driveDistanceWithOdom(12);
+  // chassis.turnToAngle(270);
+  // chassis.driveDistanceWithOdom(12);
+  // chassis.turnToAngle(0);
   //chassis.moveable();
 
   //chassis.brake(hold);
 
   //chassis.bezierTurn(0,0,5,5,2,12,7);
+  //chassis.setDriveMaxVoltage(6);
   //chassis.driveDistanceWithOdom(24);
-  // chassis.setTurnMaxVoltage(8);
-  // chassis.turnToAngle(90);
+  //  chassis.setTurnMaxVoltage(8);
+  //  chassis.driveDistance(12);
+  //  chassis.turnToAngle(90);
+  //  chassis.driveDistance(12);
+  //  chassis.turnToAngle(180);
+  //  chassis.driveDistance(12);
+  //  chassis.turnToAngle(270);
+  //  chassis.driveDistance(12);
+  //  chassis.turnToAngle(0);
   //chassis.moveToPosition(12,24);
   //chassis.turnToPosition(24,24);
 
@@ -343,20 +354,20 @@ void setDriveTrainConstants()
 {
     // Set the Drive PID values for the DriveTrain
     chassis.setDriveConstants(
-        0.7,  // Kp - Proportion Constant
-        0.0003, // Ki - Integral Constant
-        0.01, // Kd - Derivative Constant was 0.17
-        .2, // Settle Error
+        0.5,  // Kp - Proportion Constant
+        0.0001, // Ki - Integral Constant
+        0.9, // Kd - Derivative Constant was 0.17
+        .1, // Settle Error
         300, // Time to Settle
-        3000 // End Time 5000
-    );
+        2000 // End Time 5000
+    );  
 
     // Set the Turn PID values for the DriveTrain
     chassis.setTurnConstants(
-        0.30,    // Kp - Proportion Constant
-        0,      // Ki - Integral Constant
-        0,      // Kd - Derivative Constant 
-        0.5,    // Settle Error
+        0.25,    // Kp - Proportion Constant
+        0.0000,      // Ki - Integral Constant
+        1.3,      // Kd - Derivative Constant 
+        0.2,    // Settle Error
         300,    // Time to Settle
         3000    // End Time
     );
