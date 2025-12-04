@@ -153,46 +153,7 @@ void autonomous()
 
 
  
-  // Tiny forward preload to take up slack
-  // chassis.driveMotors(2, 2); // 2 volts forward for a moment
-  // wait(100, msec);
-  chassis.brake(hold);
-
-
-  chassis.setPosition(24,24,0);
-  chassis.moveToPosition(0,0);
-  chassis.moveToPosition(0,0);
-
-  // // chassis.driveDistance(72);
-  // // chassis.driveDistanceWithOdom(48);
-  // chassis.driveDistanceWithOdom(12);
-  // chassis.turnToAngle(90);
-  // //wait(5, sec);
-  // chassis.driveDistanceWithOdom(12);
-  // chassis.turnToAngle(180);
-  // chassis.driveDistanceWithOdom(12);
-  // chassis.turnToAngle(270);
-  // chassis.driveDistanceWithOdom(12);
-  // chassis.turnToAngle(0);
-  //chassis.moveable();
-
-  //chassis.brake(hold);
-
-  //chassis.bezierTurn(0,0,5,5,2,12,7);
-  //chassis.setDriveMaxVoltage(6);
-  //chassis.driveDistanceWithOdom(24);
-  //  chassis.setTurnMaxVoltage(8);
-  //  chassis.driveDistance(12);
-  //  chassis.turnToAngle(90);
-  //  chassis.driveDistance(12);
-  //  chassis.turnToAngle(180);
-  //  chassis.driveDistance(12);
-  //  chassis.turnToAngle(270);
-  //  chassis.driveDistance(12);
-  //  chassis.turnToAngle(0);
-  //chassis.moveToPosition(12,24);
-  //chassis.turnToPosition(24,24);
-
+  Auton_1();
  
 
   // switch (lastPressed) 
@@ -385,6 +346,14 @@ void Auton_1()
     Brain.Screen.print("Skills 1 running.");
     chassis.setTurnMaxVoltage(8);
     chassis.setPosition(-47,15,90);
+  
+    //Starting Square
+    chassis.driveDistanceWithOdom(16);
+    chassis.turnToAngle(180);
+    chassis.driveDistanceWithOdom(10);
+    chassis.turnToAngle(270);
+    chassis.driveDistanceWithOdom(15);
+    
 
 }
 
