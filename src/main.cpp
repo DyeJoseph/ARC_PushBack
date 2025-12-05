@@ -152,8 +152,13 @@ void autonomous()
   setDriveTrainConstants();
 
 
+<<<<<<< Updated upstream
   Auton_1();
   //Auton_2();
+=======
+  //Auton_1();
+  Auton_2();
+>>>>>>> Stashed changes
   //Auton_3();
   //Auton_4();
 
@@ -327,7 +332,11 @@ void setDriveTrainConstants()
     // Set the Turn PID values for the DriveTrain
     chassis.setTurnConstants(
         0.25,    // Kp - Proportion Constant
+<<<<<<< Updated upstream
         0.000,      // Ki - Integral Constant
+=======
+        0.00,      // Ki - Integral Constant
+>>>>>>> Stashed changes
         1.4,      // Kd - Derivative Constant 
         0.2,    // Settle Error
         200,    // Time to Settle
@@ -449,6 +458,16 @@ void Auton_1()
 
 
 
+<<<<<<< Updated upstream
+=======
+    //goes for wall balls
+    chassis.driveDistanceWithOdom(-17);
+    chassis.turnToAngle(0);
+    chassis.driveDistanceWithOdom(13); //may be to close
+    //drop bar down
+
+
+>>>>>>> Stashed changes
     
 
 
@@ -459,6 +478,114 @@ void Auton_1()
 void Auton_2()
 {
     Brain.Screen.print("Skills 2 running.");
+
+    //SETUP
+    mainIntake.setVelocity(100, percent);
+    colorSort.setVelocity(100, percent);
+    topStage.setVelocity(100, percent);
+    bottomStage.setVelocity(100, percent);
+    chassis.setPosition(-46,0,90);
+    chassis.setDriveMaxVoltage(10);
+    chassis.setTurnMaxVoltage(8);
+
+    //GRAB 4 BLUE START BALLS
+    wait(.01, sec); //DROP BAR
+    chassis.driveDistanceWithOdom(-10);
+    
+    //GRAB 2 BLUE WALL BALLS
+    chassis.turnToAngle(10);
+    chassis.driveDistanceWithOdom(53);
+    chassis.turnToAngle(0);
+    mainIntake.spin(forward);
+    colorSort.spin(forward);
+    chassis.driveDistance(28);
+    wait(.25, sec);
+    chassis.driveDistance(-5);
+    matchLoad.set(true);
+    wait(.25, sec);
+    mainIntake.stop();
+    colorSort.stop();
+    matchLoad.set(false);
+
+    //GRAB 1 BLUE BALL
+    chassis.turnToAngle(208);
+    chassis.driveDistanceWithOdom(39.5);
+    chassis.turnToAngle(270);
+    mainIntake.spin(forward);
+    chassis.driveDistanceWithOdom(47);
+
+    //PUT 7 BALLS IN TOP MIDDLE
+    chassis.turnToAngle(135);
+    toggleIntakeFlap();
+    chassis.driveDistance(15);
+    mainIntake.spin(forward, 65, percent);
+    colorSort.spin(forward, 65, percent);
+    topStage.spin(forward, 65, percent);
+    wait(1, sec);
+    mainIntake.stop();
+    colorSort.stop();
+    topStage.stop();
+
+    //UNTESTED FROM HERE ON SO FARRRRRRRR
+    //GRAB 2 RED BALLS
+    chassis.driveDistanceWithOdom(-47);
+    chassis.turnToAngle(0);
+    mainIntake.spin(forward);
+    colorSort.spin(forward);
+    chassis.driveDistance(28);
+    wait(.25, sec);
+    chassis.driveDistance(-5);
+    matchLoad.set(true);
+    wait(.25, sec);
+    mainIntake.stop();
+    colorSort.stop();
+    matchLoad.set(false);
+
+    //GRAB 6 FROM BOTTOM FAR MATCH LOADER
+    chassis.driveDistance(-28);
+    chassis.turnToAngle(270);
+    toggleLift();
+    chassis.driveDistanceWithOdom(15);
+    matchLoad.set(true);
+    mainIntake.spin(forward);
+    colorSort.spin(forward);
+    topStage.spin(forward);
+    wait(2,sec);
+    mainIntake.stop();
+    colorSort.stop();
+    topStage.stop();
+
+    //LOAD 8 INTO FAR LONG GOAL SIDE
+    chassis.driveDistance(-15);
+    chassis.turnToAngle(90);
+    chassis.driveDistanceWithOdom(20);
+    toggleIntakeFlap();
+    bottomStage.spin(forward);
+    colorSort.spin(forward);
+    topStage.spin(forward);
+    wait(2,sec);
+    bottomStage.stop();
+    colorSort.stop();
+    topStage.stop();
+
+    //GRAB 2 RED FROM CENTER UNDER GOAL
+
+    //GRAB 6 FROM CLOSE MATCH LOADER
+
+    //LOAD 8 INTO CLOSE LONG GOAL SIDE
+
+    //PARK
+
+
+    //CLEAR FOR KEVIN
+    wait(3, sec);
+    mainIntake.spin(reverse);
+    colorSort.spin(reverse);
+    topStage.spin(reverse);
+    wait(1.5, sec);
+    mainIntake.stop();
+    colorSort.stop();
+    topStage.stop();
 }
 
 /// @brief Auton Slot 3 - Write code for route within this function.
@@ -487,7 +614,7 @@ void Auton_3()
     chassis.driveDistanceWithOdom(14.5);
     matchLoad.set(true);
     mainIntake.spin(fwd);
-    colorSort.spin(forward);
+    colorSort.spin(fwd);
     topStage.spin(fwd);
     wait(3, sec);
 
