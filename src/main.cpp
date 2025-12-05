@@ -151,13 +151,8 @@ void autonomous()
   setDriveTrainConstants();
 
 
-<<<<<<< Updated upstream
   Auton_1();
   //Auton_2();
-=======
-  //Auton_1();
-  Auton_2();
->>>>>>> Stashed changes
   //Auton_3();
   //Auton_4();
 
@@ -293,9 +288,9 @@ void toggleLift(){
 }
 
 void toggleIntakeFlap(){
-  static bool flapState = false;
-  flapState = !flapState;
-  intakeFlap.set(flapState);
+  static bool staticFlap = false;
+  staticFlap = !staticFlap;
+  intakeFlap.set(staticFlap);
 }
 
 void slowIntake(){
@@ -346,11 +341,7 @@ void setDriveTrainConstants()
     // Set the Turn PID values for the DriveTrain
     chassis.setTurnConstants(
         0.25,    // Kp - Proportion Constant
-<<<<<<< Updated upstream
         0.000,      // Ki - Integral Constant
-=======
-        0.00,      // Ki - Integral Constant
->>>>>>> Stashed changes
         1.4,      // Kd - Derivative Constant 
         0.2,    // Settle Error
         200,    // Time to Settle
@@ -472,8 +463,6 @@ void Auton_1()
 
 
 
-<<<<<<< Updated upstream
-=======
     //goes for wall balls
     chassis.driveDistanceWithOdom(-17);
     chassis.turnToAngle(0);
@@ -481,7 +470,6 @@ void Auton_1()
     //drop bar down
 
 
->>>>>>> Stashed changes
     
 
 

@@ -501,9 +501,9 @@ void Drive::moveable(){
 
 void Drive::turnToPosition(float desX, float desY){
     updatePosition();
-    float deltaX = chassisOdometry.getXPosition()-desX;
-    float deltaY = chassisOdometry.getYPosition()-desY;
-    float angle = atan(deltaX/deltaY) * (180.0/M_PI);
+    float deltaX = desX-chassisOdometry.getXPosition();
+    float deltaY = desY-chassisOdometry.getYPosition();
+    float angle = atan2(deltaX, deltaY) * (180.0/M_PI);
     turnToAngle(angle);
     updatePosition();
 }
@@ -531,12 +531,9 @@ void Drive::bezierTurn(float curX, float curY, float midX, float midY, float des
         nextX = (pow(1-pts[i], 2)*curX) + (2*(1-pts[i])*pts[i]*midX) + (pow(pts[i], 2)*desX);
         nextY = (pow(1-pts[i], 2)*curY) + (2*(1-pts[i])*pts[i]*midY) + (pow(pts[i], 2)*desY);  
         moveToPosition(nextX, nextY);
-        std::cout << i << std::endl;
-        std::cout << nextX << ", " << nextY << std::endl;
     }
 
     delete [] pts;
-    std::cout << "Deleted Points" << std::endl;
 }
 
 void Drive::updatePosition(){
