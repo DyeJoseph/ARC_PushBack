@@ -152,9 +152,9 @@ void autonomous()
   setDriveTrainConstants();
 
 
-  //Auton_1();
+  Auton_1();
   //Auton_2();
-  Auton_3();
+  //Auton_3();
   //Auton_4();
 
   // switch (lastPressed) 
@@ -319,8 +319,8 @@ void setDriveTrainConstants()
         0.5,  // Kp - Proportion Constant
         0.0001, // Ki - Integral Constant
         0.9, // Kd - Derivative Constant
-        .1, // Settle Error
-        100, // Time to Settle
+        .25, // Settle Error
+        200, // Time to Settle
         2000 // End Time 5000
     );  
 
@@ -330,7 +330,7 @@ void setDriveTrainConstants()
         0.0000,      // Ki - Integral Constant
         1.3,      // Kd - Derivative Constant 
         0.2,    // Settle Error
-        300,    // Time to Settle
+        200,    // Time to Settle
         1000    // End Time
     );
     
@@ -346,43 +346,47 @@ void Auton_1()
 {
     Brain.Screen.print("Skills 1 running.");
     chassis.setTurnMaxVoltage(8);
-    chassis.setPosition(-47,15,90);
+    chassis.setPosition(-46,15,0);
+    mainIntake.setVelocity(100, percent);
+    colorSort.setVelocity(100, percent);
+    topStage.setVelocity(100, percent);
 
 
-    // //test
-    // chassis.driveDistanceWithOdom(72);
-    // chassis.turnToAngle(180);
-    // chassis.driveDistanceWithOdom(24);
+
+    //Pencers        matchLoad.set(true);
+    //Intakes        
+      //Main/Pencers mainIntake.spin(fwd);
+      //Top          topStage.spin(fwd);
+      //Color        colorSort.spin(fwd);
+    //Outake         toggleLift();
+    //Dropdown
+    //flap           toggleIntakeFlap();
+
+        // //pincers grab match loads
+    //   matchLoad.set(true);
+    //   mainIntake.spin(fwd);
+    //   colorSort.spin(fwd);
+    //   topStage.spin(fwd);
+    //   wait(1.5, sec); 
+    //   mainIntake.stop();
+    //   colorSort.stop();
+    //   topStage.stop();
+    //   matchLoad.set(false);
+
+
+
+
+
+
+
+
+
+
+    
   
-    //Starting Square
-    chassis.driveDistanceWithOdom(16);
-    chassis.turnToAngle(180);
-    chassis.driveDistanceWithOdom(10);
-    chassis.turnToAngle(270);
-    chassis.driveDistanceWithOdom(15);
-    //drop down bar
-    chassis.driveDistanceWithOdom(-6);
-    chassis.turnToAngle(0);
-    chassis.driveDistanceWithOdom(39);
-    chassis.turnToAngle(270);
-    chassis.driveDistanceWithOdom(19);
-    //is now lined up with match loader
-    //pincers grab match loads
 
 
-    //going to score on long goal
-    chassis.driveDistanceWithOdom(-10);
-    chassis.turnToAngle(90);
-    //lift outake
-    chassis.driveDistanceWithOdom(19);
-    //outake all
 
-
-    //goes for wall balls
-    chassis.driveDistanceWithOdom(-17);
-    chassis.turnToAngle(0);
-    chassis.driveDistanceWithOdom(13); //may be to close
-    //drop bar down
     
 
 
