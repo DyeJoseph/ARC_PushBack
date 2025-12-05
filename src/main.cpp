@@ -411,7 +411,7 @@ void Auton_1()
       topStage.stop();
 
     chassis.driveDistanceWithOdom(-8.5);
-    toggleIntakeFlap();
+    toggleIntakeFlap(); // down
     chassis.turnToAngle(45);
     chassis.driveDistanceWithOdom(17);
     chassis.turnToAngle(90);
@@ -429,7 +429,31 @@ void Auton_1()
       colorSort.stop();
       topStage.stop();
 
-    
+    // getting 3 blue and 3 red from wall intake
+    chassis.turnToAngle(115);
+    chassis.driveDistanceWithOdom(24.2);
+    chassis.turnToAngle(90);
+    mainIntake.spin(forward);
+    colorSort.spin(forward);
+    topStage.spin(forward);
+    matchLoad.set(true);
+    chassis.driveDistanceWithOdom(5);
+    wait(1.7, sec);
+    mainIntake.stop();
+    colorSort.stop();
+    topStage.stop();
+
+    // scoring 5 blue and 2 red
+    chassis.driveDistanceWithOdom(-4);
+    chassis.turnToAngle(270);
+    chassis.driveDistanceWithOdom(27);
+    bottomStage.spin(forward);
+    colorSort.spin(forward);
+    topStage.spin(forward);
+    wait(1.7, sec);
+
+
+
 
     
 
