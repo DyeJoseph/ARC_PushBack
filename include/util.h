@@ -24,5 +24,7 @@ float inTermsOfNegative180To180(float angle);
 
 void writeToCard(std::string filename, std::string text);
 void writeToCard(std::string filename, float number);
+void writeCommaToCard(std::string filename);
+void writeNewLineToCard(std::string filename);
 
 enum ODOM_TYPE{NO_ODOM=0, HORIZONTAL_AND_VERTICAL=1, TWO_VERTICAL=2, TWO_AT_45=3};

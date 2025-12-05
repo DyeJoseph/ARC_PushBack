@@ -28,11 +28,6 @@ using namespace vex;
   int teamColor = 0; //red = 0, blue = 1
   int driver = 0; //Elliot = 0, Jacob = 1
 
-  //Prototypes
-  void toggleLift();
-  void toggleIntakeFlap();
-
-
   // Define Values for the Chassis here:
   Drive chassis
   (
@@ -61,6 +56,10 @@ void Auton_5();
 void Auton_6();
 void Auton_7();
 void Auton_8();
+
+void toggleLift();
+void toggleIntakeFlap();
+void slowIntake();
 
 //////////////////////////////////////////////////////////////////////
 
@@ -234,6 +233,7 @@ void usercontrol()
 
   Controller1.ButtonL1.pressed(toggleLift);
   Controller1.ButtonUp.pressed(toggleIntakeFlap);
+  Controller1.ButtonDown.pressed(slowIntake);
 
   bottomColorSort.setLight(ledState::on);
   bottomColorSort.integrationTime(20);
@@ -318,6 +318,20 @@ void toggleIntakeFlap(){
   static bool flapState = false;
   flapState = !flapState;
   intakeFlap.set(flapState);
+}
+
+void slowIntake(){
+  static bool isSlowed = false;
+  isSlowed = !isSlowed;
+  if(isSlowed){
+    mainIntake.setVelocity(50, percent);
+    colorSort.setVelocity(100, percent);
+    topStage.setVelocity(50, percent);
+  }else{
+    mainIntake.setVelocity(85, percent);
+    colorSort.setVelocity(100, percent);
+    topStage.setVelocity(100, percent);
+  }
 }
 
 int main() 
@@ -565,6 +579,28 @@ void Auton_7()
 /// @brief Auton Slot 8 - Write code for route within this function.
 void Auton_8()
 {
-    Brain.Screen.print("Auton 8 running.");
+  isInAuton = true;
+  rotation1.resetPosition();
+  rotation2.resetPosition();
+  inertial1.resetHeading();
+  wait(100, msec);
+
+  chassis.setDriveConstants(
+        0.7,  // Kp - Proportion Constant
+        0.0003, // Ki - Integral Constant
+        0.01, // Kd - Derivative Constant was 0.17
+        .2, // Settle Error
+        300, // Time to Settle
+        3000 // End Time 5000
+  );
+
+  chassis.driveDistanceWithOdom(72);
+  chassis.turn(90);
+  chassis.driveDistanceWithOdom(72);
+  chassis.turn(90);
+  chassis.driveDistanceWithOdom(72);
+  chassis.turn(90);
+  chassis.driveDistanceWithOdom(72);
+  chassis.turn(90);
     
 }
