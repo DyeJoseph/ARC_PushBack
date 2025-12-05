@@ -321,14 +321,14 @@ void setDriveTrainConstants()
         0.9, // Kd - Derivative Constant
         .25, // Settle Error
         200, // Time to Settle
-        2000 // End Time 5000
+        1000 // End Time 5000
     );  
 
     // Set the Turn PID values for the DriveTrain
     chassis.setTurnConstants(
         0.25,    // Kp - Proportion Constant
-        0.0000,      // Ki - Integral Constant
-        1.3,      // Kd - Derivative Constant 
+        0.000,      // Ki - Integral Constant
+        1.4,      // Kd - Derivative Constant 
         0.2,    // Settle Error
         200,    // Time to Settle
         1000    // End Time
@@ -350,6 +350,7 @@ void Auton_1()
     mainIntake.setVelocity(100, percent);
     colorSort.setVelocity(100, percent);
     topStage.setVelocity(100, percent);
+    bottomStage.setVelocity(100, percent);
 
 
 
@@ -362,7 +363,7 @@ void Auton_1()
     //Dropdown
     //flap           toggleIntakeFlap();
 
-        // //pincers grab match loads
+    //pincers grab match loads
     //   matchLoad.set(true);
     //   mainIntake.spin(fwd);
     //   colorSort.spin(fwd);
@@ -374,15 +375,75 @@ void Auton_1()
     //   matchLoad.set(false);
 
 
+    //First T
+      mainIntake.spin(fwd);
+      colorSort.spin(fwd);
+      topStage.spin(fwd);
+    chassis.driveDistanceWithOdom(56); //50 to short, 56 hits wall every 3 times or so
+    matchLoad.set(true);
+      wait(0.5, sec); 
+    //Goes for matchload
+    chassis.driveDistanceWithOdom(-13); //13
+    toggleLift();
+    matchLoad.set(false);
+    chassis.turnToAngle(270);
+    chassis.driveDistanceWithOdom(11.5);
+    matchLoad.set(true);
+      wait(1.7, sec);
+      mainIntake.stop();
+      colorSort.stop();
+      topStage.stop();
+      matchLoad.set(false);    
+    chassis.driveDistanceWithOdom(-13.5);
+    chassis.turnToAngle(90);
+    chassis.driveDistanceWithOdom(16.5);
+    //Load long with 8
+      toggleIntakeFlap();
+      wait(0.1, sec);
+      //mainIntake.spin(fwd);
+      bottomStage.spin(fwd);
+      colorSort.spin(fwd);
+      topStage.spin(fwd);
+      wait(1.7, sec);
+      bottomStage.stop();
+      //mainIntake.stop();
+      colorSort.stop();
+      topStage.stop();
 
-
-
-
-
-
-
+    chassis.driveDistanceWithOdom(-8.5);
+    toggleIntakeFlap();
+    chassis.turnToAngle(45);
+    chassis.driveDistanceWithOdom(17);
+    chassis.turnToAngle(90);
+    chassis.driveDistanceWithOdom(33);
+    //Grabs 2 from bellow
+    chassis.turnToAngle(180);
+    //Drop Down bar
+    wait(1, sec);
+    chassis.turnToAngle(90);
+      mainIntake.spin(fwd);
+      colorSort.spin(fwd);
+      topStage.spin(fwd);
+    chassis.driveDistanceWithOdom(27);
+      mainIntake.stop();
+      colorSort.stop();
+      topStage.stop();
 
     
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
   
 
 
