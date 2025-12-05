@@ -454,25 +454,16 @@ void Drive::driveDistanceWithOdom(float distance){
         driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
 
 
-        // Optional debug prints (keep if useful)
-        Brain.Screen.clearScreen();
-        Brain.Screen.setCursor(1,1);
-        Brain.Screen.print(chassisOdometry.getXPosition());
-        Brain.Screen.newLine();
-        Brain.Screen.print(chassisOdometry.getYPosition());
-        Brain.Screen.newLine();
-        Brain.Screen.print(targetX);
-        Brain.Screen.newLine();
-        Brain.Screen.print(rotation1.position(degrees));
-        Brain.Screen.newLine();
-        Brain.Screen.print(rotation2.position(degrees));
+
         
-        //std::cout << "Target X: " << targetX << std::endl;
+
         if(i%10==0){
             //std::cout << "CurX, CurY: " << curX << ", " << curY << std::endl;
             std::cout << "X,Y: " << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << std::endl;
 
             std::cout << "Linear Error: " << linearError << std::endl;
+
+            std::cout << "Heading:" << inertial1.heading() << std::endl;
         }
         
         i++;
@@ -586,6 +577,7 @@ void Drive::updatePosition(){
 void Drive::setPosition(float x, float y, float heading){
     // Reset odom pose
     chassisOdometry.setPosition(x, y, heading);
+    inertial1.setHeading(heading, degrees);
 
     // Sync odom encoder baselines with the actual sensors
     switch (odomType) {

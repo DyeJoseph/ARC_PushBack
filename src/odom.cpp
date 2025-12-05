@@ -60,10 +60,12 @@ float Odom::getForwardLeftDegrees(){ return forwardDegreesL; }
 float Odom::getLateralDegrees(){ return lateralDegrees; }
 
 //Mutators
-void Odom::setPosition(float xPosition, float yPosition, float heading = 0.0){
+void Odom::setPosition(float xPosition, float yPosition, float heading){
     this->xPosition = xPosition;
     this->yPosition = yPosition;
     this->heading = heading;
+    if (!heading)
+        this->heading = 0;
 }
 void Odom::setHeading(float heading){
     this->heading = heading;

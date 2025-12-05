@@ -42,7 +42,10 @@ motor topStage = motor(PORT18, ratio6_1, false); //not always spinning
 motor_group mainIntake = motor_group(intakeL, intakeR, bottomStage);
 
 //Pistons
+
+/// @brief Pincers
 digital_out matchLoad = digital_out(Brain.ThreeWirePort.H);
+
 digital_out intakeFlap = digital_out(Brain.ThreeWirePort.A);
 digital_out intakeLift = digital_out(Brain.ThreeWirePort.D);
 
