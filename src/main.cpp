@@ -359,6 +359,7 @@ void Auton_1()
       //Main/Pencers mainIntake.spin(fwd);
       //Top          topStage.spin(fwd);
       //Color        colorSort.spin(fwd);
+      //Bottom       bottomStage.spin(fwd);
     //Outake         toggleLift();
     //Dropdown
     //flap           toggleIntakeFlap();
@@ -368,7 +369,7 @@ void Auton_1()
     //   mainIntake.spin(fwd);
     //   colorSort.spin(fwd);
     //   topStage.spin(fwd);
-    //   wait(1.5, sec); 
+    //   wait(1.7, sec); 
     //   mainIntake.stop();
     //   colorSort.stop();
     //   topStage.stop();
@@ -400,13 +401,13 @@ void Auton_1()
     //Load long with 8
       toggleIntakeFlap();
       wait(0.1, sec);
-      //mainIntake.spin(fwd);
-      bottomStage.spin(fwd);
+      mainIntake.spin(fwd);
+      //bottomStage.spin(fwd);
       colorSort.spin(fwd);
       topStage.spin(fwd);
       wait(1.7, sec);
-      bottomStage.stop();
-      //mainIntake.stop();
+      //bottomStage.stop();
+      mainIntake.stop();
       colorSort.stop();
       topStage.stop();
 
