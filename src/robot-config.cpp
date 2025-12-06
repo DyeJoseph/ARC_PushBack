@@ -50,6 +50,8 @@ digital_out intakeFlap = digital_out(Brain.ThreeWirePort.A);
 digital_out intakeLift = digital_out(Brain.ThreeWirePort.D);
 
 
+digital_out dropDown = digital_out(Brain.ThreeWirePort.F);
+
 
 //Color Sort Opticals
 optical bottomColorSort = optical(PORT11);
