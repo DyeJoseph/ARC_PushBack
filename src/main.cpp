@@ -386,16 +386,8 @@ void Auton_1()
     //Dropdown       toggleDropDown();
     //flap           toggleIntakeFlap();
 
-    //pincers grab match loads
-    //   matchLoad.set(true);
-    //   mainIntake.spin(fwd);
-    //   colorSort.spin(fwd);
-    //   topStage.spin(fwd);
-    //   wait(1.7, sec); 
-    //   mainIntake.stop();
-    //   colorSort.stop();
-    //   topStage.stop();
-    //   matchLoad.set(false);
+
+    
 
 
     //First T
