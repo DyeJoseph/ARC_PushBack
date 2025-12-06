@@ -540,7 +540,6 @@ void Auton_2()
     toggleIntakeFlap(); // closing after it scores
 
 
-    //UNTESTED FROM HERE ON SO FARRRRRRRR
     //GRAB 2 RED BALLS
     chassis.driveDistanceWithOdom(-43); // -42
     chassis.turnToAngle(0);
@@ -576,7 +575,7 @@ void Auton_2()
     //LOAD 8 INTO FAR LONG GOAL SIDE
     chassis.driveDistanceWithOdom(-15); 
     chassis.turnToAngle(90);
-    chassis.driveDistanceWithOdom(20);
+    chassis.driveDistanceWithOdom(18);
     toggleIntakeFlap(); //open
     bottomStage.spin(forward);
     colorSort.spin(forward);
@@ -618,7 +617,7 @@ void Auton_2()
     //LOAD 8 INTO CLOSE LONG GOAL SIDE
     chassis.driveDistanceWithOdom(-15); 
     chassis.turnToAngle(270);
-    chassis.driveDistanceWithOdom(20);
+    chassis.driveDistanceWithOdom(18);
     toggleIntakeFlap(); //open
     bottomStage.spin(forward);
     colorSort.spin(forward);
@@ -629,6 +628,7 @@ void Auton_2()
     topStage.stop();
 
     //PARK
+    // UNTESTED
     chassis.driveDistanceWithOdom(-7);
 
     //if enough time
