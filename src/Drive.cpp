@@ -457,14 +457,14 @@ void Drive::driveDistanceWithOdom(float distance){
 
         
 
-        if(i%10==0){
-            //std::cout << "CurX, CurY: " << curX << ", " << curY << std::endl;
-            std::cout << "X,Y: " << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << std::endl;
+        // if(i%10==0){
+        //     //std::cout << "CurX, CurY: " << curX << ", " << curY << std::endl;
+        //     std::cout << "X,Y: " << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << std::endl;
 
-            std::cout << "Linear Error: " << linearError << std::endl;
+        //     std::cout << "Linear Error: " << linearError << std::endl;
 
-            std::cout << "Heading:" << inertial1.heading() << std::endl;
-        }
+        //     std::cout << "Heading:" << inertial1.heading() << std::endl;
+        // }
         
         i++;
 

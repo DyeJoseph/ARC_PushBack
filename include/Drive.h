@@ -23,11 +23,11 @@ class Drive
     float driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime;
     float turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime;
 
-    Odom chassisOdometry;
+    
     int odomType;
         
     public:
-
+    Odom chassisOdometry;
     float predictedAngle;
 
     Drive(motor_group leftDrive, motor_group rightDrive, int inertialPORT, float wheelDiameter, float wheelRatio, float maxVoltage, int odomType, float odomWheelDiameter, float odomPod1Offset, float odomPod2Offset);
