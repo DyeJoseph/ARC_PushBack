@@ -40,4 +40,6 @@ extern digital_out matchLoad;
 extern digital_out intakeFlap;
 extern digital_out intakeLift;
 
+extern digital_out dropDown;
+
 extern optical bottomColorSort;

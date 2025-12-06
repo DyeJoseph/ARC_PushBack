@@ -151,8 +151,8 @@ void autonomous()
   setDriveTrainConstants();
 
 
-  //Auton_1();
-  Auton_2();
+  Auton_1();
+  //Auton_2();
   //Auton_3();
   //Auton_4();
 
@@ -293,6 +293,14 @@ void toggleIntakeFlap(){
   intakeFlap.set(staticFlap);
 }
 
+void toggleDropDown(){
+
+  static bool staticDrop = false;
+  staticDrop = !staticDrop;
+  dropDown.set(staticDrop);
+
+}
+
 void slowIntake(){
   static bool isSlowed = false;
   isSlowed = !isSlowed;
@@ -375,7 +383,7 @@ void Auton_1()
       //Color        colorSort.spin(fwd);
       //Bottom       bottomStage.spin(fwd);
     //Outake         toggleLift();
-    //Dropdown
+    //Dropdown       toggleDropDown();
     //flap           toggleIntakeFlap();
 
     //pincers grab match loads
@@ -401,8 +409,9 @@ void Auton_1()
     //Goes for matchload
     chassis.driveDistanceWithOdom(-14); //13
     toggleLift();
-    matchLoad.set(false);
+    // matchLoad.set(false);
     chassis.turnToAngle(270);
+    matchLoad.set(false);
     chassis.driveDistanceWithOdom(12); //1.5 worked before
     matchLoad.set(true);
       wait(1.7, sec);
@@ -415,15 +424,13 @@ void Auton_1()
     chassis.driveDistanceWithOdom(16.5);
     //Load long with 8
       toggleIntakeFlap();
-      wait(0.1, sec);
+      wait(0.05, sec);
       topStage.spin(reverse);
-      wait(0.2, sec);
+      wait(0.1, sec);
       mainIntake.spin(fwd);
-      //bottomStage.spin(fwd);
       colorSort.spin(fwd);
       topStage.spin(fwd);
       wait(1.7, sec);
-      //bottomStage.stop();
       mainIntake.stop();
       colorSort.stop();
       topStage.stop();
@@ -478,11 +485,18 @@ void Auton_1()
 
 
     //goes for wall balls
-    chassis.driveDistanceWithOdom(-17);
+    chassis.driveDistanceWithOdom(-15); //-17 perfectly aligns
     toggleIntakeFlap();
     chassis.turnToAngle(0);
     chassis.driveDistanceWithOdom(13); //may be to close
-    //drop bar down
+    chassis.driveDistanceWithOdom(-2);
+    matchLoad.set(true);
+    chassis.turnToAngle(5);
+    matchLoad.set(false);
+    chassis.driveDistanceWithOdom(-62);
+    chassis.turnToAngle(90);
+
+
 
 }
 
