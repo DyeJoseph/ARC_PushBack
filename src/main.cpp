@@ -510,7 +510,7 @@ void Auton_2()
     chassis.turnToAngle(0);
     mainIntake.spin(forward);
     colorSort.spin(forward);
-    chassis.driveDistanceWithOdom(18); //driveDistance
+    chassis.driveDistanceWithOdom(18); //driveDistance //18
     matchLoad.set(true);
     // wait(.25, sec);
     chassis.driveDistanceWithOdom(-5); //driveDistance
@@ -524,11 +524,11 @@ void Auton_2()
     chassis.driveDistanceWithOdom(38.1); //39.5
     chassis.turnToAngle(270);
     mainIntake.spin(forward);
-    chassis.driveDistanceWithOdom(49); // 47
+    chassis.driveDistanceWithOdom(47); // 47
 
     //PUT 7 BALLS IN TOP MIDDLE
     chassis.turnToAngle(136); // 134
-    chassis.driveDistanceWithOdom(10); //driveDistance // 15 11 is sometimes too far
+    chassis.driveDistanceWithOdom(9.8); // 10.5
     toggleIntakeFlap(); 
     mainIntake.spin(forward, 65, percent);
     colorSort.spin(forward, 65, percent);
@@ -548,7 +548,7 @@ void Auton_2()
     topStage.spin(forward);
     chassis.driveDistanceWithOdom(23); //driveDistance 24
     //matchLoad.set(true);
-    // wait(.25, sec);
+    wait(.25, sec);
     matchLoad.set(true);
     chassis.driveDistanceWithOdom(-5); //driveDistance
     matchLoad.set(false);
@@ -591,7 +591,7 @@ void Auton_2()
     chassis.turnToAngle(0);
     chassis.driveDistanceWithOdom(14); // 18
     chassis.turnToAngle(90);
-    chassis.driveDistanceWithOdom(44); //49
+    chassis.driveDistanceWithOdom(45); //49
     chassis.turnToAngle(180);
     chassis.driveDistanceWithOdom(5);
     chassis.driveDistanceWithOdom(-5);
