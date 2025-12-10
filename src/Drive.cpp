@@ -425,10 +425,6 @@ void Drive::driveDistanceWithOdom(float distance){
     float targetX = startX + dirX * distance;
     float targetY = startY + dirY * distance;
 
-
-
-    int i =0;
-
     while (!linearPID.isSettled())
     {
         updatePosition();
@@ -450,23 +446,7 @@ void Drive::driveDistanceWithOdom(float distance){
         linearOutput  = clamp(linearOutput,  -driveMaxVoltage, driveMaxVoltage);
         angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
 
-
         driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
-
-
-
-        
-
-        // if(i%10==0){
-        //     //std::cout << "CurX, CurY: " << curX << ", " << curY << std::endl;
-        //     std::cout << "X,Y: " << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << std::endl;
-
-        //     std::cout << "Linear Error: " << linearError << std::endl;
-
-        //     std::cout << "Heading:" << inertial1.heading() << std::endl;
-        // }
-        
-        i++;
 
         updatePosition();
         wait(10, msec);

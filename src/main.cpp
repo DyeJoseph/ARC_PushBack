@@ -338,12 +338,12 @@ void setDriveTrainConstants()
 {
     // Set the Drive PID values for the DriveTrain
     chassis.setDriveConstants(
-        0.5,  // Kp - Proportion Constant
-        0.0001, // Ki - Integral Constant
+        0.4,  // Kp - Proportion Constant
+        0.000, // Ki - Integral Constant
         0.9, // Kd - Derivative Constant
-        .25, // Settle Error
+        1.00, // Settle Error
         200, // Time to Settle
-        1000 // End Time 5000
+        3000 // End Time 5000
     );  
 
     // Set the Turn PID values for the DriveTrain
@@ -351,7 +351,7 @@ void setDriveTrainConstants()
         0.25,    // Kp - Proportion Constant
         0.000,      // Ki - Integral Constant
         1.4,      // Kd - Derivative Constant 
-        0.2,    // Settle Error
+        0.5,    // Settle Error
         200,    // Time to Settle
         1000    // End Time
     );
@@ -535,7 +535,6 @@ void Auton_2()
     mainIntake.spin(forward);
     colorSort.spin(forward);
     chassis.driveDistanceWithOdom(23); //18 // 19
-    std::cout << "COORD1: " << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
     matchLoad.set(true);
     // wait(.25, sec);
     
@@ -553,7 +552,8 @@ void Auton_2()
     chassis.turnToAngle(270);
     mainIntake.spin(forward);
     colorSort.spin(forward);
-    chassis.driveDistanceWithOdom(62); // 47 // 48 //57.5
+    chassis.driveDistanceWithOdom(30); // 47 // 48 //57.5
+    chassis.driveDistanceWithOdom(26);
 
     wait(0.2, sec);
     //PUT 7 BALLS IN TOP MIDDLE
@@ -564,8 +564,6 @@ void Auton_2()
     wait(1, sec);
     toggleIntakeFlap(); 
     chassis.driveDistanceWithOdom(10); // 9.8 10.5 // 9.6 // 10.5
-    
-    std::cout << "COORD2: " << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
 
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward, 100, percent);

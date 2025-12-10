@@ -75,11 +75,17 @@ float PID::compute(float error)
 /// @return Returns TRUE if settled, Returns FALSE if not settled
 bool PID::isSettled()
 {
-    if(runTime > endTime && endTime != 0)
+    if(runTime > endTime && endTime != 0){
+        std::cout << "TIMEOUT" << std::endl;
         return true;
+    }
+        
 
-    if(timeSpentSettled > timeToSettle)
+    if(timeSpentSettled > timeToSettle){
+        std::cout << "SETTLED" << std::endl;
         return true;
+    }
+        
     else
         return false;
 }
