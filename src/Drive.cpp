@@ -280,7 +280,16 @@ void Drive::turnToAngle(float angle, float maxVoltage)
     {
         float error = inTermsOfNegative180To180(inertial1.heading()-angle);
         float output = turnPID.compute(error);
-        output = clamp(output, -maxVoltage, maxVoltage);
+
+        //Minimum output threshold for turning
+        if(fabs(output) < 2)
+            if(output < 0)
+                output = -2.5;
+            else
+                output = 2.5;
+        else
+            output = clamp(output, -maxVoltage, maxVoltage);
+
         driveMotors(-output, output);
         task::sleep(10);
     }while(!turnPID.isSettled());
@@ -465,7 +474,9 @@ void Drive::moveable(){
         updatePosition();
         float x = chassisOdometry.getXPosition();
         float y = chassisOdometry.getYPosition();
-        std::cout << "X: " << x << ", Y: " << y << std::endl;
+        // float x = rotation1.position(degrees);
+        // float y = rotation2.position(degrees);
+        // std::cout << "X: " << x << ", Y: " << y << std::endl;
         Brain.Screen.clearScreen();
         Brain.Screen.setCursor(1,1);
         Brain.Screen.print("X: ");

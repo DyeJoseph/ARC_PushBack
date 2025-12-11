@@ -1,4 +1,5 @@
 #include "odom.h"
+#include <iostream>
 
 /// @brief Constructor for odometry with two forward rotation sensors
 /// @param forwardRightWheelDiameter Right side forward rotation wheel diameter
@@ -186,27 +187,31 @@ void Odom::updatePositionTwoAt45(float currentLeftDegrees, float currentRightDeg
     float deltaHeading = degTo180(headingGyro - heading);
 
 
-    //taking this aout make turning x accurate
-    // if(fabs(deltaHeading) > 0.01){
-    //     //THIS MAY NEED TO BE += INSTEAD
-    //     deltaLeft -= leftRotationDistance*degToRad(deltaHeading);
-    //     deltaRight += rightRotationDistance*degToRad(deltaHeading);
-    // }
+    //taking this out make turning x accurate
+    if(fabs(deltaHeading) > 0.01){
+        //THIS MAY NEED TO BE += INSTEAD
+        deltaLeft -= leftRotationDistance*degToRad(deltaHeading);
+        deltaRight += rightRotationDistance*degToRad(deltaHeading);
+    }
 
     // //Gives answer in radians
     // float deltaY = (deltaLeft + deltaRight) / sqrt(2.0);
     // float deltaX = (deltaLeft - deltaRight) / sqrt(2.0);
 
-    // float deltaY = (deltaLeft + deltaRight) / 1.363996;
-    // float deltaX = (deltaLeft - deltaRight) / 1.462708 * -1.0;
 
-    float deltaY = (deltaLeft + deltaRight) / 1.3382612;
-    float deltaX = (deltaLeft - deltaRight) / 1.4862896;
+    float deltaX = (deltaLeft + deltaRight) / 1.3382612;
+    float deltaY = (deltaLeft - deltaRight) / 1.4862896;
+
+    // std::cout << "DeltaX: " << deltaX << ", DeltaY: " << deltaY << std::endl;
 
     //Update x and y positions and heading
     float avgHeading = degToRad(getHeading()+deltaHeading/2.0);
-    float globalDeltaX = deltaX * cos(avgHeading) + deltaY * sin(avgHeading);
-    float globalDeltaY = deltaX * sin(avgHeading) + deltaY * cos(avgHeading);
+    float globalDeltaX = deltaY * cos(avgHeading) + deltaX * sin(avgHeading);
+    float globalDeltaY = deltaY * sin(avgHeading) + deltaX * cos(avgHeading);
+
+    // std::cout << "globalDeltaX: " << globalDeltaX << ", globalDeltaY: " << globalDeltaY << std::endl;
+    // std::cout << "X: " << getXPosition() << ", Y: " << getYPosition() << ", Heading: " << headingGyro << std::endl;
+
     setPosition((globalDeltaX+getXPosition()), (globalDeltaY+getYPosition()), headingGyro);
     
     //Update variables to store new location information

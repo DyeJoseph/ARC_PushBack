@@ -39,7 +39,7 @@ using namespace vex;
     12,                   // The maximum amount of the voltage used in the drivebase (1 - 12)
     odomType,
     1.955,                  //Odometry wheel diameter (set to zero if no odom) (1.96 robot behind by .2)
-    -3.687,               //Odom pod1 offset 
+    -3.867,               //Odom pod1 offset 
     -3.867                //Odom pod2 offset
   );
 
@@ -156,6 +156,11 @@ void autonomous()
   //Auton_3();
   //Auton_4();
 
+  // while(1){
+  //   chassis.setPosition(0,0,0);
+  //   chassis.moveable();
+  // }
+
   // switch (lastPressed) 
   // {
   //   case 1:
@@ -266,9 +271,6 @@ void usercontrol()
     }
     intakeFlap.set(flapState);
 
-
-
-
     Brain.Screen.clearScreen();
     Brain.Screen.setCursor(1,1);
     Brain.Screen.print("Axis3: %d", Controller1.Axis3.position());
@@ -338,9 +340,9 @@ void setDriveTrainConstants()
 {
     // Set the Drive PID values for the DriveTrain
     chassis.setDriveConstants(
-        0.4,  // Kp - Proportion Constant
-        0.000, // Ki - Integral Constant
-        0.9, // Kd - Derivative Constant
+        0.7,  // Kp - Proportion Constant
+        0.0001, // Ki - Integral Constant
+        1.7, // Kd - Derivative Constant
         1.00, // Settle Error
         200, // Time to Settle
         3000 // End Time 5000
@@ -351,22 +353,19 @@ void setDriveTrainConstants()
         0.25,    // Kp - Proportion Constant
         0.000,      // Ki - Integral Constant
         1.4,      // Kd - Derivative Constant 
-        0.5,    // Settle Error
+        2.0,    // Settle Error
         200,    // Time to Settle
         1000    // End Time
     );
     
 }
 
-
-
-
-
 //Auton Route Functions
 /// @brief Auton Slot 1 - Write code for route within this function.
 void Auton_1()
 {
     Brain.Screen.print("Skills 1 running.");
+    std::cout << "\n\n\n\n\nSTART------------------------------------\n";
     chassis.setTurnMaxVoltage(8);
     chassis.setPosition(-46,15,0);
     mainIntake.setVelocity(100, percent);
@@ -506,7 +505,6 @@ void Auton_2()
     chassis.setDriveMaxVoltage(10);
     chassis.setTurnMaxVoltage(8);
 
-
     //GRAB 4 BLUE START BALLS
     toggleLift(); //UP
     toggleDropDown(); // down
@@ -519,11 +517,15 @@ void Auton_2()
     chassis.driveDistanceWithOdom(-15);
     chassis.driveDistanceWithOdom(5);
     matchLoad.set(true);
+
+    std::cout << "POINT 1: " << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
     
     //GRAB 2 BLUE WALL BALLS
-    chassis.turnToAngle(13.5); // 10 // 12
-    wait(50, msec);
-    chassis.driveDistanceWithOdom(60); //59
+    // chassis.turnToAngle(13.5); // 10 // 12
+    // chassis.driveDistanceWithOdom(60); //59
+
+    chassis.moveToPosition(4, 49);
+    std::cout << "POINT 2: " << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
 
     matchLoad.set(false);
     mainIntake.stop();
@@ -532,11 +534,12 @@ void Auton_2()
     toggleDropDown(); // up
 
     chassis.turnToAngle(0);
+    std::cout << "HEADING: " << chassis.chassisOdometry.getHeading() << std::endl;
+
     mainIntake.spin(forward);
     colorSort.spin(forward);
-    chassis.driveDistanceWithOdom(23); //18 // 19
+    chassis.driveDistanceWithOdom(12);
     matchLoad.set(true);
-    // wait(.25, sec);
     
     chassis.driveDistanceWithOdom(-5); 
     matchLoad.set(false);
@@ -552,8 +555,7 @@ void Auton_2()
     chassis.turnToAngle(270);
     mainIntake.spin(forward);
     colorSort.spin(forward);
-    chassis.driveDistanceWithOdom(30); // 47 // 48 //57.5
-    chassis.driveDistanceWithOdom(26);
+    chassis.driveDistanceWithOdom(47.5); // 47 // 48 //57.5
 
     wait(0.2, sec);
     //PUT 7 BALLS IN TOP MIDDLE
@@ -563,7 +565,7 @@ void Auton_2()
     toggleLift(); // down
     wait(1, sec);
     toggleIntakeFlap(); 
-    chassis.driveDistanceWithOdom(10); // 9.8 10.5 // 9.6 // 10.5
+    chassis.driveDistanceWithOdom(7); // 9.8 10.5 // 9.6 // 10.5
 
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward, 100, percent);
