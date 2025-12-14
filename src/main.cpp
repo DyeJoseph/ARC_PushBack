@@ -350,10 +350,10 @@ void setDriveTrainConstants()
 
     // Set the Turn PID values for the DriveTrain
     chassis.setTurnConstants(
-        0.25,    // Kp - Proportion Constant
-        0.000,      // Ki - Integral Constant
+        .25,    // Kp - Proportion Constant
+        0.0,      // Ki - Integral Constant
         1.4,      // Kd - Derivative Constant 
-        2.0,    // Settle Error
+        2,//1.25    // Settle Error
         200,    // Time to Settle
         1000    // End Time
     );
@@ -544,13 +544,11 @@ void Auton_2()
 
     //GRAB 4 BLUE START BALLS
     toggleLift(); //UP
-    //toggleDropDown(); // down
+    toggleDropDown(); // down
     wait(.5, sec);
-    
     mainIntake.spin(forward);
     colorSort.spin(forward);
     topStage.spin(forward);
-
     chassis.driveDistanceWithOdom(-15);
     chassis.driveDistanceWithOdom(5);
     matchLoad.set(true);
@@ -558,28 +556,21 @@ void Auton_2()
     std::cout << "POINT 1: " << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
     
     //GRAB 2 BLUE WALL BALLS
-    // chassis.turnToAngle(13.5); // 10 // 12
-    // chassis.driveDistanceWithOdom(60); //59
-
-    //chassis.moveToPosition(4, 49); //4,49
     chassis.turnToAngle(15);
     chassis.driveDistanceWithOdom(46);
     std::cout << "POINT 2: " << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
-
     matchLoad.set(false);
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
-    //toggleDropDown(); // up
+    toggleDropDown(); // up
 
     chassis.turnToAngle(0);
     //std::cout << "HEADING: " << chassis.chassisOdometry.getHeading() << std::endl;
-
     mainIntake.spin(forward);
     colorSort.spin(forward);
     chassis.driveDistanceWithOdomTime(16, 1000);//14 to short
     matchLoad.set(true);
-    
     chassis.driveDistanceWithOdom(-5); 
     // matchLoad.set(false);
     // mainIntake.stop();
@@ -588,26 +579,31 @@ void Auton_2()
 
     //GRAB 1 BLUE BALL
     chassis.turnToAngle(208);
+    std::cout << "HEADING: " << chassis.chassisOdometry.getHeading() << std::endl;
     wait(50, msec);
     chassis.driveDistanceWithOdom(39.1); //38.1 39.5
+    std::cout << "HEADING: " << chassis.chassisOdometry.getHeading() << std::endl;
     wait(50, msec);
-    matchLoad.set(false);
     mainIntake.stop();
     colorSort.stop();
+    matchLoad.set(false);
     chassis.turnToAngle(270);
     mainIntake.spin(forward);
     colorSort.spin(forward);
-    chassis.driveDistanceWithOdom(50); // 47.5
+    chassis.driveDistanceWithOdomSettle(48.5, 400, .4); // 47.5
 
     wait(0.2, sec);
+
+
+    
     //PUT 7 BALLS IN TOP MIDDLE
     chassis.turnToAngle(134); // 134
-    //toggleDropDown(); // down
+    toggleDropDown(); // down
     wait(.5, sec);
     toggleLift(); // down
     wait(0.5, sec);
     toggleIntakeFlap(); 
-    chassis.driveDistanceWithOdomTime(6, 1000); //7 slighty to far
+    chassis.driveDistanceWithOdomTime(6.75, 1000); //7 slighty to far
 
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward, 100, percent);
@@ -615,22 +611,23 @@ void Auton_2()
     wait(1, sec);
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward, 100, percent);
-    topStage.spin(forward, 35, percent);
+    topStage.spin(forward, 55, percent);
 
-    wait(1, sec);
+    wait(1.5, sec);
 
      // closing after it scores
 
 
     //GRAB 2 RED BALLS
     chassis.driveDistanceWithOdom(-41); // -42 // -43
+
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
     toggleIntakeFlap(); // down
 
     toggleLift();
-    //toggleDropDown(); // up
+    toggleDropDown(); // up
     chassis.turnToAngle(0);
     mainIntake.spin(forward);
     colorSort.spin(forward);
@@ -721,7 +718,7 @@ void Auton_2()
 
     //LOAD 8 INTO CLOSE LONG GOAL SIDE
     chassis.driveDistanceWithOdom(-15); 
-    chassis.turnToAngle(270);
+    chassis.turnToAngle(275);
     chassis.driveDistanceWithOdomTime(16, 1000);
     toggleIntakeFlap(); //open
     mainIntake.spin(forward);
@@ -966,6 +963,10 @@ void Auton_4()
 void Auton_5()
 {
     Brain.Screen.print("Auton 5 running.");
+    chassis.setPosition(0,0,0);
+    //chassis.turnToAngleD(90, 8, 1.73);
+    chassis.turnToAngle(90);
+    
 }
 
 /// @brief Auton Slot 6 - Write code for route within this function.

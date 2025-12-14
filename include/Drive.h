@@ -56,6 +56,7 @@ class Drive
     void driveDistanceWithOdom(float distance);
     void driveDistanceWithOdomTime(float distance, float timeLimit);
     void driveDistanceWithOdomTime(float distance, float timeLimit, float maxVoltage);
+    void driveDistanceWithOdomSettle(float distance, float settleTime, float settleError);
 
 
 
@@ -74,6 +75,7 @@ class Drive
     void turnToAngle(float angle);
     void turnToAngle(float angle, float maxVoltage);
     void turnToAngleTime(float angle, float timeLimit, float maxVoltage);
+    void turnToAngleD(float angle, float maxVoltage, float turnKdUpdate);
     
     void moveToPosition(float, float);
     void turnToPosition(float desX, float desY);

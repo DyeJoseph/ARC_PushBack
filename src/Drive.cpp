@@ -297,6 +297,32 @@ void Drive::turnToAngle(float angle, float maxVoltage)
     updatePosition();
 }
 
+void Drive::turnToAngleD(float angle, float maxVoltage, float turnKdUpdate)
+{
+    updatePosition();
+    angle = inTermsOfNegative180To180(angle);
+    PID turnPID(turnKp, turnKi, turnKdUpdate, turnSettleError, turnTimeToSettle, turnEndTime);
+    do
+    {
+        float error = inTermsOfNegative180To180(inertial1.heading()-angle);
+        float output = turnPID.compute(error);
+
+        //Minimum output threshold for turning
+        if(fabs(output) < 2)
+            if(output < 0)
+                output = -2.5;
+            else
+                output = 2.5;
+        else
+            output = clamp(output, -maxVoltage, maxVoltage);
+
+        driveMotors(-output, output);
+        task::sleep(10);
+    }while(!turnPID.isSettled());
+    brake();
+    updatePosition();
+}
+
 void Drive::turnToAngleTime(float angle, float timeLimit, float maxVoltage)
 {
     updatePosition();
@@ -401,6 +427,61 @@ void Drive::driveDistanceWithOdom(float distance){
     updatePosition();
 }
 
+void Drive::driveDistanceWithOdomSettle(float distance, float settleTime, float settleError){
+    // Creates PID objects for linear and angular output
+    PID linearPID(driveKp, driveKi, driveKd, settleError, settleTime, driveEndTime);
+    PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
+
+    updatePosition();
+
+    // --- Starting pose (field coordinates & heading) ---
+    float startHeadingDeg = inertial1.heading();
+    float startHeadingRad = degToRad(startHeadingDeg);
+
+    // Unit forward direction based on starting heading
+    float dirX = sin(startHeadingRad);
+    float dirY = cos(startHeadingRad);
+
+    // Starting position in field coordinates
+    float startX = chassisOdometry.getXPosition();
+    float startY = chassisOdometry.getYPosition();
+
+    // Target point in field coordinates (distance along starting heading)
+    float targetX = startX + dirX * distance;
+    float targetY = startY + dirY * distance;
+
+    while (!linearPID.isSettled())
+    {
+        updatePosition();
+
+        // Odom-based pose
+        float curX = chassisOdometry.getXPosition();
+        float curY = chassisOdometry.getYPosition();
+
+        float dx = targetX - curX;
+        float dy = targetY - curY;
+
+        // Signed error along the original heading:
+        float linearError  = dx * dirX + dy * dirY;
+        float angularError = degTo180(startHeadingDeg - inertial1.heading());
+
+        float linearOutput  = linearPID.compute(linearError);
+        float angularOutput = angularPID.compute(angularError);
+
+        linearOutput  = clamp(linearOutput,  -driveMaxVoltage, driveMaxVoltage);
+        angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
+
+        driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
+
+        updatePosition();
+        wait(10, msec);
+    }
+
+    // Make absolutely sure we stop
+    brake();
+    driveMotors(0, 0);
+    updatePosition();
+}
 
 void Drive::driveDistanceWithOdomTime(float distance, float timeLimit){
     // Creates PID objects for linear and angular output
