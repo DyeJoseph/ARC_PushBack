@@ -297,6 +297,32 @@ void Drive::turnToAngle(float angle, float maxVoltage)
     updatePosition();
 }
 
+void Drive::turnToAngleTime(float angle, float timeLimit, float maxVoltage)
+{
+    updatePosition();
+    angle = inTermsOfNegative180To180(angle);
+    PID turnPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, timeLimit);
+    do
+    {
+        float error = inTermsOfNegative180To180(inertial1.heading()-angle);
+        float output = turnPID.compute(error);
+
+        //Minimum output threshold for turning
+        if(fabs(output) < 2)
+            if(output < 0)
+                output = -2.5;
+            else
+                output = 2.5;
+        else
+            output = clamp(output, -maxVoltage, maxVoltage);
+
+        driveMotors(-output, output);
+        task::sleep(10);
+    }while(!turnPID.isSettled());
+    brake();
+    updatePosition();
+}
+
 /// @brief Turns sharply to a specific location and moves to it
 /// @param desX Desired X position
 /// @param desY Desired Y position
@@ -317,100 +343,8 @@ void Drive::moveToPosition(float desX, float desY){
     driveDistanceWithOdom(distance);
 }
 
-// void Drive::moveToPosition(float desX, float desY){
-//     // Creates PID objects for linear and angular output
-//     //float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime
-//     PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime);
-//     PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
 
-//     turnToPosition(desX, desY);
-    
-//     updatePosition();
-//     // Sets the starting variables for the Position and Heading
-//     float startHeading = inertial1.heading();
 
-//     //  Loops while the linear PID has not yet settled
-//     while(!linearPID.isSettled())
-//     {
-//         updatePosition();
-//         // Updates the Error for the linear values and the angular values
-//         float linearError = sqrt(pow(desX-chassisOdometry.getXPosition(), 2.0) + pow(desY-chassisOdometry.getYPosition(), 2.0));
-//         float angularError = degTo180(startHeading - inertial1.heading());
-
-//         // Sets the linear output and angular output to the output of the error passed through the PID compute functions
-//         float linearOutput = linearPID.compute(linearError);
-//         float angularOutput = angularPID.compute(angularError);
-
-//         // Clamps the values of the output to fit within the -12 to 12 volt limit of the vex motors
-//         linearOutput = clamp(linearOutput, -driveMaxVoltage, driveMaxVoltage);
-//         angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
-
-//         // Drives motors according to the linear Output and includes the linear Output to keep the robot in a straight path relative to is start heading
-//         driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
-
-//         // std::cout << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << std::endl;
-//         std::cout << linearOutput << std::endl;
-        
-//         wait(10, msec);
-//     }
-//     // Stops the motors once PID has settled
-//     // brake();
-//     std::cout << "OUT OF LOOP" << std::endl;
-//     updatePosition();
-// }
-
-//Original
-// void Drive::driveDistanceWithOdom(float distance){
-//     // Creates PID objects for linear and angular output
-//     //float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime
-//     PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime);
-//     PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
-    
-//     updatePosition();
-//     // Sets the starting variables for the Position and Heading
-//     float xToGo = cos(degToRad(inertial1.heading()))* distance;
-//     float yToGo = sin(degToRad(inertial1.heading()))* distance;
-//     float startHeading = inertial1.heading();
-
-//     float targetX = chassisOdometry.getXPosition() + xToGo;
-//     float targetY = chassisOdometry.getYPosition() + yToGo;
-
-//     //  Loops while the linear PID has not yet settled
-//     while(!linearPID.isSettled())
-//     {
-//         updatePosition();
-//         // Updates the Error for the linear values and the angular values
-//         float linearError = sqrt(pow(targetX - chassisOdometry.getXPosition(), 2.0) + pow(targetY - chassisOdometry.getYPosition(), 2.0));
-
-        
-//         float angularError = degTo180(startHeading - inertial1.heading());
-
-//         xToGo = cos(degToRad(inertial1.heading())) * linearError;
-//         yToGo = sin(degToRad(inertial1.heading())) * linearError;
-
-//         // Sets the linear output and angular output to the output of the error passed through the PID compute functions
-//         float linearOutput = linearPID.compute(linearError);
-//         float angularOutput = angularPID.compute(angularError);
-
-//         // Clamps the values of the output to fit within the -12 to 12 volt limit of the vex motors
-//         linearOutput = clamp(linearOutput, -driveMaxVoltage, driveMaxVoltage);
-//         angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
-
-//         // Drives motors according to the linear Output and includes the linear Output to keep the robot in a straight path relative to is start heading
-//         driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
-
-//         Brain.Screen.clearScreen();
-//         Brain.Screen.setCursor(1,1);
-//         Brain.Screen.print(linearOutput);
-
-//         wait(10, msec);
-//     }
-//     // Stops the motors once PID has settled
-//     brake();
-//     updatePosition();
-// }
-
-//Modified
 void Drive::driveDistanceWithOdom(float distance){
     // Creates PID objects for linear and angular output
     PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime);
@@ -466,6 +400,123 @@ void Drive::driveDistanceWithOdom(float distance){
     driveMotors(0, 0);
     updatePosition();
 }
+
+
+void Drive::driveDistanceWithOdomTime(float distance, float timeLimit){
+    // Creates PID objects for linear and angular output
+    PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, timeLimit);
+    PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
+
+    updatePosition();
+
+    // --- Starting pose (field coordinates & heading) ---
+    float startHeadingDeg = inertial1.heading();
+    float startHeadingRad = degToRad(startHeadingDeg);
+
+    // Unit forward direction based on starting heading
+    float dirX = sin(startHeadingRad);
+    float dirY = cos(startHeadingRad);
+
+    // Starting position in field coordinates
+    float startX = chassisOdometry.getXPosition();
+    float startY = chassisOdometry.getYPosition();
+
+    // Target point in field coordinates (distance along starting heading)
+    float targetX = startX + dirX * distance;
+    float targetY = startY + dirY * distance;
+
+    while (!linearPID.isSettled())
+    {
+        updatePosition();
+
+        // Odom-based pose
+        float curX = chassisOdometry.getXPosition();
+        float curY = chassisOdometry.getYPosition();
+
+        float dx = targetX - curX;
+        float dy = targetY - curY;
+
+        // Signed error along the original heading:
+        float linearError  = dx * dirX + dy * dirY;
+        float angularError = degTo180(startHeadingDeg - inertial1.heading());
+
+        float linearOutput  = linearPID.compute(linearError);
+        float angularOutput = angularPID.compute(angularError);
+
+        linearOutput  = clamp(linearOutput,  -driveMaxVoltage, driveMaxVoltage);
+        angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
+
+        driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
+
+        updatePosition();
+        wait(10, msec);
+    }
+
+    // Make absolutely sure we stop
+    brake();
+    driveMotors(0, 0);
+    updatePosition();
+}
+
+
+void Drive::driveDistanceWithOdomTime(float distance, float timeLimit, float maxVoltage){
+    // Creates PID objects for linear and angular output
+    PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, timeLimit);
+    PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
+
+    updatePosition();
+
+    // --- Starting pose (field coordinates & heading) ---
+    float startHeadingDeg = inertial1.heading();
+    float startHeadingRad = degToRad(startHeadingDeg);
+
+    // Unit forward direction based on starting heading
+    float dirX = sin(startHeadingRad);
+    float dirY = cos(startHeadingRad);
+
+    // Starting position in field coordinates
+    float startX = chassisOdometry.getXPosition();
+    float startY = chassisOdometry.getYPosition();
+
+    // Target point in field coordinates (distance along starting heading)
+    float targetX = startX + dirX * distance;
+    float targetY = startY + dirY * distance;
+
+    while (!linearPID.isSettled())
+    {
+        updatePosition();
+
+        // Odom-based pose
+        float curX = chassisOdometry.getXPosition();
+        float curY = chassisOdometry.getYPosition();
+
+        float dx = targetX - curX;
+        float dy = targetY - curY;
+
+        // Signed error along the original heading:
+        float linearError  = dx * dirX + dy * dirY;
+        float angularError = degTo180(startHeadingDeg - inertial1.heading());
+
+        float linearOutput  = linearPID.compute(linearError);
+        float angularOutput = angularPID.compute(angularError);
+
+        linearOutput  = clamp(linearOutput,  -maxVoltage, maxVoltage);
+        angularOutput = clamp(angularOutput, -maxVoltage, maxVoltage);
+
+        driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
+
+        updatePosition();
+        wait(10, msec);
+    }
+
+    // Make absolutely sure we stop
+    brake();
+    driveMotors(0, 0);
+    updatePosition();
+}
+
+
+
 
 void Drive::moveable(){
     //updates odom and printx x and y position
