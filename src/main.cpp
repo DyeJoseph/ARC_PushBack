@@ -24,7 +24,7 @@ using namespace vex;
   int odomType = TWO_AT_45;
 
   volatile bool cancelMacro = true;
-  vex::thread macroThread;;
+  vex::thread macroThread;
 
   bool isColorSorting = false; //SET TO TRUE NORMALLY
 
@@ -595,6 +595,7 @@ void Auton_2()
 
     //GRAB 4 BLUE START BALLS
     toggleLift(); //UP
+    wait(0.25, sec);
     toggleDropDown(); // down
     wait(.4, sec); // .5
     mainIntake.spin(forward);
