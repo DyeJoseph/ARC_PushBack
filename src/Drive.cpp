@@ -282,7 +282,7 @@ void Drive::turnToAngle(float angle, float maxVoltage)
         float output = turnPID.compute(error);
 
         //Minimum output threshold for turning
-        if(fabs(output) < 2)
+        if(fabs(output) < 2.5)
             if(output < 0)
                 output = -2.5;
             else
