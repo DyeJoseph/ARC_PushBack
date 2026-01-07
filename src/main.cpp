@@ -163,9 +163,10 @@ void autonomous()
 
 
   //Auton_1();
-  Auton_2();
+  //Auton_2();
   //Auton_3();
   //Auton_4();
+  Auton_7();
 
   // while(1){
   //   chassis.setPosition(0,0,0);
@@ -1075,10 +1076,7 @@ void Auton_4()
 /// @brief Auton Slot 5 - Write code for route within this function.
 void Auton_5()
 {
-    Brain.Screen.print("Auton 5 running.");
-    chassis.setPosition(0,0,0);
-    //chassis.turnToAngleD(90, 8, 1.73);
-    chassis.turnToAngle(90);
+    
     
 }
 
@@ -1493,7 +1491,92 @@ void Auton_6()
 /// @brief Auton Slot 7 - Write code for route within this function.
 void Auton_7()
 {
-    Brain.Screen.print("Auton 7 running.");
+    //Setup
+    Brain.Screen.print("Match Auton Right");
+    mainIntake.setVelocity(100, percent);
+    colorSort.setVelocity(100, percent);
+    topStage.setVelocity(100, percent);
+    bottomStage.setVelocity(100, percent);
+    chassis.setPosition(-46,-8,0);
+    chassis.setDriveMaxVoltage(10);
+    chassis.setTurnMaxVoltage(8);
+
+    //Grab Other Bots Match Load
+    matchLoad.set(true);
+    mainIntake.spin(forward);
+    chassis.driveDistanceWithOdom(-39);
+    chassis.turnToAngle(270);
+    mainIntake.stop();
+    matchLoad.set(false);
+
+    //Intake 6 From Match Load
+    chassis.driveDistanceWithOdomTime(14, 1000);
+    mainIntake.spin(forward);
+    colorSort.spin(forward);
+    topStage.spin(forward);
+    matchLoad.set(true);
+    wait(2, sec);
+
+    //Outtake 3 Blue
+    chassis.driveDistanceWithOdom(-5);
+    chassis.turnToAngle(200);
+    mainIntake.spin(reverse, 50, percent);
+    wait(.8, sec);
+    mainIntake.stop();
+    mainIntake.spin(forward);
+    
+    //Load Into 5 Red Into Long Goal
+    chassis.turnToAngle(93);
+    mainIntake.stop();
+    colorSort.stop();
+    topStage.stop();
+    matchLoad.set(false);
+    toggleLift(); //UP
+    chassis.driveDistanceWithOdomTime(25, 1000);
+    toggleIntakeFlap(); //OPEN
+    mainIntake.spin(forward);
+    colorSort.spin(forward);
+    topStage.spin(forward);
+    wait(1, sec);
+    mainIntake.spin(reverse);
+    wait(.2, sec);
+    mainIntake.spin(forward);
+    wait(1.5, sec);
+
+    //Grab 7 Match Loads
+        toggleIntakeFlap(); //CLOSE
+    chassis.driveDistanceWithOdom(-7);
+    mainIntake.stop();
+    colorSort.stop();
+    topStage.stop();
+    toggleLift(); //DOWN
+    chassis.turnToAngle(270);
+    chassis.driveDistanceWithOdomTime(23, 1000);
+    matchLoad.set(true);
+    mainIntake.spin(forward);
+    colorSort.spin(forward);
+    topStage.spin(forward);
+    wait(3.5,sec);
+    matchLoad.set(false);
+    mainIntake.stop();
+    colorSort.stop();
+    topStage.stop();
+
+
+    //Load 7 Match Loads Into Bottom Middle Goal
+    chassis.driveDistanceWithOdom(-5);
+    chassis.turnToAngle(49);
+    chassis.driveDistanceWithOdom(55);
+    mainIntake.spin(reverse, 15, percent);
+    colorSort.spin(reverse, 90, percent);
+    topStage.spin(reverse, 100, percent);
+    wait(4, sec);
+    chassis.driveDistanceWithOdom(-2);
+    colorSort.spin(reverse, 100, percent);
+    mainIntake.spin(reverse, 100, percent);
+    wait(10, sec);
+
+    
 }
 
 /// @brief Auton Slot 8 - Write code for route within this function.
