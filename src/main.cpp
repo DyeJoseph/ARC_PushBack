@@ -250,11 +250,12 @@ void usercontrol()
 
       if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
         mainIntake.spin(forward);
-        if(flapState){
+        topStage.spin(forward);
+        /*if(flapState){
           topStage.spin(forward);
         }else{
           topStage.stop();
-        }
+        }*/
         if(lastSeen == teamColor || !isColorSorting){
           colorSort.spin(forward);
         }else{
@@ -283,15 +284,19 @@ void usercontrol()
           colorSort.spin(reverse);
         }
         
-      }else if(Controller1.ButtonDown.pressing()){
+      }else if(Controller1.ButtonUp.pressing()){
+        flapState = true;
         mainIntake.spin(forward);
         topStage.spin(forward, 35, percent);
-        flapState = true;
         if(lastSeen == teamColor || !isColorSorting){
           colorSort.spin(forward);
         }else{
           colorSort.spin(reverse);
         }
+      }else if(Controller1.ButtonDown.pressing()){
+        mainIntake.spin(reverse, 35, percent);
+        topStage.spin(reverse);
+        colorSort.spin(forward, 20, percent);
       }else{
         matchLoad.set(false);
         mainIntake.stop();
@@ -299,7 +304,7 @@ void usercontrol()
         topStage.stop();
       }
 
-      if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing()){
+      if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing() && !Controller1.ButtonUp.pressing()){
         flapState = false;
       }
 
