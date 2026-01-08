@@ -166,6 +166,7 @@ void autonomous()
   //Auton_2();
   //Auton_3();
   //Auton_4();
+  //Auton_5();
   Auton_7();
 
   // while(1){
@@ -249,11 +250,12 @@ void usercontrol()
 
       if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
         mainIntake.spin(forward);
-        if(flapState){
+        topStage.spin(forward);
+        /*if(flapState){
           topStage.spin(forward);
         }else{
           topStage.stop();
-        }
+        }*/
         if(lastSeen == teamColor || !isColorSorting){
           colorSort.spin(forward);
         }else{
@@ -282,15 +284,19 @@ void usercontrol()
           colorSort.spin(reverse);
         }
         
-      }else if(Controller1.ButtonDown.pressing()){
+      }else if(Controller1.ButtonUp.pressing()){
+        flapState = true;
         mainIntake.spin(forward);
         topStage.spin(forward, 35, percent);
-        flapState = true;
         if(lastSeen == teamColor || !isColorSorting){
           colorSort.spin(forward);
         }else{
           colorSort.spin(reverse);
         }
+      }else if(Controller1.ButtonDown.pressing()){
+        mainIntake.spin(reverse, 35, percent);
+        topStage.spin(reverse);
+        colorSort.spin(forward, 20, percent);
       }else{
         matchLoad.set(false);
         mainIntake.stop();
@@ -298,7 +304,7 @@ void usercontrol()
         topStage.stop();
       }
 
-      if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing()){
+      if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing() && !Controller1.ButtonUp.pressing()){
         flapState = false;
       }
 
@@ -1088,7 +1094,7 @@ void Auton_4()
 /// @brief Auton Slot 5 - Write code for route within this function.
 void Auton_5()
 {
-    
+    chassis.moveable();
     
 }
 
@@ -1562,7 +1568,7 @@ void Auton_7()
     matchLoad.set(true);
     mainIntake.spin(forward);
     chassis.driveDistanceWithOdom(-39);
-    chassis.turnToAngle(270);
+    chassis.turnToAngle(272);
     mainIntake.stop();
     matchLoad.set(false);
 
@@ -1623,22 +1629,36 @@ void Auton_7()
 
 
     //Load 7 Match Loads Into Bottom Middle Goal
-    // chassis.driveDistanceWithOdom(-5);
-    // chassis.turnToAngle(49);
-    // chassis.driveDistanceWithOdom(55);
-    // mainIntake.spin(reverse, 17, percent); // 15 // 35
-    // colorSort.spin(reverse, 95, percent); // 90 // 100
-    // topStage.spin(reverse, 100, percent);
-    // wait(4, sec); // 4
-    // mainIntake.spin(reverse, 15, percent);
-    // topStage.spin(reverse, 100, percent);
-    // wait(2, sec);
+    chassis.driveDistanceWithOdom(-5);
+    chassis.turnToAngle(49);
+
+    //chassis.moveable();
+    //chassis.movetopos(-8.78, -7.99, 47.8);
+    
+    
+    chassis.driveDistanceWithOdom(53); //55
+    mainIntake.spin(reverse, 17, percent); // 15 // 35
+    colorSort.spin(reverse, 95, percent); // 90 // 100
+    topStage.spin(reverse, 100, percent);
+    wait(2, sec); // 4
+    mainIntake.spin(forward, 100, percent);
+    colorSort.spin(forward, 100, percent);
+    topStage.spin(forward, 100, percent);
+    wait(.5, sec);
+    mainIntake.spin(reverse, 17, percent); // 15 // 35
+    colorSort.spin(reverse, 95, percent); // 90 // 100
+    topStage.spin(reverse, 100, percent);
+    wait(3, sec);
+    mainIntake.spin(reverse, 15, percent);
+    topStage.spin(reverse, 100, percent);
+    wait(2, sec);
 
     // // chassis.driveDistanceWithOdom(-2);
     // colorSort.spin(reverse, 100, percent);
     // mainIntake.spin(reverse, 100, percent);
     // wait(10, sec);
 
+    
 
     /////// ALTERNATE ROUTE /////////
  
