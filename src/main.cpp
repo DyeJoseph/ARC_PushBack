@@ -1602,18 +1602,20 @@ void Auton_7()
 
     //Grab 7 Match Loads
     toggleIntakeFlap(); //CLOSE
-    chassis.driveDistanceWithOdom(-7);
+    chassis.driveDistanceWithOdom(-5); // -7
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
     toggleLift(); //DOWN
-    chassis.turnToAngle(270);
-    chassis.driveDistanceWithOdomTime(24, 1000); // 23
+    chassis.turnToAngle(272); // 270
+    wait(0.2, sec);
+    chassis.turnToAngle(272);
+    chassis.driveDistanceWithOdomTime(26, 1000); // 24
     matchLoad.set(true);
     mainIntake.spin(forward);
     colorSort.spin(forward);
     topStage.spin(forward);
-    wait(3.5,sec);
+    wait(4.0,sec);
     matchLoad.set(false);
     mainIntake.stop();
     colorSort.stop();
@@ -1621,28 +1623,58 @@ void Auton_7()
 
 
     //Load 7 Match Loads Into Bottom Middle Goal
-    chassis.driveDistanceWithOdom(-5);
-    chassis.turnToAngle(49);
-    chassis.driveDistanceWithOdom(55);
-    mainIntake.spin(reverse, 17, percent); // 15 // 35
-    colorSort.spin(reverse, 95, percent); // 90 // 100
-    topStage.spin(reverse, 100, percent);
-    wait(4, sec); // 4
-    mainIntake.spin(reverse, 15, percent);
-    topStage.spin(reverse, 100, percent);
-    wait(2, sec);
+    // chassis.driveDistanceWithOdom(-5);
+    // chassis.turnToAngle(49);
+    // chassis.driveDistanceWithOdom(55);
+    // mainIntake.spin(reverse, 17, percent); // 15 // 35
+    // colorSort.spin(reverse, 95, percent); // 90 // 100
+    // topStage.spin(reverse, 100, percent);
+    // wait(4, sec); // 4
+    // mainIntake.spin(reverse, 15, percent);
+    // topStage.spin(reverse, 100, percent);
+    // wait(2, sec);
 
-    // chassis.driveDistanceWithOdom(-2);
-    colorSort.spin(reverse, 100, percent);
-    mainIntake.spin(reverse, 100, percent);
-    wait(10, sec);
+    // // chassis.driveDistanceWithOdom(-2);
+    // colorSort.spin(reverse, 100, percent);
+    // mainIntake.spin(reverse, 100, percent);
+    // wait(10, sec);
 
 
     /////// ALTERNATE ROUTE /////////
-    // turn to angle 22
-    // drive forward 70
-    // turn to 135
-    // drive 7 inches
+ 
+    // loads into top middle instead
+    chassis.driveDistanceWithOdom(-5);
+    chassis.turnToAngle(22);
+    chassis.driveDistanceWithOdom(78); //80
+    chassis.turnToAngle(134);
+    topStage.setBrake(hold);
+    toggleDropDown(); // down
+    wait(.5, sec);
+    // toggleLift(); // down
+    wait(0.5, sec);
+    toggleIntakeFlap(); //up
+
+    
+    chassis.driveDistanceWithOdomTime(14, 1000); // 15
+
+    mainIntake.spin(forward, 100, percent);
+    colorSort.spin(forward, 100, percent);
+    topStage.spin(forward, 43, percent); //65 // 55 // 45
+    wait(1.4, sec); //1.2
+
+    topStage.spin(reverse);
+    bottomStage.spin(reverse);
+    wait(0.20, sec);
+
+    mainIntake.spin(forward, 100, percent);
+    colorSort.spin(forward, 100, percent);
+    topStage.spin(forward, 36.5, percent); // 55 // 45 // 36
+
+    wait(2.3, sec); // 1.8 before change
+    
+
+    
+    
     // intake stuff    
 }
 
