@@ -1589,7 +1589,7 @@ void Auton_7()
     topStage.stop();
     matchLoad.set(false);
     toggleLift(); //UP
-    chassis.driveDistanceWithOdomTime(25, 1000);
+    chassis.driveDistanceWithOdomTime(26, 1000);// 25
     toggleIntakeFlap(); //OPEN
     mainIntake.spin(forward);
     colorSort.spin(forward);
@@ -1598,17 +1598,17 @@ void Auton_7()
     mainIntake.spin(reverse);
     wait(.2, sec);
     mainIntake.spin(forward);
-    wait(1.5, sec);
+    wait(1.7, sec); // 1.5
 
     //Grab 7 Match Loads
-        toggleIntakeFlap(); //CLOSE
+    toggleIntakeFlap(); //CLOSE
     chassis.driveDistanceWithOdom(-7);
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
     toggleLift(); //DOWN
     chassis.turnToAngle(270);
-    chassis.driveDistanceWithOdomTime(23, 1000);
+    chassis.driveDistanceWithOdomTime(24, 1000); // 23
     matchLoad.set(true);
     mainIntake.spin(forward);
     colorSort.spin(forward);
@@ -1624,16 +1624,26 @@ void Auton_7()
     chassis.driveDistanceWithOdom(-5);
     chassis.turnToAngle(49);
     chassis.driveDistanceWithOdom(55);
-    mainIntake.spin(reverse, 15, percent);
-    colorSort.spin(reverse, 90, percent);
+    mainIntake.spin(reverse, 17, percent); // 15 // 35
+    colorSort.spin(reverse, 95, percent); // 90 // 100
     topStage.spin(reverse, 100, percent);
-    wait(4, sec);
-    chassis.driveDistanceWithOdom(-2);
+    wait(4, sec); // 4
+    mainIntake.spin(reverse, 15, percent);
+    topStage.spin(reverse, 100, percent);
+    wait(2, sec);
+
+    // chassis.driveDistanceWithOdom(-2);
     colorSort.spin(reverse, 100, percent);
     mainIntake.spin(reverse, 100, percent);
     wait(10, sec);
 
-    
+
+    /////// ALTERNATE ROUTE /////////
+    // turn to angle 22
+    // drive forward 70
+    // turn to 135
+    // drive 7 inches
+    // intake stuff    
 }
 
 /// @brief Auton Slot 8 - Write code for route within this function.
