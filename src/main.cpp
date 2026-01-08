@@ -166,6 +166,7 @@ void autonomous()
   //Auton_2();
   //Auton_3();
   //Auton_4();
+  //Auton_5();
   Auton_7();
 
   // while(1){
@@ -1088,7 +1089,7 @@ void Auton_4()
 /// @brief Auton Slot 5 - Write code for route within this function.
 void Auton_5()
 {
-    
+    chassis.moveable();
     
 }
 
@@ -1562,7 +1563,7 @@ void Auton_7()
     matchLoad.set(true);
     mainIntake.spin(forward);
     chassis.driveDistanceWithOdom(-39);
-    chassis.turnToAngle(270);
+    chassis.turnToAngle(272);
     mainIntake.stop();
     matchLoad.set(false);
 
@@ -1608,6 +1609,7 @@ void Auton_7()
     topStage.stop();
     toggleLift(); //DOWN
     chassis.turnToAngle(270);
+    chassis.turnToAngle(270);
     chassis.driveDistanceWithOdomTime(24, 1000); // 23
     matchLoad.set(true);
     mainIntake.spin(forward);
@@ -1623,11 +1625,24 @@ void Auton_7()
     //Load 7 Match Loads Into Bottom Middle Goal
     chassis.driveDistanceWithOdom(-5);
     chassis.turnToAngle(49);
-    chassis.driveDistanceWithOdom(55);
+
+    //chassis.moveable();
+    //chassis.movetopos(-8.78, -7.99, 47.8);
+    
+    
+    chassis.driveDistanceWithOdom(53); //55
     mainIntake.spin(reverse, 17, percent); // 15 // 35
     colorSort.spin(reverse, 95, percent); // 90 // 100
     topStage.spin(reverse, 100, percent);
-    wait(4, sec); // 4
+    wait(2, sec); // 4
+    mainIntake.spin(forward, 100, percent);
+    colorSort.spin(forward, 100, percent);
+    topStage.spin(forward, 100, percent);
+    wait(.5, sec);
+    mainIntake.spin(reverse, 17, percent); // 15 // 35
+    colorSort.spin(reverse, 95, percent); // 90 // 100
+    topStage.spin(reverse, 100, percent);
+    wait(3, sec);
     mainIntake.spin(reverse, 15, percent);
     topStage.spin(reverse, 100, percent);
     wait(2, sec);
@@ -1637,6 +1652,7 @@ void Auton_7()
     mainIntake.spin(reverse, 100, percent);
     wait(10, sec);
 
+    
 
     /////// ALTERNATE ROUTE /////////
     // turn to angle 22
