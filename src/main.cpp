@@ -23,9 +23,6 @@ using namespace vex;
 
   int odomType = TWO_AT_45;
 
-  volatile bool cancelMacro = true;
-  vex::thread macroThread;
-
   bool isColorSorting = false; //SET TO TRUE NORMALLY
 
   bool isInAuton = false;
@@ -67,10 +64,6 @@ void toggleIntakeFlap();
 void slowIntake();
 void toggleColorSort();
 void toggleDropDown();
-
-void startMacro();
-void cancelMacroHandler();
-void stopAllIntakeMotors();
 
 //////////////////////////////////////////////////////////////////////
 
@@ -167,43 +160,40 @@ void autonomous()
   //Auton_3();
   //Auton_4();
   //Auton_5();
-  Auton_7();
+  // Auton_7();
 
-  // while(1){
-  //   chassis.setPosition(0,0,0);
-  //   chassis.moveable();
-  // }
 
-  // switch (lastPressed) 
-  // {
-  //   case 1:
-  //     Auton_1();
-  //     break;
-  //   case 2:
-  //     Auton_2();
-  //     break;
-  //   case 3:
-  //     Auton_3;
-  //     break;
-  //   case 4:
-  //     Auton_4();
-  //     break;
-  //   case 5:
-  //     Auton_5();
-  //     break;
-  //   case 6:
-  //     Auton_6();
-  //     break;
-  //   case 7:
-  //     Auton_7();
-  //     break;
-  //   case 8:
-  //     Auton_8();
-  //     break;
-  //   default:
-  //     DefaultAuton();
-  //     break;
-  // }
+  switch (lastPressed) 
+  {
+    case 1:
+      Auton_1();
+      break;
+    case 2:
+      Auton_2();
+      break;
+    case 3:
+      Auton_3;
+      break;
+    case 4:
+      Auton_4();
+      break;
+    case 5:
+      Auton_5();
+      break;
+    case 6:
+      Auton_6();
+      break;
+    case 7:
+      Auton_7();
+      break;
+    case 8:
+      Auton_8();
+      break;
+    default:
+      Auton_1();
+      break;
+  }
+
 }
 
 /// @brief Runs during the UserControl section of the competition
@@ -223,96 +213,89 @@ void usercontrol()
   topStage.setVelocity(100, percent);
 
   Controller1.ButtonL1.pressed(toggleLift);
-  // Controller1.ButtonUp.pressed(toggleIntakeFlap);
-  // Controller1.ButtonDown.pressed(slowIntake);
   Controller1.ButtonLeft.pressed(toggleDropDown);
   Controller1.ButtonRight.pressed(toggleColorSort);
-
-  Controller1.ButtonA.pressed(startMacro);
-  Controller1.ButtonB.pressed(cancelMacroHandler);
 
   bottomColorSort.setLight(ledState::on);
   bottomColorSort.integrationTime(20);
 
   while (1) {
-    if(cancelMacro){
 
-      if(driver)
-        chassis.tank();
-      else
-        chassis.arcade();
+    if(driver)
+      chassis.tank();
+    else
+      chassis.arcade();
 
-      if(bottomColorSort.color() == vex::color::red){
-        lastSeen = 0;
-      }else if(bottomColorSort.color() == vex::color::blue){
-        lastSeen = 1;
-      }
+    if(bottomColorSort.color() == vex::color::red){
+      lastSeen = 0;
+    }else if(bottomColorSort.color() == vex::color::blue){
+      lastSeen = 1;
+    }
 
-      if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
-        mainIntake.spin(forward);
+    if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
+      mainIntake.spin(forward);
+      topStage.spin(forward);
+      if(flapState){
         topStage.spin(forward);
-        /*if(flapState){
-          topStage.spin(forward);
-        }else{
-          topStage.stop();
-        }*/
-        if(lastSeen == teamColor || !isColorSorting){
-          colorSort.spin(forward);
-        }else{
-          colorSort.spin(reverse);
-        }
-      }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
-        mainIntake.spin(reverse);
-        topStage.spin(reverse);
-        colorSort.spin(forward, 25, percent);
-      }else if(Controller1.ButtonL2.pressing()){
-        matchLoad.set(true);
-        mainIntake.spin(forward);
-        if(lastSeen == teamColor || !isColorSorting){
-          colorSort.spin(forward);
-        }else{
-          colorSort.spin(reverse);
-        }
-
-      }else if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
-        mainIntake.spin(forward);
-        topStage.spin(forward);
-        flapState = true;
-        if(lastSeen == teamColor || !isColorSorting){
-          colorSort.spin(forward);
-        }else{
-          colorSort.spin(reverse);
-        }
-        
-      }else if(Controller1.ButtonUp.pressing()){
-        flapState = true;
-        mainIntake.spin(forward);
-        topStage.spin(forward, 35, percent);
-        if(lastSeen == teamColor || !isColorSorting){
-          colorSort.spin(forward);
-        }else{
-          colorSort.spin(reverse);
-        }
-      }else if(Controller1.ButtonDown.pressing()){
-        mainIntake.spin(reverse, 35, percent);
-        topStage.spin(reverse);
-        colorSort.spin(forward, 20, percent);
       }else{
-        matchLoad.set(false);
-        mainIntake.stop();
-        colorSort.stop();
         topStage.stop();
       }
-
-      if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing() && !Controller1.ButtonUp.pressing()){
-        flapState = false;
+      if(lastSeen == teamColor || !isColorSorting){
+        colorSort.spin(forward);
+      }else{
+        colorSort.spin(reverse);
+      }
+    }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
+      mainIntake.spin(reverse);
+      topStage.spin(reverse);
+      colorSort.spin(forward, 25, percent);
+    }else if(Controller1.ButtonL2.pressing()){
+      matchLoad.set(true);
+      mainIntake.spin(forward);
+      if(lastSeen == teamColor || !isColorSorting){
+        colorSort.spin(forward);
+      }else{
+        colorSort.spin(reverse);
       }
 
-      intakeFlap.set(flapState);
-
+    }else if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
+      mainIntake.spin(forward);
+      topStage.spin(forward);
+      flapState = true;
+      if(lastSeen == teamColor || !isColorSorting){
+        colorSort.spin(forward);
+      }else{
+        colorSort.spin(reverse);
+      }
+        
+    }else if(Controller1.ButtonUp.pressing()){
+      flapState = true;
+      mainIntake.spin(forward);
+      topStage.spin(forward, 35, percent);
+      if(lastSeen == teamColor || !isColorSorting){
+        colorSort.spin(forward);
+      }else{
+        colorSort.spin(reverse);
+      }
+    }else if(Controller1.ButtonDown.pressing()){
+      flapState = true;
+      mainIntake.spin(reverse, 35, percent);
+      topStage.spin(reverse);
+      colorSort.spin(forward, 20, percent);
+    }else{
+      matchLoad.set(false);
+      mainIntake.stop();
+      colorSort.stop();
+      topStage.stop();
     }
-    wait(20, msec);
+
+    if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing() && !Controller1.ButtonUp.pressing() && !Controller1.ButtonDown.pressing()){
+      flapState = false;
+    }
+
+    intakeFlap.set(flapState);
   }
+  wait(20, msec);
 }
 
 void toggleLift(){
@@ -352,29 +335,6 @@ void slowIntake(){
 void toggleColorSort(){
   isColorSorting = !isColorSorting;
 }
-
-void startMacro() {
-    if (!macroThread.joinable()) {
-        cancelMacro = false;
-        macroThread = vex::thread(Auton_6);
-    }
-}
-
-void cancelMacroHandler() {
-    cancelMacro = true;
-    if (macroThread.joinable()) {
-        macroThread.join();
-    }
-    stopAllIntakeMotors();
-}
-
-void stopAllIntakeMotors() {
-  mainIntake.stop();
-  colorSort.stop();
-  topStage.stop();
-  bottomStage.stop();
-}
-
 
 int main() 
 {
@@ -997,13 +957,6 @@ void Auton_3()
     // chassis.driveDistanceWithOdom(-20);
     // chassis.moveToPosition(-63.8, -8.2);
 
-
-
-
-  
-
-
-
 }
 
 /// @brief Auton Slot 4 - Write code for route within this function.
@@ -1080,15 +1033,6 @@ void Auton_4()
     // chassis.turnToAngle(180);
     chassis.moveToPosition(-62, 7.5);
 
-    
-
-
-
-
-
-
-
-
 }
 
 /// @brief Auton Slot 5 - Write code for route within this function.
@@ -1101,601 +1045,13 @@ void Auton_5()
 /// @brief Auton Slot 6 - Write code for route within this function.
 void Auton_6()
 {
-    if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-       Brain.Screen.print("Skills 2 running.");
-    std::cout << "\n\n\n\n\nSTART------------------------------------\n";
-    //SETUP
-    mainIntake.setVelocity(100, percent);
-    colorSort.setVelocity(100, percent);
-    topStage.setVelocity(100, percent);
-    bottomStage.setVelocity(100, percent);
-    chassis.setPosition(0,0,90);
-    chassis.setDriveMaxVoltage(10);
-    chassis.setTurnMaxVoltage(8);
 
-    //GRAB 4 BLUE START BALLS
-    toggleLift(); //UP
-    wait(0.25, sec);
-    toggleDropDown(); // down
-    wait(.4, sec); // .5
-    mainIntake.spin(forward);
-    colorSort.spin(forward);
-    topStage.spin(forward);
-    chassis.driveDistanceWithOdom(-15);
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    chassis.driveDistanceWithOdom(5);
-    matchLoad.set(true);
-
-    std::cout << "POINT 1: " << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
-    
-    //GRAB 2 BLUE WALL BALLS
-    chassis.turnToAngle(15);
-    chassis.driveDistanceWithOdom(46);
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    std::cout << "POINT 2: " << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
-    matchLoad.set(false);
-    mainIntake.stop();
-    colorSort.stop();
-    topStage.stop();
-    toggleDropDown(); // up
-
-    chassis.turnToAngle(0);
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    //std::cout << "HEADING: " << chassis.chassisOdometry.getHeading() << std::endl;
-    mainIntake.spin(forward);
-    colorSort.spin(forward);
-    chassis.driveDistanceWithOdomTime(16, 1000);//14 to short
-    matchLoad.set(true);
-    chassis.driveDistanceWithOdomTime(-5, 1000); 
-    // matchLoad.set(false);
-    // mainIntake.stop();
-    // colorSort.stop();
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-
-
-    //GRAB 1 BLUE BALL
-    chassis.turnToAngle(208);
-    std::cout << "HEADING: " << chassis.chassisOdometry.getHeading() << std::endl;
-    // wait(50, msec);
-    chassis.driveDistanceWithOdom(38.8); //38.1 39.5 // 39.3
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    std::cout << "HEADING: " << chassis.chassisOdometry.getHeading() << std::endl;
-    // wait(50, msec);
-    mainIntake.stop();
-    colorSort.stop();
-    // matchLoad.set(false);
-    chassis.turnToAngle(270);
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    matchLoad.set(false);
-    mainIntake.spin(forward);
-    colorSort.spin(forward);
-    chassis.driveDistanceWithOdomSettle(48.76, 400, .4); // 47.5 // 48.76
-
-    // wait(0.2, sec);
-    if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    
-    //PUT 7 BALLS IN TOP MIDDLE
-    
-    chassis.turnToAngle(134); // 134
-    topStage.setBrake(hold);
-    toggleDropDown(); // down
-    wait(.5, sec);
-    toggleLift(); // down
-    wait(0.5, sec);
-    toggleIntakeFlap(); 
-    if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    
-    chassis.driveDistanceWithOdomTime(5, 1000); //7 // 6.75
-
-    mainIntake.spin(forward, 100, percent);
-    colorSort.spin(forward, 100, percent);
-    topStage.spin(forward, 43, percent); //65 // 55 // 45
-    wait(1.4, sec); //1.2
-    if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    topStage.spin(reverse);
-    bottomStage.spin(reverse);
-    wait(0.20, sec);
-
-    mainIntake.spin(forward, 100, percent);
-    colorSort.spin(forward, 100, percent);
-    topStage.spin(forward, 36.5, percent); // 55 // 45 // 36
-
-    wait(2.3, sec); // 1.8 before change
-    if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    // chassis.driveDistanceWithOdom(1);
-    // wait(0.1, sec);
-
-
-    // mainIntake.stop();
-    // colorSort.stop();
-    // topStage.stop();
-    
-
-
-    //GRAB 2 RED BALLS FROM WALL
-    chassis.driveDistanceWithOdom(-42); // -42 // -43 // -41
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    toggleIntakeFlap(); // down
-
-    // Moving this above (-41)
-    // mainIntake.stop();
-    // colorSort.stop();
-    // topStage.stop();
-    // toggleIntakeFlap(); // down
-
-    toggleLift();
-    toggleDropDown(); // up
-    chassis.turnToAngle(0);
-    mainIntake.spin(forward, 100, percent);
-    colorSort.spin(forward,100, percent);
-    topStage.spin(forward, 100, percent);
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    chassis.driveDistanceWithOdomTime(21, 1000); // 23 //22 //21
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    //matchLoad.set(true);
-    wait(0.5, sec);
-    // toggleDropDown(); // down
-    matchLoad.set(true);
-  
-    chassis.driveDistanceWithOdom(-5); //driveDistance
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    //toggleDropDown(); // up
-
-    // mainIntake.stop();
-    colorSort.stop();
-    topStage.stop();
-    // matchLoad.set(false);
-
-
-
-    //GRAB 6 FROM BOTTOM FAR MATCH LOADER
-    chassis.driveDistanceWithOdom(-9); //11  // -10 //9.5
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    chassis.turnToAngle(270);
-    matchLoad.set(false);
-    
-    // toggleLift();
-
-    chassis.driveDistanceWithOdomTime(15.7, 1000); // 15 // 14 //13.9
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    wait(0.4, sec);
-
-    topStage.stop();
-
-    matchLoad.set(true);
-    mainIntake.spin(forward);
-    colorSort.spin(forward);
-    topStage.spin(forward);
-    
-    wait(2,sec); //1.7
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    colorSort.stop();
-    // topStage.stop();
-    
-
-
-    //LOAD 8 INTO FAR LONG GOAL SIDE
-    chassis.driveDistanceWithOdomTime(-5, 1000); // -14.6
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    chassis.turnToAngle(92); // 90
-    
-    // mainIntake.stop();
-    matchLoad.set(false);
-
-    chassis.driveDistanceWithOdomTime(21.1, 1000); // (11.5 + 9.6)
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    toggleIntakeFlap(); //open
-    mainIntake.spin(forward);
-    colorSort.spin(forward);
-    topStage.spin(forward, 20, percent);
-    if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    wait(0.3, sec);
-    chassis.driveDistanceWithOdomTime(3, 1000);
-
-    topStage.spin(reverse);
-    colorSort.spin(reverse);
-    bottomStage.spin(reverse);
-    wait(0.15, sec);    
-    if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-
-    topStage.spin(forward, 100, percent);
-    colorSort.spin(forward);
-    mainIntake.spin(forward);
-    wait(2.7,sec); // 2 // 2.5
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-
-    mainIntake.stop();
-    colorSort.stop();
-    topStage.stop();
-
-    //GRAB 2 RED FROM CENTER UNDER GOAL
-    chassis.driveDistanceWithOdom(-10);
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    toggleIntakeFlap(); // close
-    chassis.turnToAngle(0);
-    chassis.driveDistanceWithOdom(12.5); // 14 // 13.5 
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    chassis.turnToAngle(88); // 90 // 87
-    chassis.driveDistanceWithOdom(47.7); //49 // 46.5 // 47
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    chassis.turnToAngle(180);
-    chassis.driveDistanceWithOdomTime(5, 1000);
-    toggleDropDown(); // down
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    wait(0.25,sec);
-    matchLoad.set(true);
-    mainIntake.spin(forward);
-    colorSort.spin(forward);
-    topStage.spin(forward);
-
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    chassis.driveDistanceWithOdomTime(-5, 1000);
-    chassis.turnToAngle(90); 
-
-    if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    //GRAB 6 FROM CLOSE MATCH LOADER
-    chassis.driveDistanceWithOdom(22); // 23
-    
-    toggleDropDown(); //up
-    topStage.stop();
-    matchLoad.set(false);
-    mainIntake.stop();
-    colorSort.stop();
-    bottomStage.stop();
-    if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    chassis.turnToAngle(124); // 124
-    chassis.driveDistanceWithOdom(29); // 27 // 29.5
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    chassis.turnToAngle(90);
-    chassis.driveDistanceWithOdomTime(9.5, 1000); //5 //8.5
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-
-    
-    matchLoad.set(true);
-    mainIntake.spin(forward);
-    colorSort.spin(forward);
-    topStage.spin(forward);
-    wait(1.7,sec);
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    
-    colorSort.stop();
-    topStage.stop();
-    
-
-    //LOAD 8 INTO CLOSE LONG GOAL SIDE
-    chassis.driveDistanceWithOdom(-15); 
-    chassis.turnToAngle(273); // 270 // 272
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-
-    mainIntake.stop();
-    matchLoad.set(false);
-
-    chassis.driveDistanceWithOdomTime(12.5, 1000); // 16 before change
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    toggleIntakeFlap(); //open
-
-    mainIntake.spin(forward);
-    colorSort.spin(forward);
-    topStage.spin(forward, 20, percent);
-    if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    chassis.driveDistanceWithOdomTime(3, 1000);
-    topStage.spin(forward, 100, percent);
-    wait(0.1,sec);
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    topStage.spin(forward, 100, percent);
-    colorSort.spin(forward);
-    mainIntake.spin(forward);
-    wait(1.5, sec);
-
-    mainIntake.spin(reverse);
-    colorSort.spin(reverse);
-    topStage.spin(reverse);
-    wait(0.25, sec);
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-
-    topStage.spin(forward, 100, percent);
-    colorSort.spin(forward);
-    mainIntake.spin(forward);
-    wait(1.5, sec);
-    if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-    mainIntake.stop();
-    colorSort.stop();
-    topStage.stop();
-
-    //PARK
-    // UNTESTED
-    chassis.driveDistanceWithOdom(-7);
-        if(cancelMacro) {
-      stopAllIntakeMotors();
-      return;
-    }
-
-    // if not enough time
-    // chassis.turnToAngle(145); // no idea if thats close yet
-    // chassis.driveDistanceWithOdom(27.5);
-    // chassis.turnToAngle(180);
-    
-   
-    // chassis.driveDistanceWithOdom(13);
-    // toggleLift() // should be up idk
-    //chassis.driveDistanceWithOdom(10);
-
-
-    //if enough time
-    // chassis.turnToAngle(215); // 225
-    // chassis.driveDistanceWithOdom(44);
-    // wait(2, sec); // need to block
-    // chassis.driveDistanceWithOdom(-60);
-    // chassis.turnToAngle(172); // no idea if thats close yet
-    // chassis.setDriveMaxVoltage(10); // speeding up
-    // chassis.driveDistanceWithOdom(35);
-
-
-    
 }
 
 /// @brief Auton Slot 7 - Write code for route within this function.
 void Auton_7()
 {
-    //Setup
-    Brain.Screen.print("Match Auton Right");
-    mainIntake.setVelocity(100, percent);
-    colorSort.setVelocity(100, percent);
-    topStage.setVelocity(100, percent);
-    bottomStage.setVelocity(100, percent);
-    chassis.setPosition(-46,-8,0);
-    chassis.setDriveMaxVoltage(10);
-    chassis.setTurnMaxVoltage(8);
-
-    //Grab Other Bots Match Load
-    matchLoad.set(true);
-    mainIntake.spin(forward);
-    chassis.driveDistanceWithOdom(-39);
-    chassis.turnToAngle(272);
-    mainIntake.stop();
-    matchLoad.set(false);
-
-    //Intake 6 From Match Load
-    chassis.driveDistanceWithOdomTime(14, 1000);
-    mainIntake.spin(forward);
-    colorSort.spin(forward);
-    topStage.spin(forward);
-    matchLoad.set(true);
-    wait(2, sec);
-
-    //Outtake 3 Blue
-    chassis.driveDistanceWithOdom(-5);
-    chassis.turnToAngle(200);
-    mainIntake.spin(reverse, 50, percent);
-    wait(.8, sec);
-    mainIntake.stop();
-    mainIntake.spin(forward);
-    
-    //Load Into 5 Red Into Long Goal
-    chassis.turnToAngle(93);
-    mainIntake.stop();
-    colorSort.stop();
-    topStage.stop();
-    matchLoad.set(false);
-    toggleLift(); //UP
-    chassis.driveDistanceWithOdomTime(26, 1000);// 25
-    toggleIntakeFlap(); //OPEN
-    mainIntake.spin(forward);
-    colorSort.spin(forward);
-    topStage.spin(forward);
-    wait(1, sec);
-    mainIntake.spin(reverse);
-    wait(.2, sec);
-    mainIntake.spin(forward);
-    wait(1.7, sec); // 1.5
-
-    //Grab 7 Match Loads
-    toggleIntakeFlap(); //CLOSE
-    chassis.driveDistanceWithOdom(-5); // -7
-    mainIntake.stop();
-    colorSort.stop();
-    topStage.stop();
-    toggleLift(); //DOWN
-    chassis.turnToAngle(272); // 270
-    wait(0.2, sec);
-    chassis.turnToAngle(272);
-    chassis.driveDistanceWithOdomTime(26, 1000); // 24
-    matchLoad.set(true);
-    mainIntake.spin(forward);
-    colorSort.spin(forward);
-    topStage.spin(forward);
-    wait(4.0,sec);
-    matchLoad.set(false);
-    mainIntake.stop();
-    colorSort.stop();
-    topStage.stop();
-
-
-    //Load 7 Match Loads Into Bottom Middle Goal
-    chassis.driveDistanceWithOdom(-5);
-    chassis.turnToAngle(49);
-
-    //chassis.moveable();
-    //chassis.movetopos(-8.78, -7.99, 47.8);
-    
-    
-    chassis.driveDistanceWithOdom(53); //55
-    mainIntake.spin(reverse, 17, percent); // 15 // 35
-    colorSort.spin(reverse, 95, percent); // 90 // 100
-    topStage.spin(reverse, 100, percent);
-    wait(2, sec); // 4
-    mainIntake.spin(forward, 100, percent);
-    colorSort.spin(forward, 100, percent);
-    topStage.spin(forward, 100, percent);
-    wait(.5, sec);
-    mainIntake.spin(reverse, 17, percent); // 15 // 35
-    colorSort.spin(reverse, 95, percent); // 90 // 100
-    topStage.spin(reverse, 100, percent);
-    wait(3, sec);
-    mainIntake.spin(reverse, 15, percent);
-    topStage.spin(reverse, 100, percent);
-    wait(2, sec);
-
-    // // chassis.driveDistanceWithOdom(-2);
-    // colorSort.spin(reverse, 100, percent);
-    // mainIntake.spin(reverse, 100, percent);
-    // wait(10, sec);
-
-    
-
-    /////// ALTERNATE ROUTE /////////
- 
-    // loads into top middle instead
-    chassis.driveDistanceWithOdom(-5);
-    chassis.turnToAngle(22);
-    chassis.driveDistanceWithOdom(78); //80
-    chassis.turnToAngle(134);
-    topStage.setBrake(hold);
-    toggleDropDown(); // down
-    wait(.5, sec);
-    // toggleLift(); // down
-    wait(0.5, sec);
-    toggleIntakeFlap(); //up
-
-    
-    chassis.driveDistanceWithOdomTime(14, 1000); // 15
-
-    mainIntake.spin(forward, 100, percent);
-    colorSort.spin(forward, 100, percent);
-    topStage.spin(forward, 43, percent); //65 // 55 // 45
-    wait(1.4, sec); //1.2
-
-    topStage.spin(reverse);
-    bottomStage.spin(reverse);
-    wait(0.20, sec);
-
-    mainIntake.spin(forward, 100, percent);
-    colorSort.spin(forward, 100, percent);
-    topStage.spin(forward, 36.5, percent); // 55 // 45 // 36
-
-    wait(2.3, sec); // 1.8 before change
-    
-
-    
-    
-    // intake stuff    
+   
 }
 
 /// @brief Auton Slot 8 - Write code for route within this function.
