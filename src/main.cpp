@@ -857,15 +857,15 @@ void Auton_6() // SCORES TOP MIDDLE
     wait(2, sec);
 
     //Outtake 3 Blue
-    chassis.driveDistanceWithOdom(-5);
+    chassis.driveDistanceWithOdomTime(-5, 1000);
     chassis.turnToAngle(200);
     mainIntake.spin(reverse, 50, percent);
-    wait(.8, sec);
+    wait(.9, sec);
     mainIntake.stop();
     mainIntake.spin(forward);
     
-    //Load Into 5 Red Into Long Goal
-    chassis.turnToAngle(93);
+    //Load Into 5 Red Into Long Goal]
+    chassis.turnToAngle(95);
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
@@ -884,20 +884,18 @@ void Auton_6() // SCORES TOP MIDDLE
 
     //Grab 7 Match Loads
     toggleIntakeFlap(); //CLOSE
-    chassis.driveDistanceWithOdom(-5); // -7
+    chassis.driveDistanceWithOdomTime(-6, 1000); // -7
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
     toggleLift(); //DOWN
     chassis.turnToAngle(272); // 270
-    wait(0.2, sec);
-    chassis.turnToAngle(272);
-    chassis.driveDistanceWithOdomTime(26, 1000); // 24
+    chassis.driveDistanceWithOdomTime(25, 1000); // 24
     matchLoad.set(true);
     mainIntake.spin(forward);
     colorSort.spin(forward);
     topStage.spin(forward);
-    wait(4.0,sec);
+    wait(2.5,sec);
     matchLoad.set(false);
     mainIntake.stop();
     colorSort.stop();
@@ -905,8 +903,8 @@ void Auton_6() // SCORES TOP MIDDLE
 
  
     // LOADS TOP MIDDLE INSTEAD
-    chassis.driveDistanceWithOdom(-5);
-    chassis.turnToAngle(22);
+    chassis.driveDistanceWithOdomTime(-5, 1000);
+    chassis.turnToAngleTime(22, 1000, 8);
     chassis.driveDistanceWithOdom(78); //80
     chassis.turnToAngle(134);
     topStage.setBrake(hold);
@@ -915,7 +913,7 @@ void Auton_6() // SCORES TOP MIDDLE
     // toggleLift(); // down
     wait(0.5, sec);
     toggleIntakeFlap(); //up
-    chassis.driveDistanceWithOdomTime(14, 1000); // 15
+    chassis.driveDistanceWithOdomTime(18, 1000); // 15
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward, 100, percent);
     topStage.spin(forward, 43, percent); //65 // 55 // 45
@@ -963,12 +961,12 @@ void Auton_7() // SCORES LOW MIDDLE
     chassis.driveDistanceWithOdomTime(-5, 1000);
     chassis.turnToAngle(200);
     mainIntake.spin(reverse, 50, percent);
-    wait(.8, sec);
+    wait(.9, sec);
     mainIntake.stop();
     mainIntake.spin(forward);
     
-    //Load Into 5 Red Into Long Goal
-    chassis.turnToAngle(93);
+    //Load Into 5 Red Into Long Goal]
+    chassis.turnToAngle(95);
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
@@ -987,7 +985,7 @@ void Auton_7() // SCORES LOW MIDDLE
 
     //Grab 7 Match Loads
     toggleIntakeFlap(); //CLOSE
-    chassis.driveDistanceWithOdomTime(-5, 1000); // -7
+    chassis.driveDistanceWithOdomTime(-6, 1000); // -7
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
@@ -1009,31 +1007,41 @@ void Auton_7() // SCORES LOW MIDDLE
 
     //Load 7 Match Loads Into Bottom Middle Goal
     chassis.driveDistanceWithOdomTime(-5, 1000);
-    chassis.turnToAngle(49); // 51
+    chassis.turnToAngle(52); // 51
+    wait(.3, sec);
+    chassis.turnToAngle(52);
 
     std::cout << inertial1.heading(deg) << std::endl;
 
     //chassis.moveable();
     //chassis.movetopos(-8.78, -7.99, 47.8);
     chassis.driveDistanceWithOdom(55); //55
+    /*colorSort.spin(forward, 100, percent);
+    mainIntake.spin(reverse, 17, percent);
+    wait(4, sec);
+    topStage.spin(reverse, 100, percent);
+    wait(8, sec);*/
+
+    
     mainIntake.spin(reverse, 17, percent); // 15 // 35
-    colorSort.spin(reverse, 95, percent); // 90 // 100
+    colorSort.spin(forward, 100, percent); // 90 // 100
     topStage.spin(reverse, 100, percent);
     wait(2, sec); // 4
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward, 100, percent);
     topStage.spin(forward, 100, percent);
-    wait(.5, sec);
+    wait(.2, sec);
     mainIntake.spin(reverse, 17, percent); // 15 // 35
-    colorSort.spin(reverse, 95, percent); // 90 // 100
+    colorSort.spin(forward, 100, percent); // 90 // 100
     topStage.spin(reverse, 100, percent);
     wait(3, sec);
+    chassis.driveDistanceWithOdom(-3);
     mainIntake.spin(reverse, 15, percent);
     topStage.spin(reverse, 100, percent);
-    wait(2, sec);
+    wait(5, sec);
     // chassis.driveDistanceWithOdom(-2);
-    colorSort.spin(reverse, 100, percent);
-    mainIntake.spin(reverse, 100, percent);
+    //colorSort.spin(reverse, 100, percent);
+    //mainIntake.spin(reverse, 100, percent);
     wait(10, sec);
 
     
