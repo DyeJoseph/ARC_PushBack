@@ -23,9 +23,6 @@ using namespace vex;
 
   int odomType = TWO_AT_45;
 
-  volatile bool cancelMacro = true;
-  vex::thread macroThread;
-
   bool isColorSorting = false; //SET TO TRUE NORMALLY
 
   bool isInAuton = false;
@@ -68,10 +65,6 @@ void slowIntake();
 void toggleColorSort();
 void toggleDropDown();
 
-void startMacro();
-void cancelMacroHandler();
-void stopAllIntakeMotors();
-
 //////////////////////////////////////////////////////////////////////
 
 
@@ -85,7 +78,6 @@ void preAuton()
 
   enum preAutonStates{START_SCREEN = 0, SELECTION_SCREEN = 1};
   int currentScreen = START_SCREEN;
-  int lastPressed = 0;
 
   // Calibrates/Resets the Brains sensors before the competition
   inertial1.calibrate();
@@ -152,7 +144,7 @@ void preAuton()
 /// @brief Runs during the Autonomous Section of the Competition
 void autonomous() 
 {  
-  //drawSponsors();
+  drawSponsors();
   isInAuton = true;
   rotation1.resetPosition();
   rotation2.resetPosition();
@@ -161,59 +153,49 @@ void autonomous()
 
   setDriveTrainConstants();
 
+  switch (lastPressed) 
+  {
+    case 0:
+      Auton_1();
+      break;
+    case 1:
+      Auton_2();
+      break;
+    case 2:
+      Auton_3;
+      break;
+    case 3:
+      Auton_4();
+      break;
+    case 4:
+      Auton_5();
+      break;
+    case 5:
+      Auton_6();
+      break;
+    case 6:
+      Auton_7();
+      break;
+    case 7:
+      Auton_8();
+      break;
+    default:
+      break;
+  }
 
-  //Auton_1();
-  //Auton_2();
-  //Auton_3();
-  //Auton_4();
-  //Auton_5();
-  Auton_7();
-
-  // while(1){
-  //   chassis.setPosition(0,0,0);
-  //   chassis.moveable();
-  // }
-
-  // switch (lastPressed) 
-  // {
-  //   case 1:
-  //     Auton_1();
-  //     break;
-  //   case 2:
-  //     Auton_2();
-  //     break;
-  //   case 3:
-  //     Auton_3;
-  //     break;
-  //   case 4:
-  //     Auton_4();
-  //     break;
-  //   case 5:
-  //     Auton_5();
-  //     break;
-  //   case 6:
-  //     Auton_6();
-  //     break;
-  //   case 7:
-  //     Auton_7();
-  //     break;
-  //   case 8:
-  //     Auton_8();
-  //     break;
-  //   default:
-  //     DefaultAuton();
-  //     break;
-  // }
 }
 
 /// @brief Runs during the UserControl section of the competition
 void usercontrol() 
 {
-  //drawSponsors();
+  drawSponsors();
  
   // User control code here, inside the loop
   bool flapState = false;
   int lastSeen = teamColor;
+
+  //CHANGE IF NOT COLOR SORTING
+  isColorSorting = true;
 
   chassis.brake(coast);
   mainIntake.setStopping(coast);
@@ -223,96 +205,89 @@ void usercontrol()
   topStage.setVelocity(100, percent);
 
   Controller1.ButtonL1.pressed(toggleLift);
-  // Controller1.ButtonUp.pressed(toggleIntakeFlap);
-  // Controller1.ButtonDown.pressed(slowIntake);
   Controller1.ButtonLeft.pressed(toggleDropDown);
   Controller1.ButtonRight.pressed(toggleColorSort);
-
-  Controller1.ButtonA.pressed(startMacro);
-  Controller1.ButtonB.pressed(cancelMacroHandler);
 
   bottomColorSort.setLight(ledState::on);
   bottomColorSort.integrationTime(20);
 
   while (1) {
-    if(cancelMacro){
 
-      if(driver)
-        chassis.tank();
-      else
-        chassis.arcade();
+    if(driver)
+      chassis.tank();
+    else
+      chassis.arcade();
 
-      if(bottomColorSort.color() == vex::color::red){
-        lastSeen = 0;
-      }else if(bottomColorSort.color() == vex::color::blue){
-        lastSeen = 1;
-      }
+    if(bottomColorSort.color() == vex::color::red){
+      lastSeen = 0;
+    }else if(bottomColorSort.color() == vex::color::blue){
+      lastSeen = 1;
+    }
 
-      if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
-        mainIntake.spin(forward);
+    if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
+      mainIntake.spin(forward);
+      topStage.spin(forward);
+      if(flapState){
         topStage.spin(forward);
-        /*if(flapState){
-          topStage.spin(forward);
-        }else{
-          topStage.stop();
-        }*/
-        if(lastSeen == teamColor || !isColorSorting){
-          colorSort.spin(forward);
-        }else{
-          colorSort.spin(reverse);
-        }
-      }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
-        mainIntake.spin(reverse);
-        topStage.spin(reverse);
-        colorSort.spin(forward, 25, percent);
-      }else if(Controller1.ButtonL2.pressing()){
-        matchLoad.set(true);
-        mainIntake.spin(forward);
-        if(lastSeen == teamColor || !isColorSorting){
-          colorSort.spin(forward);
-        }else{
-          colorSort.spin(reverse);
-        }
-
-      }else if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
-        mainIntake.spin(forward);
-        topStage.spin(forward);
-        flapState = true;
-        if(lastSeen == teamColor || !isColorSorting){
-          colorSort.spin(forward);
-        }else{
-          colorSort.spin(reverse);
-        }
-        
-      }else if(Controller1.ButtonUp.pressing()){
-        flapState = true;
-        mainIntake.spin(forward);
-        topStage.spin(forward, 35, percent);
-        if(lastSeen == teamColor || !isColorSorting){
-          colorSort.spin(forward);
-        }else{
-          colorSort.spin(reverse);
-        }
-      }else if(Controller1.ButtonDown.pressing()){
-        mainIntake.spin(reverse, 35, percent);
-        topStage.spin(reverse);
-        colorSort.spin(forward, 20, percent);
       }else{
-        matchLoad.set(false);
-        mainIntake.stop();
-        colorSort.stop();
         topStage.stop();
       }
-
-      if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing() && !Controller1.ButtonUp.pressing()){
-        flapState = false;
+      if(lastSeen == teamColor || !isColorSorting){
+        colorSort.spin(forward);
+      }else{
+        colorSort.spin(reverse);
+      }
+    }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
+      mainIntake.spin(reverse);
+      topStage.spin(reverse);
+      colorSort.spin(forward, 25, percent);
+    }else if(Controller1.ButtonL2.pressing()){
+      matchLoad.set(true);
+      mainIntake.spin(forward);
+      if(lastSeen == teamColor || !isColorSorting){
+        colorSort.spin(forward);
+      }else{
+        colorSort.spin(reverse);
       }
 
-      intakeFlap.set(flapState);
-
+    }else if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
+      mainIntake.spin(forward);
+      topStage.spin(forward);
+      flapState = true;
+      if(lastSeen == teamColor || !isColorSorting){
+        colorSort.spin(forward);
+      }else{
+        colorSort.spin(reverse);
+      }
+        
+    }else if(Controller1.ButtonUp.pressing()){
+      flapState = true;
+      mainIntake.spin(forward);
+      topStage.spin(forward, 35, percent);
+      if(lastSeen == teamColor || !isColorSorting){
+        colorSort.spin(forward);
+      }else{
+        colorSort.spin(reverse);
+      }
+    }else if(Controller1.ButtonDown.pressing()){
+      flapState = true;
+      mainIntake.spin(reverse, 35, percent);
+      topStage.spin(reverse);
+      colorSort.spin(forward, 20, percent);
+    }else{
+      matchLoad.set(false);
+      mainIntake.stop();
+      colorSort.stop();
+      topStage.stop();
     }
-    wait(20, msec);
+
+    if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing() && !Controller1.ButtonUp.pressing() && !Controller1.ButtonDown.pressing()){
+      flapState = false;
+    }
+
+    intakeFlap.set(flapState);
   }
+  wait(20, msec);
 }
 
 void toggleLift(){
@@ -352,29 +327,6 @@ void slowIntake(){
 void toggleColorSort(){
   isColorSorting = !isColorSorting;
 }
-
-void startMacro() {
-    if (!macroThread.joinable()) {
-        cancelMacro = false;
-        macroThread = vex::thread(Auton_6);
-    }
-}
-
-void cancelMacroHandler() {
-    cancelMacro = true;
-    if (macroThread.joinable()) {
-        macroThread.join();
-    }
-    stopAllIntakeMotors();
-}
-
-void stopAllIntakeMotors() {
-  mainIntake.stop();
-  colorSort.stop();
-  topStage.stop();
-  bottomStage.stop();
-}
-
 
 int main() 
 {
@@ -997,13 +949,6 @@ void Auton_3()
     // chassis.driveDistanceWithOdom(-20);
     // chassis.moveToPosition(-63.8, -8.2);
 
-
-
-
-  
-
-
-
 }
 
 /// @brief Auton Slot 4 - Write code for route within this function.
@@ -1079,15 +1024,6 @@ void Auton_4()
     chassis.moveToPosition(-60, 34.5);
     // chassis.turnToAngle(180);
     chassis.moveToPosition(-62, 7.5);
-
-    
-
-
-
-
-
-
-
 
 }
 
