@@ -78,7 +78,6 @@ void preAuton()
 
   enum preAutonStates{START_SCREEN = 0, SELECTION_SCREEN = 1};
   int currentScreen = START_SCREEN;
-  int lastPressed = 0;
 
   // Calibrates/Resets the Brains sensors before the competition
   inertial1.calibrate();
@@ -145,7 +144,7 @@ void preAuton()
 /// @brief Runs during the Autonomous Section of the Competition
 void autonomous() 
 {  
-  //drawSponsors();
+  drawSponsors();
   isInAuton = true;
   rotation1.resetPosition();
   rotation2.resetPosition();
@@ -154,43 +153,33 @@ void autonomous()
 
   setDriveTrainConstants();
 
-
-  //Auton_1();
-  //Auton_2();
-  //Auton_3();
-  //Auton_4();
-  //Auton_5();
-  // Auton_7();
-
-
   switch (lastPressed) 
   {
-    case 1:
+    case 0:
       Auton_1();
       break;
-    case 2:
+    case 1:
       Auton_2();
       break;
-    case 3:
+    case 2:
       Auton_3;
       break;
-    case 4:
+    case 3:
       Auton_4();
       break;
-    case 5:
+    case 4:
       Auton_5();
       break;
-    case 6:
+    case 5:
       Auton_6();
       break;
-    case 7:
+    case 6:
       Auton_7();
       break;
-    case 8:
+    case 7:
       Auton_8();
       break;
     default:
-      Auton_1();
       break;
   }
 
@@ -199,11 +188,14 @@ void autonomous()
 /// @brief Runs during the UserControl section of the competition
 void usercontrol() 
 {
-  //drawSponsors();
+  drawSponsors();
  
   // User control code here, inside the loop
   bool flapState = false;
   int lastSeen = teamColor;
+
+  //CHANGE IF NOT COLOR SORTING
+  isColorSorting = true;
 
   chassis.brake(coast);
   mainIntake.setStopping(coast);
