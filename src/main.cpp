@@ -713,6 +713,9 @@ void Auton_5() // SLPITS BLOCKS BETWEEN HIGH AND LOW
     chassis.setTurnMaxVoltage(8);
 
     //Grab Other Bots Match Load
+    toggleLift();
+    wait(.1, sec);
+    toggleLift();
     matchLoad.set(true);
     mainIntake.spin(forward);
     chassis.driveDistanceWithOdom(-39);
@@ -841,6 +844,9 @@ void Auton_6() // SCORES TOP MIDDLE
     chassis.setTurnMaxVoltage(8);
 
     //Grab Other Bots Match Load
+    toggleLift();
+    wait(.1, sec);
+    toggleLift();
     matchLoad.set(true);
     mainIntake.spin(forward);
     chassis.driveDistanceWithOdom(-39);
@@ -942,6 +948,9 @@ void Auton_7() // SCORES LOW MIDDLE
     chassis.setTurnMaxVoltage(8);
 
     //Grab Other Bots Match Load
+    toggleLift();
+    wait(.1, sec);
+    toggleLift();
     matchLoad.set(true);
     mainIntake.spin(forward);
     chassis.driveDistanceWithOdom(-39);
