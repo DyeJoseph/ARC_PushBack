@@ -703,7 +703,7 @@ void Auton_5() // SLPITS BLOCKS BETWEEN HIGH AND LOW
 {
     chassis.moveable();
 
-    Brain.Screen.print("Match Auton Right");
+    //Brain.Screen.print("Match Auton Right");
     mainIntake.setVelocity(100, percent);
     colorSort.setVelocity(100, percent);
     topStage.setVelocity(100, percent);
@@ -714,7 +714,7 @@ void Auton_5() // SLPITS BLOCKS BETWEEN HIGH AND LOW
 
     //Grab Other Bots Match Load
     toggleLift();
-    wait(.1, sec);
+    wait(.2, sec);
     toggleLift();
     matchLoad.set(true);
     mainIntake.spin(forward);
@@ -834,7 +834,7 @@ void Auton_5() // SLPITS BLOCKS BETWEEN HIGH AND LOW
 
 void Auton_6() // SCORES TOP MIDDLE
 {
-    Brain.Screen.print("Match Auton Right");
+    //Brain.Screen.print("Match Auton Right");
     mainIntake.setVelocity(100, percent);
     colorSort.setVelocity(100, percent);
     topStage.setVelocity(100, percent);
@@ -845,7 +845,7 @@ void Auton_6() // SCORES TOP MIDDLE
 
     //Grab Other Bots Match Load
     toggleLift();
-    wait(.1, sec);
+    wait(.2, sec);
     toggleLift();
     matchLoad.set(true);
     mainIntake.spin(forward);
@@ -949,7 +949,7 @@ void Auton_7() // SCORES LOW MIDDLE
 
     //Grab Other Bots Match Load
     toggleLift();
-    wait(.1, sec);
+    wait(.2, sec);
     toggleLift();
     matchLoad.set(true);
     mainIntake.spin(forward);
