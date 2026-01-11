@@ -459,7 +459,7 @@ void Auton_2()
     toggleIntakeFlap(); 
 
     
-    chassis.driveDistanceWithOdomTime(5, 1000); //7 // 6.75
+    chassis.driveDistanceWithOdomTime(7, 1000); //7 // 6.75
 
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward, 100, percent);
@@ -502,7 +502,7 @@ void Auton_2()
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward,100, percent);
     topStage.spin(forward, 100, percent);
-    chassis.driveDistanceWithOdomTime(21, 1000); // 23 //22 //21
+    chassis.driveDistanceWithOdomTime(20, 1000); // 23 //22 //21
     //matchLoad.set(true);
     wait(0.5, sec);
     // toggleDropDown(); // down
@@ -519,7 +519,7 @@ void Auton_2()
 
 
     //GRAB 6 FROM BOTTOM FAR MATCH LOADER
-    chassis.driveDistanceWithOdom(-9); //11  // -10 //9.5
+    chassis.driveDistanceWithOdom(-10); //11  // -10 //9.5
     chassis.turnToAngle(270);
     matchLoad.set(false);
     
@@ -605,7 +605,7 @@ void Auton_2()
     bottomStage.stop();
 
     chassis.turnToAngle(124); // 124
-    chassis.driveDistanceWithOdom(29); // 27 // 29.5
+    chassis.driveDistanceWithOdom(31); // 27 // 29.5
     chassis.turnToAngle(90);
     chassis.driveDistanceWithOdomTime(9.5, 1000); //5 //8.5
 
@@ -701,7 +701,6 @@ void Auton_4()
 /// @brief Auton Slot 5 - Write code for route within this function.
 void Auton_5() // SLPITS BLOCKS BETWEEN HIGH AND LOW
 {
-    chassis.moveable();
 
     //Brain.Screen.print("Match Auton Right");
     mainIntake.setVelocity(100, percent);
@@ -849,7 +848,7 @@ void Auton_6() // SCORES TOP MIDDLE
     toggleLift();
     matchLoad.set(true);
     mainIntake.spin(forward);
-    chassis.driveDistanceWithOdom(-39);
+    chassis.driveDistanceWithOdom(-40);
     chassis.turnToAngle(272);
     mainIntake.stop();
     matchLoad.set(false);
@@ -871,7 +870,7 @@ void Auton_6() // SCORES TOP MIDDLE
     mainIntake.spin(forward);
     
     //Load Into 5 Red Into Long Goal]
-    chassis.turnToAngle(95);
+    chassis.turnToAngle(93);
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
@@ -889,13 +888,15 @@ void Auton_6() // SCORES TOP MIDDLE
     wait(1.7, sec); // 1.5
 
     //Grab 7 Match Loads
-    toggleIntakeFlap(); //CLOSE
     chassis.driveDistanceWithOdomTime(-6, 1000); // -7
+    toggleIntakeFlap(); //CLOSE
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
     toggleLift(); //DOWN
-    chassis.turnToAngle(272); // 270
+    chassis.turnToAngle(275); // 270
+    wait(.2, sec);
+    chassis.turnToAngle(275);
     chassis.driveDistanceWithOdomTime(25, 1000); // 24
     matchLoad.set(true);
     mainIntake.spin(forward);
@@ -911,7 +912,7 @@ void Auton_6() // SCORES TOP MIDDLE
     // LOADS TOP MIDDLE INSTEAD
     chassis.driveDistanceWithOdomTime(-5, 1000);
     chassis.turnToAngleTime(22, 1000, 8);
-    chassis.driveDistanceWithOdom(78); //80
+    chassis.driveDistanceWithOdom(79 ); //80
     chassis.turnToAngle(134);
     topStage.setBrake(hold);
     // toggleDropDown(); // down
@@ -919,7 +920,7 @@ void Auton_6() // SCORES TOP MIDDLE
     // toggleLift(); // down
     wait(0.5, sec);
     toggleIntakeFlap(); //up
-    chassis.driveDistanceWithOdomTime(18, 1000); // 15
+    chassis.driveDistanceWithOdomTime(19, 1000); // 15
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward, 100, percent);
     topStage.spin(forward, 43, percent); //65 // 55 // 45
