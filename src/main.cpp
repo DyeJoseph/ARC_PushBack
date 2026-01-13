@@ -194,8 +194,8 @@ void usercontrol()
   bool flapState = false;
   int lastSeen = teamColor;
 
-  //CHANGE IF NOT COLOR SORTING
-  isColorSorting = true;
+  //CHANGE IF COLOR SORTING
+  isColorSorting = false;
 
   chassis.brake(coast);
   mainIntake.setStopping(coast);
@@ -226,12 +226,13 @@ void usercontrol()
 
     if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
       mainIntake.spin(forward);
-      topStage.spin(forward);
-      if(flapState){
-        topStage.spin(forward);
-      }else{
-        topStage.stop();
-      }
+      topStage.spin(forward, 50, percent);
+      
+      // if(flapState){
+      //   topStage.spin(forward);
+      // }else{
+      //   topStage.stop();
+      // }
       if(lastSeen == teamColor || !isColorSorting){
         colorSort.spin(forward);
       }else{
@@ -372,14 +373,14 @@ void setDriveTrainConstants()
 
 //Auton Route Functions
 /// @brief Auton Slot 1 - Write code for route within this function.
-void Auton_1()
+void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
 {
     Brain.Screen.print("Auton 1.");
 
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.
-void Auton_2()
+void Auton_2() //1 MINUTE SKILLS
 {
     Brain.Screen.print("Skills running.");
     std::cout << "\n\n\n\n\nSTART------------------------------------\n";
@@ -442,7 +443,7 @@ void Auton_2()
     matchLoad.set(false);
     mainIntake.spin(forward);
     colorSort.spin(forward);
-    chassis.driveDistanceWithOdomSettle(48.76, 400, .4); // 47.5 // 48.76
+    chassis.driveDistanceWithOdomSettle(48.5, 400, .4); // 47.5 // 48.76
 
     // wait(0.2, sec);
 
@@ -475,6 +476,8 @@ void Auton_2()
     topStage.spin(forward, 36.5, percent); // 55 // 45 // 36
 
     wait(2.3, sec); // 1.8 before change
+    chassis.driveDistanceWithOdom(-5);
+    chassis.driveDistanceWithOdom(5);
 
     // chassis.driveDistanceWithOdom(1);
     // wait(0.1, sec);
@@ -520,7 +523,7 @@ void Auton_2()
 
     //GRAB 6 FROM BOTTOM FAR MATCH LOADER
     chassis.driveDistanceWithOdom(-10); //11  // -10 //9.5
-    chassis.turnToAngle(270);
+    chassis.turnToAngle(271); //270
     matchLoad.set(false);
     
     // toggleLift();
@@ -545,7 +548,9 @@ void Auton_2()
     //LOAD 8 INTO FAR LONG GOAL SIDE
     chassis.driveDistanceWithOdomTime(-5, 1000); // -14.6
     
-    chassis.turnToAngle(92); // 90
+    chassis.turnToAngle(93); // 90
+    wait(.2, sec);
+    chassis.turnToAngle(93);
     
     // mainIntake.stop();
     matchLoad.set(false);
@@ -623,6 +628,8 @@ void Auton_2()
     //LOAD 8 INTO CLOSE LONG GOAL SIDE
     chassis.driveDistanceWithOdom(-15); 
     chassis.turnToAngle(273); // 270 // 272
+    wait(.2, sec);
+    chassis.turnToAngle(273);
 
     mainIntake.stop();
     matchLoad.set(false);
@@ -687,13 +694,13 @@ void Auton_2()
 }
 
 /// @brief Auton Slot 3 - Write code for route within this function.
-void Auton_3()
+void Auton_3() //EMPTY (UPDATE WHEN CHANGED)
 {
     Brain.Screen.print("Auton 3 running.");
 }
 
 /// @brief Auton Slot 4 - Write code for route within this function.
-void Auton_4()
+void Auton_4() //EMPTY (UPDATE WHEN CHANGED)
 {
     Brain.Screen.print("Auton 4 running.");
 }
@@ -830,7 +837,6 @@ void Auton_5() // SLPITS BLOCKS BETWEEN HIGH AND LOW
 }
 
 /// @brief Auton Slot 6 - Write code for route within this function.
-
 void Auton_6() // SCORES TOP MIDDLE
 {
     //Brain.Screen.print("Match Auton Right");
@@ -864,13 +870,16 @@ void Auton_6() // SCORES TOP MIDDLE
     //Outtake 3 Blue
     chassis.driveDistanceWithOdomTime(-5, 1000);
     chassis.turnToAngle(200);
+
     mainIntake.spin(reverse, 50, percent);
     wait(.9, sec);
     mainIntake.stop();
     mainIntake.spin(forward);
     
     //Load Into 5 Red Into Long Goal]
-    chassis.turnToAngle(93);
+    chassis.turnToAngle(92);
+    wait(.2, sec);
+    chassis.turnToAngle(92);
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
@@ -888,15 +897,16 @@ void Auton_6() // SCORES TOP MIDDLE
     wait(1.7, sec); // 1.5
 
     //Grab 7 Match Loads
+    chassis.setDriveMaxVoltage(8);
     chassis.driveDistanceWithOdomTime(-6, 1000); // -7
     toggleIntakeFlap(); //CLOSE
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
     toggleLift(); //DOWN
-    chassis.turnToAngle(275); // 270
+    chassis.turnToAngle(276); // 270
     wait(.2, sec);
-    chassis.turnToAngle(275);
+    chassis.turnToAngle(276);     
     chassis.driveDistanceWithOdomTime(25, 1000); // 24
     matchLoad.set(true);
     mainIntake.spin(forward);
@@ -912,15 +922,15 @@ void Auton_6() // SCORES TOP MIDDLE
     // LOADS TOP MIDDLE INSTEAD
     chassis.driveDistanceWithOdomTime(-5, 1000);
     chassis.turnToAngleTime(22, 1000, 8);
-    chassis.driveDistanceWithOdom(79 ); //80
-    chassis.turnToAngle(134);
+    chassis.driveDistanceWithOdom(79); //80
+    chassis.turnToAngle(140);
     topStage.setBrake(hold);
     // toggleDropDown(); // down
     wait(.5, sec);
     // toggleLift(); // down
     wait(0.5, sec);
     toggleIntakeFlap(); //up
-    chassis.driveDistanceWithOdomTime(19, 1000); // 15
+    chassis.driveDistanceWithOdomTime(20, 1000); // 15
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward, 100, percent);
     topStage.spin(forward, 43, percent); //65 // 55 // 45
@@ -1040,7 +1050,7 @@ void Auton_7() // SCORES LOW MIDDLE
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward, 100, percent);
     topStage.spin(forward, 100, percent);
-    wait(.2, sec);
+    wait(.5, sec);
     mainIntake.spin(reverse, 17, percent); // 15 // 35
     colorSort.spin(forward, 100, percent); // 90 // 100
     topStage.spin(reverse, 100, percent);
@@ -1049,6 +1059,7 @@ void Auton_7() // SCORES LOW MIDDLE
     mainIntake.spin(reverse, 15, percent);
     topStage.spin(reverse, 100, percent);
     wait(5, sec);
+    chassis.driveDistanceWithOdom(-5);
     // chassis.driveDistanceWithOdom(-2);
     //colorSort.spin(reverse, 100, percent);
     //mainIntake.spin(reverse, 100, percent);
@@ -1058,7 +1069,7 @@ void Auton_7() // SCORES LOW MIDDLE
 }
 
 /// @brief Auton Slot 8 - Write code for route within this function.
-void Auton_8()
+void Auton_8() //EMPTY (UPDATE WHEN CHANGED)
 {
   Brain.Screen.print("Auton 8 running.");
 }
