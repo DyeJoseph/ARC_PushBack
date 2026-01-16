@@ -618,9 +618,9 @@ void Drive::moveable(){
         Brain.Screen.print("Y: ");
         Brain.Screen.print(y);
         Brain.Screen.print(heading);
-        std::cout << "\nHeading: " << chassisOdometry.getHeading();
-        std::cout << "\nx: " << x;
-        std::cout << "\ny: " << y;
+        //std::cout << "\nHeading: " << chassisOdometry.getHeading();
+        //std::cout << "\nx: " << x;
+        //std::cout << "\ny: " << y;
         wait(50, msec); 
     }
 }
@@ -734,25 +734,24 @@ void Drive::setPosition(float x, float y, float heading){
 }
 
 void Drive::movetopos(float x, float y, float angle) {
-    // ===== LemLib-style behavior knobs =====
-    const float lead = 0.4f;                // carrot lead factor
-    const float close_range = 7.5f;         // inches: when we enter "close/settle" mode (LemLib default-ish)
+    const float lead = 0.4f;                // carrot lead factor (larger = slower smoother approach, smaller = tighter more aggresive)
+    const float close_range = 7.5f;         // inches: when we enter "close/settle" mode
     const float early_exit_range = 0.0f;    // inches: set >0 if you want earlier exit past target line
 
     // Speed/limits
     const float max_drive = driveMaxVoltage;   // volts
     const float max_turn  = turnMaxVoltage;    // volts
-    const float dt_ms = 10.0f;
+    const float dt_ms = 10.0f;                 // how often loop updates
 
-    // Exit conditions (use your constants)
+    // Exit conditions
     const float settle_dist = driveSettleError;   // inches
     const float settle_ang  = turnSettleError;    // degrees
     const int   settle_time = driveTimeToSettle;  // ms
     const int   timeout_ms  = driveEndTime;       // ms
 
     // PIDs (use your tuned values)
-    PID drivePID(0.9, 0.0, 2.0, settle_dist, settle_time, timeout_ms);
-    PID headingPID(0.3, 0.0, 1.4, settle_ang,  settle_time, timeout_ms);
+    PID drivePID(0.7, 0.0001, 1.7, settle_dist, settle_time, timeout_ms); //timeout_ms
+    PID headingPID(0.3, 0.0, 1.4, settle_ang,  settle_time, timeout_ms); //timeout_ms
 
     // Persistent loop variables (like LemLib)
     bool close = false;
@@ -805,9 +804,17 @@ void Drive::movetopos(float x, float y, float angle) {
 
         if (close) lateralError *= scalar;       // only use cosine magnitude while settling
         else       lateralError *= sgn(scalar);   // far away, only use the sign (prevents stalling/circles)
+        
+        
+        /*if (close && dist_to_target > .5f)
+            lateralError *= scalar;
+        else
+            lateralError = dist_to_target;*/
 
         // angularError: when close, target final angle; else target carrot heading
         float angularError = close ? final_err : travel_err;
+        std::cout << "\n" << angularError;
+
 
         // ===== Exit conditions (LemLib-style): must be close AND both errors settled =====
         if (close) {
@@ -815,18 +822,23 @@ void Drive::movetopos(float x, float y, float angle) {
             const bool ang_ok  = fabs(angularError)   < settle_ang;
 
             if (dist_ok && ang_ok) settled_ms += (int)dt_ms;
-            else settled_ms = 0;
+            else if (settled_ms > 0)
+                settled_ms -= (int)dt_ms;
 
             if (settled_ms >= settle_time) {
-                std::cout << "SETTLED-----------------" << std::endl;
-                break;
-            }
-        }
+            std::cout << "\nSETTTTTTTTTTTTTTTTTTTTTTTTLE";
+            break;  // SETTLED
+    }
+}
 
         // ===== Early exit if crossed target line while close (optional) =====
         {
             // line through target oriented with target heading:
             // (y - y0)*(-sinθ) <= (x - x0)*cosθ + early_exit_range
+
+            const float final_heading_err = fabs(inTermsOfNegative180To180(angle - robotH));
+            const bool heading_ok = final_heading_err < settle_ang;  // 1.5° in your case
+
             const float s = sin(degToRad(angle));
             const float c = cos(degToRad(angle));
 
@@ -834,10 +846,10 @@ void Drive::movetopos(float x, float y, float angle) {
             const bool carrotSide = (carrotY - y) * (-s) <= (carrotX - x) * (c) + early_exit_range;
             const bool sameSide = (robotSide == carrotSide);
 
-            if (!sameSide && prevSameSide && close) {
-                std::cout << "SETTLED-----------------" << std::endl;
+            /*if (!sameSide && prevSameSide && close && heading_ok) {
+                std::cout << "Yes I SETTLED-----------------" << std::endl;
                 break;
-            }
+            }*/
             prevSameSide = sameSide;
         }
 
@@ -847,6 +859,7 @@ void Drive::movetopos(float x, float y, float angle) {
 
         // Clamp
         drive_output   = clamp(drive_output,   -max_drive, max_drive);
+        if (fabs(drive_output) < 1.0f) drive_output = sgn(drive_output) * 1.0f;
         heading_output = clamp(heading_output, -max_turn,  max_turn);
 
         // Mix
@@ -864,7 +877,8 @@ void Drive::movetopos(float x, float y, float angle) {
     }
 
     std::cout << "X POS: " << chassisOdometry.getXPosition()
-              << " Y POS: " << chassisOdometry.getYPosition() << std::endl;
+              << " Y POS: " << chassisOdometry.getYPosition() 
+              << " HEADING: " << chassisOdometry.getHeading() << std::endl;
 
     brake();
 }
