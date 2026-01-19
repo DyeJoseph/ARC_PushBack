@@ -813,7 +813,6 @@ void Drive::movetopos(float x, float y, float angle) {
 
         // angularError: when close, target final angle; else target carrot heading
         float angularError = close ? final_err : travel_err;
-        std::cout << "\n" << angularError;
 
 
         // ===== Exit conditions (LemLib-style): must be close AND both errors settled =====
