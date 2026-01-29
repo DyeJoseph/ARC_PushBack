@@ -104,14 +104,18 @@ void Drive::tank(){
     int leftY = 0;
     int rightX = 0;
     if(Controller1.Axis3.position(percent) >= 0)
-        leftY = pow(Controller1.Axis3.position(percent),2)/100;
+        //leftY = pow(Controller1.Axis3.position(percent),2)/100;
+        leftY = Controller1.Axis3.position(percent);
     else
-        leftY = pow(Controller1.Axis3.position(percent),2)/-100;
+        //leftY = pow(Controller1.Axis3.position(percent),2)/-100;
+        leftY = Controller1.Axis3.position(percent);
     
     if(Controller1.Axis2.position(percent) >= 0)
-        rightX = pow(Controller1.Axis2.position(percent),2)/100;
+        //rightX = pow(Controller1.Axis2.position(percent),2)/100;
+        rightX = Controller1.Axis2.position(percent);
     else
-        rightX = pow(Controller1.Axis2.position(percent),2)/-100;
+        //rightX = pow(Controller1.Axis2.position(percent),2)/-100;
+        rightX = Controller1.Axis2.position(percent);
 
     leftDrive.spin(forward, leftY, percent);
     rightDrive.spin(forward, rightX, percent);
@@ -289,11 +293,6 @@ void Drive::turnToAngle(float angle, float maxVoltage)
                 output = 1.55;
         else
             output = clamp(output, -maxVoltage, maxVoltage);
-//         if (fabs(error) < turnSettleError) {
-//             output = 0;
-// }
-//         else {
-//             output = clamp(output, -maxVoltage, maxVoltage);}
 
         driveMotors(-output, output);
         task::sleep(10);
