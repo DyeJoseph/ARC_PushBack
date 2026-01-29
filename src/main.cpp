@@ -88,7 +88,7 @@ void preAuton()
 
   vex::color colors[8] = {vex::color::red, vex::color::red, vex::color::red, vex::color::red, 
                           vex::color::blue, vex::color::blue, vex::color::blue, vex::color::blue};
-  std::string names[8] = {"NONE", "NONE", "1mSkill", "TopDef5", 
+  std::string names[8] = {"NONE", "UCF", "1mSkill", "TopDef5", 
                           "Park5", "2xTop7", "TopMid7", "LowMid7"};
   Button buttons[9];
   createAutonButtons(colors, names, buttons);
@@ -146,7 +146,7 @@ void preAuton()
 /// @brief Runs during the Autonomous Section of the Competition
 void autonomous() 
 {  
-  /*drawSponsors();
+  drawSponsors();
   isInAuton = true;
   rotation1.resetPosition();
   rotation2.resetPosition();
@@ -183,8 +183,8 @@ void autonomous()
       break;
     default:
       break;
-  }*/
- Auton_3();
+  }
+//  Auton_3();
 }
 
 /// @brief Runs during the UserControl section of the competition
@@ -465,8 +465,127 @@ void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.
-void Auton_2() //HIT MIDDLE TOP, THEN RUN
+void Auton_2() // UCF Route
 {
+  // SETTING UP
+  mainIntake.setVelocity(100, percent);
+  colorSort.setVelocity(100, percent);
+  topStage.setVelocity(100, percent);
+  bottomStage.setVelocity(100, percent);
+
+  chassis.setPosition(-46,-8,0);
+  chassis.setDriveMaxVoltage(10);
+  chassis.setTurnMaxVoltage(8);
+
+  toggleLift();
+  wait(0.2, sec);
+  toggleLift();
+
+  // GRAB MATCH LOADS
+  matchLoad.set(true);
+  mainIntake.spin(forward);
+
+  // BLOCKING TOP MIDDLE
+  chassis.driveDistanceWithOdom(-39);
+  chassis.turnToAngle(60);
+  wait(0.1, sec);
+  mainIntake.stop();
+  matchLoad.set(false);
+  chassis.movetopos(0,-22.5,60);
+  wait(1.5, sec);
+  chassis.movetopos(13.5, -15, 60);
+  wait(0.5, sec);
+
+  // GRABS 6 FROM MATCH LOAD
+  chassis.driveDistanceWithOdom(-67.5);
+  chassis.turnToAngle(270);
+  chassis.movetopos(-57,-47,270);
+  mainIntake.spin(forward);
+  colorSort.spin(forward);
+  topStage.spin(forward);
+  matchLoad.set(true);
+  wait(2, sec);
+  mainIntake.stop();
+  colorSort.stop();
+  topStage.stop(); 
+
+
+  // OUTTAKE 3 BLOCKS
+  chassis.driveDistanceWithOdom(-5);
+  chassis.turnToAngle(145);
+  wait(.1, sec);
+  mainIntake.spin(reverse, 50, percent);
+  wait(.8, sec);
+  mainIntake.stop();
+  mainIntake.spin(forward);
+
+  // SCORE 5 INTO HIGH GOAL
+  chassis.turnToAngle(90);
+  mainIntake.stop();
+  matchLoad.set(false);
+  toggleLift(); // up
+  wait(.1, sec);
+  chassis.movetopos(-32,-47,90);
+  toggleIntakeFlap(); // open
+  mainIntake.spin(forward);
+  colorSort.spin(forward);
+  topStage.spin(forward);
+  wait(1, sec);
+  topStage.spin(reverse);
+  mainIntake.spin(reverse);
+  wait(.2, sec);
+  topStage.spin(forward);
+  mainIntake.spin(forward);
+  wait(1.7, sec);
+  toggleIntakeFlap(); // close
+
+  // GRAB 8 FROM MATCH LOAD
+  chassis.driveDistanceWithOdomTime(-5, 1000);
+  mainIntake.stop();
+  colorSort.stop();
+  topStage.stop();
+  toggleLift(); // down
+  chassis.turnToAngle(270);
+  chassis.movetopos(-57, -47, 270);
+  matchLoad.set(true);
+  colorSort.spin(forward);
+  topStage.spin(forward);
+  wait(3.5,sec);
+  matchLoad.set(false);
+  mainIntake.stop();
+  colorSort.stop();
+  topStage.stop();
+
+  // SCORE 8 INTO HIGH GOAL
+  chassis.driveDistanceWithOdomTime(-5, 1000);
+  chassis.turnToAngle(90);
+  matchLoad.set(false);
+  toggleLift(); // up
+  wait(.1, sec);
+  chassis.movetopos(-32,-47, 90);
+  toggleIntakeFlap(); // open
+  mainIntake.spin(forward);
+  colorSort.spin(forward);
+  topStage.spin(forward);
+  wait(1, sec);
+  topStage.spin(reverse);
+  mainIntake.spin(reverse);
+  wait(.2, sec);
+  topStage.spin(forward);
+  mainIntake.spin(forward);
+  wait(1.7, sec);
+  toggleIntakeFlap(); // close
+
+
+
+
+
+  
+  
+
+  
+
+
 }
 
 /// @brief Auton Slot 3 - Write code for route within this function.
