@@ -745,6 +745,7 @@ void Drive::movetopos(float x, float y, float angle) {
     // Speed/limits
     const float max_drive = driveMaxVoltage;   // volts
     const float max_turn  = turnMaxVoltage;    // volts
+    const float min_turn = 1.0f;               // volts
     const float dt_ms = 10.0f;                 // how often loop updates
 
     // Exit conditions
@@ -755,7 +756,7 @@ void Drive::movetopos(float x, float y, float angle) {
 
     // PIDs (use your tuned values)
     PID drivePID(0.7, 0.0001, 1.7, settle_dist, settle_time, timeout_ms); //timeout_ms
-    PID headingPID(0.27, 0.0001, 1.5, settle_ang,  settle_time, timeout_ms); //timeout_ms
+    PID headingPID(0.3, 0.0001, 1.5, settle_ang,  settle_time, timeout_ms); //timeout_ms
 
     // Persistent loop variables (like LemLib)
     bool close = false;
@@ -862,8 +863,16 @@ void Drive::movetopos(float x, float y, float angle) {
 
         // Clamp
         drive_output   = clamp(drive_output,   -max_drive, max_drive);
-        if (fabs(drive_output) < 1.0f) drive_output = sgn(drive_output) * 1.0f;
-        heading_output = clamp(heading_output, -max_turn,  max_turn);
+        if (fabs(drive_output) < 1.0f) 
+            drive_output = sgn(drive_output) * 1.0f;
+
+        heading_output = clamp(heading_output, -max_turn, max_turn);
+
+        // ---- MIN TURN FLOOR ----
+        if (fabs(heading_output) > 0.0f && fabs(heading_output) < min_turn) {
+            heading_output = sgn(heading_output) * min_turn;
+        }
+;
 
         // Mix
         const float left_voltage  = drive_output + heading_output;
