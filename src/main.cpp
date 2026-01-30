@@ -800,13 +800,14 @@ void Auton_3() //1 MINUTE SKILL REAL
 void Auton_4() //TOP MIDDLE DEFENSE
 {
   //SET UP
+  //thread odomThread(odomDebugThread);
   mainIntake.setVelocity(100, percent);
   colorSort.setVelocity(100, percent);
   topStage.setVelocity(100, percent);
   bottomStage.setVelocity(100, percent);
   chassis.setPosition(-46,-8,0);
-  chassis.setDriveMaxVoltage(10);
-  chassis.setTurnMaxVoltage(8);
+  chassis.setDriveMaxVoltage(12);
+  chassis.setTurnMaxVoltage(10);
   toggleLift();
   wait(.2, sec);
   toggleLift();
@@ -817,12 +818,12 @@ void Auton_4() //TOP MIDDLE DEFENSE
 
   //DRIVE TO MATCH LOAD
   chassis.driveDistanceWithOdom(-38);
-  chassis.setDriveMaxVoltage(8);
   chassis.turnToAngle(270);
   wait(.1, sec);
   mainIntake.stop();
   matchLoad.set(false);
-  chassis.movetopos(-61.5, -43.6, 270);
+  chassis.movetopos(-55, -47, 270);
+  chassis.driveDistanceWithOdomTime(4, 400);
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
@@ -830,7 +831,7 @@ void Auton_4() //TOP MIDDLE DEFENSE
   wait(2, sec);
 
   //OUTTAKE 3 BALLS
-  chassis.driveDistanceWithOdom(-6);
+  chassis.driveDistanceWithOdomTime(-6, 1000);
   chassis.turnToAngle(200);
   wait(.1, sec);
   mainIntake.spin(reverse, 50, percent);
@@ -843,16 +844,16 @@ void Auton_4() //TOP MIDDLE DEFENSE
   wait(.1, sec);
   mainIntake.stop();
   matchLoad.set(false);
-  chassis.driveDistanceWithOdom(6);
+  chassis.driveDistanceWithOdomTime(7, 1000);
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
   matchLoad.set(true);
   wait(2, sec);
-  chassis.driveDistanceWithOdom(-6);
+  chassis.driveDistanceWithOdomTime(-6, 1000);
 
   //LOAD INTO LONG GOAL
-  chassis.turnToAngle(90);
+  chassis.turnToAngle(94);
   wait(.1, sec);
   mainIntake.stop();
   colorSort.stop();
@@ -860,7 +861,8 @@ void Auton_4() //TOP MIDDLE DEFENSE
   matchLoad.set(false);
   toggleLift();
   wait(.1, sec);
-  chassis.movetopos(-23, -45, 90);
+  chassis.movetopos(-29, -48.5, 94);
+  chassis.driveDistanceWithOdomTime(6, 600);
   toggleIntakeFlap(); //OPEN
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -875,11 +877,10 @@ void Auton_4() //TOP MIDDLE DEFENSE
   toggleIntakeFlap(); //CLOSE
 
   //RAM MIDDLE LEFT
-  chassis.setDriveMaxVoltage(12);
   toggleLift();
   chassis.driveDistanceWithOdom(-20);
   chassis.turnToAngle(65);
-  chassis.movetopos(17,-17, 65);
+  chassis.movetopos(14,-20, 65);
 
 }
 
@@ -898,8 +899,8 @@ void Auton_6() //DOUBLE LOAD TOP
   topStage.setVelocity(100, percent);
   bottomStage.setVelocity(100, percent);
   chassis.setPosition(-46,-8,0);
-  chassis.setDriveMaxVoltage(10);
-  chassis.setTurnMaxVoltage(8);
+  chassis.setDriveMaxVoltage(12);
+  chassis.setTurnMaxVoltage(10);
   toggleLift();
   wait(.2, sec);
   toggleLift();
@@ -909,13 +910,13 @@ void Auton_6() //DOUBLE LOAD TOP
   mainIntake.spin(forward);
 
   //DRIVE TO MATCH LOAD
-  chassis.driveDistanceWithOdom(-38);
-  chassis.setDriveMaxVoltage(8);
+  chassis.driveDistanceWithOdomTime(-38, 1500);
   chassis.turnToAngle(270);
   wait(.1, sec);
   mainIntake.stop();
   matchLoad.set(false);
-  chassis.movetopos(-61.5, -43.6, 270);
+  chassis.movetopos(-55, -47, 270);
+  chassis.driveDistanceWithOdomTime(4, 400);
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
@@ -923,7 +924,7 @@ void Auton_6() //DOUBLE LOAD TOP
   wait(2, sec);
 
   //OUTTAKE 3 BALLS
-  chassis.driveDistanceWithOdom(-6);
+  chassis.driveDistanceWithOdomTime(-6, 1000);
   chassis.turnToAngle(200);
   wait(.1, sec);
   mainIntake.spin(reverse, 50, percent);
@@ -932,7 +933,7 @@ void Auton_6() //DOUBLE LOAD TOP
   mainIntake.spin(forward);
 
   //LOAD INTO LONG GOAL
-  chassis.turnToAngle(90);
+  chassis.turnToAngle(94);
   wait(.1, sec);
   mainIntake.stop();
   colorSort.stop();
@@ -940,7 +941,8 @@ void Auton_6() //DOUBLE LOAD TOP
   matchLoad.set(false);
   toggleLift();
   wait(.1, sec);
-  chassis.movetopos(-24.5, -45, 90);
+  chassis.movetopos(-31, -48.5, 94);
+  chassis.driveDistanceWithOdomTime(3, 600);
   toggleIntakeFlap(); //OPEN
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -961,9 +963,10 @@ void Auton_6() //DOUBLE LOAD TOP
   topStage.stop();
   toggleLift(); //DOWN
   wait(.1, sec);
-  chassis.driveDistanceWithOdom(-6);
-  chassis.turnToAngle(271);
-  chassis.movetopos(-65.5, -43, 271);
+  chassis.driveDistanceWithOdomTime(-6, 1000);
+  chassis.turnToAngleTime(270, 1000, 10);
+  chassis.movetopos(-55, -47, 270);
+  chassis.driveDistanceWithOdomTime(4, 400);
   matchLoad.set(true);
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -976,11 +979,13 @@ void Auton_6() //DOUBLE LOAD TOP
 
   //LOAD TOP GOAL AGAIN
   chassis.driveDistanceWithOdomTime(-6, 1000);
-  chassis.turnToAngle(90);
+  chassis.turnToAngleTime(180, 1000, 10)
+;  chassis.turnToAngleTime(90, 1000, 10);
   wait(.1, sec);
   toggleLift();
   wait(.1, sec);
-  chassis.movetopos(-24.5, -45, 90);
+  chassis.movetopos(-31, -48.5, 94);
+  chassis.driveDistanceWithOdomTime(6, 600);
   toggleIntakeFlap(); //OPEN
   mainIntake.spin(forward);
   colorSort.spin(forward);
