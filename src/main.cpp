@@ -454,6 +454,8 @@ void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
 /// @brief Auton Slot 2 - Write code for route within this function.
 void Auton_2() // UCF Route
 {
+
+  thread odomThread(odomDebugThread);
   // SETTING UP
   mainIntake.setVelocity(100, percent);
   colorSort.setVelocity(100, percent);
@@ -473,23 +475,24 @@ void Auton_2() // UCF Route
   mainIntake.spin(forward);
 
   // BLOCKING TOP MIDDLE
-  chassis.driveDistanceWithOdom(-39);
-  chassis.turnToPosition(13.5, -15);
-  // wait(0.1, sec);
+  chassis.driveDistanceWithOdomTime(-39,1400);
+  chassis.turnToAngleTime(60,1400,10);
   mainIntake.stop();
   matchLoad.set(false);
-  // chassis.movetopos(0,-22.5,60);
-  // wait(1.5, sec);
-  chassis.movetopos(13.5, -15, 60);
-  wait(0.1, sec);
+  chassis.movetopos(13.5, -15.5, 60);
+  // wait(0.1, sec);
+
 
   // GRABS 6 FROM MATCH LOAD
-  chassis.driveDistanceWithOdom(-15); // -67.5
-  chassis.turnToPosition(-46,-47);
-  chassis.movetopos(-46,-47,240);
-  chassis.turnToAngle(270);
-  chassis.movetopos(-58,-47,270); //-60
-  chassis.driveDistanceWithOdomTime(2, 1000);
+  chassis.driveDistanceWithOdomTime(-15,700); // -67.5
+  // wait(0.1, sec);
+  // chassis.turnToAngle(240);
+  chassis.turnToAngleTime(150,500,10);
+  chassis.turnToAngle(240);
+  // chassis.movetopos(-46,-47,240); //-46,-47
+  chassis.movetopos(-53,-49,240); //-53,-53,270
+  chassis.turnToAngleTime(270,1200,10);
+  chassis.driveDistanceWithOdomTime(8, 400);
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
@@ -501,71 +504,76 @@ void Auton_2() // UCF Route
 
 
   // OUTTAKE 3 BLOCKS
-  chassis.driveDistanceWithOdom(-5);
-  chassis.turnToAngle(145);
-  wait(.1, sec);
+  chassis.driveDistanceWithOdomTime(-5,400);
+  chassis.turnToAngleTime(145,500,10);
+  toggleLift(); // up
   mainIntake.spin(reverse, 50, percent);
-  wait(.8, sec);
+  wait(.6, sec);
   mainIntake.stop();
   mainIntake.spin(forward);
 
   // SCORE 5 INTO HIGH GOAL
+  chassis.turnToAngleTime(180,500,10);
   chassis.turnToAngle(90);
+  // wait(.1, sec);
   mainIntake.stop();
   matchLoad.set(false);
-  toggleLift(); // up
-  wait(.1, sec);
-  chassis.movetopos(-30,-47,90); // -32,-47,90
+  chassis.driveDistanceWithOdomTime(22,750);
+  // chassis.movetopos(-40,-33,90); // -33.5,-47,90
   toggleIntakeFlap(); // open
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
-  wait(1, sec);
+  wait(.8, sec);
   topStage.spin(reverse);
   mainIntake.spin(reverse);
-  wait(.2, sec);
+  wait(.15, sec);
   topStage.spin(forward);
   mainIntake.spin(forward);
-  wait(1.7, sec);
+  wait(.7, sec);
   toggleIntakeFlap(); // close
 
   // GRAB 8 FROM MATCH LOAD
-  chassis.driveDistanceWithOdomTime(-5, 1000);
+  chassis.driveDistanceWithOdomTime(-5,400);
   mainIntake.stop();
   colorSort.stop();
   topStage.stop();
   toggleLift(); // down
-  chassis.turnToPosition(-58,-47);
-  chassis.movetopos(-58, -47, 270);
-  chassis.driveDistanceWithOdomTime(2,1000);
+  chassis.turnToAngleTime(180,500,10); 
+  chassis.turnToAngleTime(270,1000,10);
+  chassis.movetopos(-53, -45, 270); //-57
+  chassis.driveDistanceWithOdomTime(8,400);
   matchLoad.set(true);
   colorSort.spin(forward);
   topStage.spin(forward);
-  wait(3,sec); //3.5
+  mainIntake.spin(forward);
+  wait(2.7,sec); //3.5
   matchLoad.set(false);
   mainIntake.stop();
   colorSort.stop();
   topStage.stop();
 
   // SCORE 8 INTO HIGH GOAL
-  chassis.driveDistanceWithOdomTime(-5, 1000);
+  chassis.driveDistanceWithOdomTime(-5, 500);
   // chassis.turnToAngle(90);
   matchLoad.set(false);
   toggleLift(); // up
-  wait(.1, sec);
-  chassis.turnToPosition(-33.5,-47);
-  chassis.movetopos(-33.5,-47, 90); // -32,-47,90
+  chassis.turnToAngleTime(180,600,10);
+  chassis.turnToAngle(90); 
+  // wait(.1, sec);
+  // chassis.movetopos(-40,-33, 90); // -32,-47,90
+  chassis.driveDistanceWithOdomTime(22,750);
   toggleIntakeFlap(); // open
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
-  wait(1, sec);
+  wait(1.2, sec); // 1
   topStage.spin(reverse);
   mainIntake.spin(reverse);
   wait(.2, sec);
   topStage.spin(forward);
   mainIntake.spin(forward);
-  wait(1.7, sec);
+  wait(1.5, sec); // 1.7
   toggleIntakeFlap(); // close
 
   mainIntake.stop();
