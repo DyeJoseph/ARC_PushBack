@@ -474,8 +474,8 @@ void Auton_2() // UCF Route
   bottomStage.setVelocity(100, percent);
 
   chassis.setPosition(-46,-8,0);
-  chassis.setDriveMaxVoltage(10);
-  chassis.setTurnMaxVoltage(8);
+  chassis.setDriveMaxVoltage(12);
+  chassis.setTurnMaxVoltage(10);
 
   toggleLift();
   wait(0.2, sec);
@@ -487,24 +487,27 @@ void Auton_2() // UCF Route
 
   // BLOCKING TOP MIDDLE
   chassis.driveDistanceWithOdom(-39);
-  chassis.turnToAngle(60);
-  wait(0.1, sec);
+  chassis.turnToPosition(13.5, -15);
+  // wait(0.1, sec);
   mainIntake.stop();
   matchLoad.set(false);
-  chassis.movetopos(0,-22.5,60);
-  wait(1.5, sec);
+  // chassis.movetopos(0,-22.5,60);
+  // wait(1.5, sec);
   chassis.movetopos(13.5, -15, 60);
-  wait(0.5, sec);
+  wait(0.1, sec);
 
   // GRABS 6 FROM MATCH LOAD
-  chassis.driveDistanceWithOdom(-67.5);
+  chassis.driveDistanceWithOdom(-15); // -67.5
+  chassis.turnToPosition(-46,-47);
+  chassis.movetopos(-46,-47,240);
   chassis.turnToAngle(270);
-  chassis.movetopos(-57,-47,270);
+  chassis.movetopos(-58,-47,270); //-60
+  chassis.driveDistanceWithOdomTime(2, 1000);
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
   matchLoad.set(true);
-  wait(2, sec);
+  wait(1.5, sec);
   mainIntake.stop();
   colorSort.stop();
   topStage.stop(); 
@@ -525,7 +528,7 @@ void Auton_2() // UCF Route
   matchLoad.set(false);
   toggleLift(); // up
   wait(.1, sec);
-  chassis.movetopos(-32,-47,90);
+  chassis.movetopos(-30,-47,90); // -32,-47,90
   toggleIntakeFlap(); // open
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -545,12 +548,13 @@ void Auton_2() // UCF Route
   colorSort.stop();
   topStage.stop();
   toggleLift(); // down
-  chassis.turnToAngle(270);
-  chassis.movetopos(-57, -47, 270);
+  chassis.turnToPosition(-58,-47);
+  chassis.movetopos(-58, -47, 270);
+  chassis.driveDistanceWithOdomTime(2,1000);
   matchLoad.set(true);
   colorSort.spin(forward);
   topStage.spin(forward);
-  wait(3.5,sec);
+  wait(3,sec); //3.5
   matchLoad.set(false);
   mainIntake.stop();
   colorSort.stop();
@@ -558,11 +562,12 @@ void Auton_2() // UCF Route
 
   // SCORE 8 INTO HIGH GOAL
   chassis.driveDistanceWithOdomTime(-5, 1000);
-  chassis.turnToAngle(90);
+  // chassis.turnToAngle(90);
   matchLoad.set(false);
   toggleLift(); // up
   wait(.1, sec);
-  chassis.movetopos(-32,-47, 90);
+  chassis.turnToPosition(-33.5,-47);
+  chassis.movetopos(-33.5,-47, 90); // -32,-47,90
   toggleIntakeFlap(); // open
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -576,15 +581,9 @@ void Auton_2() // UCF Route
   wait(1.7, sec);
   toggleIntakeFlap(); // close
 
-
-
-
-
-  
-  
-
-  
-
+  mainIntake.stop();
+  colorSort.stop();
+  topStage.stop();
 
 }
 
