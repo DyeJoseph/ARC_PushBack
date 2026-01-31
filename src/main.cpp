@@ -23,7 +23,7 @@ using namespace vex;
 
   int odomType = TWO_AT_45;
 
-  bool isColorSorting = false; //SET TO TRUE NORMALLY
+  bool isColorSorting = false;
   bool odomDebugEnabled = true;
 
   bool isInAuton = false;
@@ -192,12 +192,12 @@ void usercontrol()
 {
   drawSponsors();
  
+  
+
   // User control code here, inside the loop
   bool flapState = false;
   int lastSeen = teamColor;
-
-  //CHANGE IF COLOR SORTING
-  isColorSorting = false;
+  
 
   chassis.brake(coast);
   mainIntake.setStopping(coast);
@@ -207,90 +207,89 @@ void usercontrol()
   topStage.setVelocity(100, percent);
 
   Controller1.ButtonL1.pressed(toggleLift);
-  Controller1.ButtonLeft.pressed(toggleDropDown);
+  // Controller1.ButtonUp.pressed(toggleIntakeFlap);
+  // Controller1.ButtonDown.pressed(slowIntake);
   Controller1.ButtonRight.pressed(toggleColorSort);
+  Controller1.ButtonL2.pressed(toggleDropDown);
+  Controller1.ButtonL2.released(toggleDropDown);
+
+  //For Skills Auton
 
   bottomColorSort.setLight(ledState::on);
   bottomColorSort.integrationTime(20);
-
   while (1) {
 
-    if(driver)
-      chassis.tank();
-    else
-      chassis.arcade();
+      if(driver)
+        chassis.tank();
+      else
+        chassis.arcade();
 
-    if(bottomColorSort.color() == vex::color::red){
-      lastSeen = 0;
-    }else if(bottomColorSort.color() == vex::color::blue){
-      lastSeen = 1;
-    }
-
-    if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
-      mainIntake.spin(forward);
-      topStage.spin(forward, 50, percent);
-      
-      // if(flapState){
-      //   topStage.spin(forward);
-      // }else{
-      //   topStage.stop();
-      // }
-      if(lastSeen == teamColor || !isColorSorting){
-        colorSort.spin(forward);
-      }else{
-        colorSort.spin(reverse);
-      }
-    }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
-      mainIntake.spin(reverse);
-      topStage.spin(reverse);
-      colorSort.spin(forward, 25, percent);
-    }else if(Controller1.ButtonL2.pressing()){
-      matchLoad.set(true);
-      mainIntake.spin(forward);
-      if(lastSeen == teamColor || !isColorSorting){
-        colorSort.spin(forward);
-      }else{
-        colorSort.spin(reverse);
+      if(bottomColorSort.color() == vex::color::red){
+        lastSeen = 0;
+      }else if(bottomColorSort.color() == vex::color::blue){
+        lastSeen = 1;
       }
 
-    }else if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
-      mainIntake.spin(forward);
-      topStage.spin(forward);
-      flapState = true;
-      if(lastSeen == teamColor || !isColorSorting){
-        colorSort.spin(forward);
+      if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
+        mainIntake.spin(forward);
+        topStage.spin(forward, 50, percent);
+        flapState = false;
+        if(lastSeen == teamColor || !isColorSorting){
+          colorSort.spin(forward);
+        }else{
+          colorSort.spin(reverse);
+        }
+      }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
+        mainIntake.spin(reverse);
+        topStage.spin(reverse);
+        colorSort.spin(forward, 25, percent);
+      }else if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
+        mainIntake.spin(forward);
+        topStage.spin(forward);
+        flapState = true;
+        colorSort.spin(fwd);
+      }else if(Controller1.ButtonDown.pressing()){
+        mainIntake.spin(reverse, 35, percent);
+        topStage.spin(reverse);
+        colorSort.spin(forward, 20, percent);
+      }else if(Controller1.ButtonUp.pressing()){
+        mainIntake.spin(forward);
+        topStage.spin(forward, 35, percent);
+        flapState = true;
+        if(lastSeen == teamColor || !isColorSorting){
+          colorSort.spin(forward);
+        }else{
+          colorSort.spin(reverse);
+        }
       }else{
-        colorSort.spin(reverse);
+        mainIntake.stop();
+        colorSort.stop();
+        topStage.stop();
       }
-        
-    }else if(Controller1.ButtonUp.pressing()){
-      flapState = true;
-      mainIntake.spin(forward);
-      topStage.spin(forward, 35, percent);
-      if(lastSeen == teamColor || !isColorSorting){
-        colorSort.spin(forward);
+      if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing() && !Controller1.ButtonUp.pressing()){
+        flapState = false;
+      }
+
+      if(Controller1.ButtonA.pressing()){
+        matchLoad.set(true);
+        mainIntake.spin(forward);
+        topStage.spin(forward, 50, percent);
+        if(lastSeen == teamColor || !isColorSorting){
+          colorSort.spin(forward);
+        }else
+          colorSort.spin(reverse);
       }else{
-        colorSort.spin(reverse);
+        matchLoad.set(false);
+        if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing() && !Controller1.ButtonR2.pressing() && !Controller1.ButtonUp.pressing()){
+          mainIntake.stop();
+          colorSort.stop();
+          topStage.stop();
+        }
       }
-    }else if(Controller1.ButtonDown.pressing()){
-      flapState = true;
-      mainIntake.spin(reverse, 35, percent);
-      topStage.spin(reverse);
-      colorSort.spin(forward, 20, percent);
-    }else{
-      matchLoad.set(false);
-      mainIntake.stop();
-      colorSort.stop();
-      topStage.stop();
-    }
-
-    if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing() && !Controller1.ButtonUp.pressing() && !Controller1.ButtonDown.pressing()){
-      flapState = false;
-    }
-
-    intakeFlap.set(flapState);
+      intakeFlap.set(flapState);
+    wait(20, msec);
   }
-  wait(20, msec);
+    
 }
 
 void toggleLift(){
