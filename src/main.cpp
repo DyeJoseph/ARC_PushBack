@@ -582,7 +582,7 @@ void Auton_2() // UCF Route
 }
 
 /// @brief Auton Slot 3 - Write code for route within this function.
-void Auton_3() //1 MINUTE SKILL REAL
+void Auton_3() //1 MINUTE SKI
 {
     //thread odomThread(odomDebugThread);
     //SETUP
@@ -844,12 +844,12 @@ void Auton_4() //TOP MIDDLE DEFENSE
   mainIntake.spin(forward);
 
   //DRIVE TO MATCH LOAD
-  chassis.driveDistanceWithOdomTime(-38, 1500);
+  chassis.driveDistanceWithOdomTime(-39, 1500);
   chassis.turnToAngle(270);
   wait(.1, sec);
   mainIntake.stop();
   matchLoad.set(false);
-  chassis.movetopos(-55, -47, 270);
+  chassis.movetopos(-55, -48, 270);
   chassis.driveDistanceWithOdomTime(4, 400);
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -937,7 +937,7 @@ void Auton_6() //DOUBLE LOAD TOP
   mainIntake.spin(forward);
 
   //DRIVE TO MATCH LOAD
-  chassis.driveDistanceWithOdomTime(-38, 1500);
+  chassis.driveDistanceWithOdomTime(-39, 1500);
   chassis.turnToAngle(270);
   wait(.1, sec);
   mainIntake.stop();
@@ -1047,13 +1047,13 @@ void Auton_7() //SCORES TOP MIDDLE REAL
   mainIntake.spin(forward);
 
   //DRIVE TO MATCH LOAD
-  chassis.driveDistanceWithOdomTime(-38,1500);
+  chassis.driveDistanceWithOdomTime(-39,1500);
   // chassis.setDriveMaxVoltage(10);
   // wait(.1, sec);
   mainIntake.stop();
   matchLoad.set(false);
   chassis.turnToAngleTime(270,1000,10);
-  chassis.movetopos(-55, -47, 270);
+  chassis.movetopos(-55, -48, 270);
   chassis.driveDistanceWithOdomTime(4,400);
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -1126,7 +1126,8 @@ void Auton_7() //SCORES TOP MIDDLE REAL
   // chassis.setDriveMaxVoltage(10);
   chassis.movetopos(-16, 15, 36); // -16,17
   chassis.turnToAngleTime(138,1200,10);
-  chassis.driveDistanceWithOdomTime(4,400); // 14
+  chassis.driveDistanceWithOdomTime(6,400); // 14
+  chassis.driveDistanceWithOdomTime(-2, 200);
   toggleIntakeFlap();
   mainIntake.spin(forward, 100, percent);
   colorSort.spin(forward, 100, percent);
@@ -1138,7 +1139,7 @@ void Auton_7() //SCORES TOP MIDDLE REAL
   mainIntake.spin(forward, 100, percent);
   colorSort.spin(forward, 100, percent);
   topStage.spin(forward, 36.5, percent); // 55 // 45 // 36
-  wait(2.3, sec); // 1.8 before change
+  wait(200, sec); // 1.8 before change
   
 }
 
@@ -1162,11 +1163,11 @@ void Auton_8() //SCORES LOW MIDDLE REAL
   mainIntake.spin(forward);
 
   //DRIVE TO MATCH LOAD
-  chassis.driveDistanceWithOdomTime(-38,1500);
+  chassis.driveDistanceWithOdomTime(-39,1500);
   mainIntake.stop();
   matchLoad.set(false);
   chassis.turnToAngleTime(270,1000,10);
-  chassis.movetopos(-55, -47, 270);
+  chassis.movetopos(-55, -48, 270);
   chassis.driveDistanceWithOdomTime(4,400);
   mainIntake.spin(forward);
   colorSort.spin(forward);
