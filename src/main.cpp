@@ -88,7 +88,7 @@ void preAuton()
 
   vex::color colors[8] = {vex::color::red, vex::color::red, vex::color::red, vex::color::red, 
                           vex::color::blue, vex::color::blue, vex::color::blue, vex::color::blue};
-  std::string names[8] = {"NONE", "UCF", "1mSkill", "TopDef5", 
+  std::string names[8] = {"NONE", "UCF", "1mSkill", "TopDef3", 
                           "Park5", "2xTop7", "TopMid7", "LowMid7"};
   Button buttons[9];
   createAutonButtons(colors, names, buttons);
@@ -184,7 +184,7 @@ void autonomous()
     default:
       break;
   }
-
+  Auton_3();
 }
 
 /// @brief Runs during the UserControl section of the competition
@@ -379,83 +379,83 @@ void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
 {   
 
 
-    mainIntake.setVelocity(100, percent);
-    colorSort.setVelocity(100, percent);
-    topStage.setVelocity(100, percent);
-    bottomStage.setVelocity(100, percent);
-    chassis.setPosition(0,0,0);
-    chassis.setDriveMaxVoltage(12);
-    chassis.setTurnMaxVoltage(10);
+    // mainIntake.setVelocity(100, percent);
+    // colorSort.setVelocity(100, percent);
+    // topStage.setVelocity(100, percent);
+    // bottomStage.setVelocity(100, percent);
+    // chassis.setPosition(0,0,0);
+    // chassis.setDriveMaxVoltage(12);
+    // chassis.setTurnMaxVoltage(10);
     
-    // chassis.driveDistanceWithOdom(12);
-    // chassis.driveDistanceWithOdom(12);
-    // chassis.driveDistanceWithOdom(12);
-    // chassis.driveDistanceWithOdom(12);
+    // // chassis.driveDistanceWithOdom(12);
+    // // chassis.driveDistanceWithOdom(12);
+    // // chassis.driveDistanceWithOdom(12);
+    // // chassis.driveDistanceWithOdom(12);
 
-    // chassis.driveDistanceWithOdom(24);
-    // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // chassis.driveDistanceWithOdom(24);
-    // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // chassis.driveDistanceWithOdom(24);
-    // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // chassis.turnToAngle(180);
-    // chassis.driveDistanceWithOdom(24);
-    // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // chassis.driveDistanceWithOdom(24);
-    // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // chassis.driveDistanceWithOdom(24);
-    // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // chassis.turnToAngle(0);
-    // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // chassis.movetopos(0,24,0);
-    // chassis.movetopos(0,48,0);
-    // chassis.turnToAngle(180);
-    // chassis.movetopos(0,24,180);
-    // chassis.movetopos(0,0,180);
-    // chassis.turnToAngle(0);
+    // // chassis.driveDistanceWithOdom(24);
+    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
+    // // chassis.driveDistanceWithOdom(24);
+    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
+    // // chassis.driveDistanceWithOdom(24);
+    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
+    // // chassis.turnToAngle(180);
+    // // chassis.driveDistanceWithOdom(24);
+    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
+    // // chassis.driveDistanceWithOdom(24);
+    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
+    // // chassis.driveDistanceWithOdom(24);
+    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
+    // // chassis.turnToAngle(0);
+    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
+    // // chassis.movetopos(0,24,0);
+    // // chassis.movetopos(0,48,0);
+    // // chassis.turnToAngle(180);
+    // // chassis.movetopos(0,24,180);
+    // // chassis.movetopos(0,0,180);
+    // // chassis.turnToAngle(0);
     
 
-    // chassis.turnToAngle(90);
+    // // chassis.turnToAngle(90);
+    // // chassis.turnToAngle(180);
+    // // chassis.turnToAngle(270);
+    // // chassis.turnToAngle(0);
+    // // chassis.turnToAngle(50);
+    // // chassis.turnToAngle(295);
+    // // chassis.turnToAngle(12);
+    // // chassis.turnToAngle(224);
+    // // chassis.turnToAngle(165);
+    // // chassis.turnToAngle(43);
+    // // chassis.turnToAngle(304);
+    // // chassis.turnToAngle(178);
+    // // chassis.turnToAngle(0);
+    // //thread odomThread(odomDebugThread);
+    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 1";
+    // chassis.movetopos(0, 24, 0);
+    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 1.5";
+    // chassis.turnToAngle(45);
+    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 2";
+    // chassis.movetopos(24,48,45);
+    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 2.5";
     // chassis.turnToAngle(180);
+    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 3";
+    // chassis.movetopos(24, 24, 180);
+    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 3.5";
+    // chassis.movetopos(24, 0, 180);
     // chassis.turnToAngle(270);
+    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 4";
+    // chassis.movetopos(0,0, 270);
+    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 4.5";
     // chassis.turnToAngle(0);
-    // chassis.turnToAngle(50);
-    // chassis.turnToAngle(295);
-    // chassis.turnToAngle(12);
-    // chassis.turnToAngle(224);
-    // chassis.turnToAngle(165);
-    // chassis.turnToAngle(43);
-    // chassis.turnToAngle(304);
-    // chassis.turnToAngle(178);
-    // chassis.turnToAngle(0);
-    //thread odomThread(odomDebugThread);
-    std::cout << "HIIIIIIIIIIIIIIIIIIIIT 1";
-    chassis.movetopos(0, 24, 0);
-    std::cout << "HIIIIIIIIIIIIIIIIIIIIT 1.5";
-    chassis.turnToAngle(45);
-    std::cout << "HIIIIIIIIIIIIIIIIIIIIT 2";
-    chassis.movetopos(24,48,45);
-    std::cout << "HIIIIIIIIIIIIIIIIIIIIT 2.5";
-    chassis.turnToAngle(180);
-    std::cout << "HIIIIIIIIIIIIIIIIIIIIT 3";
-    chassis.movetopos(24, 24, 180);
-    std::cout << "HIIIIIIIIIIIIIIIIIIIIT 3.5";
-    chassis.movetopos(24, 0, 180);
-    chassis.turnToAngle(270);
-    std::cout << "HIIIIIIIIIIIIIIIIIIIIT 4";
-    chassis.movetopos(0,0, 270);
-    std::cout << "HIIIIIIIIIIIIIIIIIIIIT 4.5";
-    chassis.turnToAngle(0);
-    std::cout << "HIIIIIIIIIIIIIIIIIIIIT 5";
-    //odomDebugEnabled = false;
-    chassis.moveable();
+    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 5";
+    // //odomDebugEnabled = false;
+    // chassis.moveable();
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.
 void Auton_2() // UCF Route
 {
 
-  thread odomThread(odomDebugThread);
+  //thread odomThread(odomDebugThread);
   // SETTING UP
   mainIntake.setVelocity(100, percent);
   colorSort.setVelocity(100, percent);
@@ -610,11 +610,13 @@ void Auton_3() //1 MINUTE SKILL REAL
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 2\n";
     //chassis.driveDistanceWithOdom(5); //MOVETOPOS
     chassis.movetopos(-36, 0, 270);
+    chassis.chassisOdometry.setPosition(-36, 0, 270);
 
     //GRAB 2 BLUE WALL BALLS
     chassis.turnToAngle(192);
     //chassis.setDriveMaxVoltage(10);
     chassis.movetopos(-46, -47, 192);
+    chassis.chassisOdometry.setPosition(-46, -47, 192);
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 3\n";
     bottomStage.spin(forward);
     mainIntake.spin(forward);
@@ -631,13 +633,14 @@ void Auton_3() //1 MINUTE SKILL REAL
     mainIntake.spin(forward);
     colorSort.spin(forward);
     matchLoad.set(true);
-    chassis.driveDistanceWithOdomTime(-5, 500); 
+    chassis.driveDistanceWithOdomTime(-5, 400); 
     
 
     //GRAB 1 BLUE BALL
     chassis.turnToAngle(41);
     //chassis.setDriveMaxVoltage(10);
-    chassis.movetopos(-14, -22, 41);
+    chassis.movetopos(-14, -23, 41);
+    chassis.chassisOdometry.setPosition(-14, -23, 41);
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 5\n";
     //chassis.setDriveMaxVoltage(8);
     mainIntake.stop();
@@ -647,7 +650,8 @@ void Auton_3() //1 MINUTE SKILL REAL
     mainIntake.spin(forward);
     colorSort.spin(forward);
     //chassis.setDriveMaxVoltage(10);
-    chassis.movetopos(19,-22, 90);
+    chassis.movetopos(18,-22, 90);
+    chassis.chassisOdometry.setPosition(18, -22, 90);
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 6\n";
     //chassis.setDriveMaxVoltage(8);
     toggleLift(); //DOWN
@@ -656,7 +660,7 @@ void Auton_3() //1 MINUTE SKILL REAL
     //LOAD 7 BALLS
     matchLoad.set(true);
     chassis.turnToAngle(314);
-    chassis.driveDistanceWithOdomTime(9, 1000);
+    chassis.driveDistanceWithOdomTime(9, 600);
     chassis.driveDistanceWithOdomTime(-2, 200);
     //chassis.movetopos(14.5, -15.5, 315); //15.5
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 7\n";
@@ -687,21 +691,23 @@ void Auton_3() //1 MINUTE SKILL REAL
     chassis.turnToAngleTime(180, 1000, 10);
     toggleIntakeFlap();
     chassis.movetopos(46, -63, 180);
+    chassis.chassisOdometry.setPosition(46, -63, 180);
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 9\n";
     mainIntake.spin(forward);
     colorSort.spin(forward);
     matchLoad.set(true);
     wait(.2, sec);
-    chassis.driveDistanceWithOdom(-12.5);  //MERGE 519-526
+    chassis.driveDistanceWithOdom(-12);  //MERGE 519-526
 
 
     //MATCH LOAD
 
     colorSort.stop();
     topStage.stop();
-    chassis.turnToAngle(90);
+    chassis.turnToAngle(91);
     matchLoad.set(false);
-    chassis.movetopos(55.5, -50.5, 90);
+    chassis.movetopos(54, -51.5, 91);
+    chassis.chassisOdometry.setPosition(55.5, -51.5, 91);
     chassis.driveDistanceWithOdomTime(4, 400);
     //chassis.movetopos(58, -51, 91);
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 10\n";
@@ -713,11 +719,12 @@ void Auton_3() //1 MINUTE SKILL REAL
 
 
     //LOAD LONG GOAL
-    chassis.driveDistanceWithOdomTime(-5, 1000); // -14.6
+    chassis.driveDistanceWithOdomTime(-5, 400); // -14.6
     chassis.turnToAngle(270); // 90
     toggleLift();
     matchLoad.set(false);
     chassis.movetopos(29.5, -49.5, 270);
+    chassis.chassisOdometry.setPosition(29.5, -49.5, 270);
     chassis.driveDistanceWithOdomTime(2, 200);
     //chassis.movetopos(29, -49.5, 270); // (11.5 + 9.6)
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 11\n";
@@ -742,9 +749,11 @@ void Auton_3() //1 MINUTE SKILL REAL
     chassis.driveDistanceWithOdom(-25); 
     chassis.turnToAngleTime(250, 200, 10);
     chassis.movetopos(25, -61, 250);
+    chassis.chassisOdometry.setPosition(25, -61, 250);
     toggleIntakeFlap(); // close
     chassis.turnToAngleTime(270, 200, 10);
-    chassis.movetopos(-6.75, -60, 270);
+    chassis.movetopos(-5.75, -60, 270);
+    chassis.chassisOdometry.setPosition(-5.75, -60, 270);
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 12\n";
     chassis.turnToAngle(0);
     toggleLift();
@@ -752,21 +761,24 @@ void Auton_3() //1 MINUTE SKILL REAL
     mainIntake.spin(forward);
     colorSort.spin(forward);
     topStage.spin(forward);
-    chassis.driveDistanceWithOdomTime(6, 1000);
+    chassis.driveDistanceWithOdomTime(6, 400);
     matchLoad.set(true);
-    chassis.driveDistanceWithOdomTime(-6, 1000);
+    chassis.driveDistanceWithOdomTime(-6, 400);
 
 
     //MATCH LOAD
     chassis.turnToAngle(270);
     chassis.movetopos(-30,-60, 270);
+    chassis.chassisOdometry.setPosition(-30, -60, 270);
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 13\n";
     matchLoad.set(false);
-    chassis.turnToAngle(301);
-    chassis.movetopos(-53, -45, 301);
+    chassis.turnToAngle(305);
+    chassis.movetopos(-53, -45, 305);
+    chassis.chassisOdometry.setPosition(-53, -45, 305);
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 14\n";
     chassis.turnToAngle(271);
     chassis.movetopos(-58, -45, 271);
+    chassis.chassisOdometry.setPosition(-58, -45, 271);
     chassis.driveDistanceWithOdomTime(4, 400);
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 15\n";
      matchLoad.set(true);
@@ -777,12 +789,13 @@ void Auton_3() //1 MINUTE SKILL REAL
 
 
     //LONG GOAL
-    chassis.driveDistanceWithOdomTime(-6, 1000);
+    chassis.driveDistanceWithOdomTime(-6, 400);
     matchLoad.set(false);
     chassis.turnToAngleTime(90, 1000, 10);
     toggleLift();
-    chassis.movetopos(-32,-46.2, 90);
-    chassis.driveDistanceWithOdomTime(2, 200);
+    chassis.movetopos(-33,-47.3, 90);
+    chassis.chassisOdometry.setPosition(-33, -47.3, 90);
+    chassis.driveDistanceWithOdomTime(6, 400);
     std::cout << "HIIIIIIIIIIIIIIIIIIIIT 16\n";
     toggleIntakeFlap();
     mainIntake.spin(forward);
@@ -825,7 +838,7 @@ void Auton_4() //TOP MIDDLE DEFENSE
   mainIntake.spin(forward);
 
   //DRIVE TO MATCH LOAD
-  chassis.driveDistanceWithOdom(-38);
+  chassis.driveDistanceWithOdomTime(-38, 1500);
   chassis.turnToAngle(270);
   wait(.1, sec);
   mainIntake.stop();
@@ -941,7 +954,7 @@ void Auton_6() //DOUBLE LOAD TOP
   mainIntake.spin(forward);
 
   //LOAD INTO LONG GOAL
-  chassis.turnToAngle(94);
+  chassis.turnToAngleTime(94, 600, 10);
   wait(.1, sec);
   mainIntake.stop();
   colorSort.stop();
@@ -950,7 +963,7 @@ void Auton_6() //DOUBLE LOAD TOP
   toggleLift();
   wait(.1, sec);
   chassis.movetopos(-31, -48.5, 94);
-  chassis.driveDistanceWithOdomTime(3, 600);
+  chassis.driveDistanceWithOdomTime(8, 600);
   toggleIntakeFlap(); //OPEN
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -961,7 +974,7 @@ void Auton_6() //DOUBLE LOAD TOP
   wait(.2, sec);
   topStage.spin(forward);
   mainIntake.spin(forward);
-  wait(1.7, sec); // 1.5
+  wait(1.2, sec); // 1.5
   toggleIntakeFlap(); //CLOSE
 
   //GRAB MATCH LOADS
@@ -979,7 +992,7 @@ void Auton_6() //DOUBLE LOAD TOP
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
-  wait(3.5,sec);
+  wait(2.5,sec);
   matchLoad.set(false);
   mainIntake.stop();
   colorSort.stop();
@@ -987,8 +1000,8 @@ void Auton_6() //DOUBLE LOAD TOP
 
   //LOAD TOP GOAL AGAIN
   chassis.driveDistanceWithOdomTime(-6, 1000);
-  chassis.turnToAngleTime(180, 1000, 10)
-;  chassis.turnToAngleTime(90, 1000, 10);
+  chassis.turnToAngleTime(180, 500, 10);  
+  chassis.turnToAngleTime(90, 500, 10);
   wait(.1, sec);
   toggleLift();
   wait(.1, sec);
@@ -1028,14 +1041,14 @@ void Auton_7() //SCORES TOP MIDDLE REAL
   mainIntake.spin(forward);
 
   //DRIVE TO MATCH LOAD
-  chassis.driveDistanceWithOdomTime(-39,1400);
+  chassis.driveDistanceWithOdomTime(-38,1500);
   // chassis.setDriveMaxVoltage(10);
   // wait(.1, sec);
   mainIntake.stop();
   matchLoad.set(false);
   chassis.turnToAngleTime(270,1000,10);
-  chassis.movetopos(-53, -47, 270);
-  chassis.driveDistanceWithOdomTime(8,400);
+  chassis.movetopos(-55, -47, 270);
+  chassis.driveDistanceWithOdomTime(4,400);
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
@@ -1075,7 +1088,7 @@ void Auton_7() //SCORES TOP MIDDLE REAL
   wait(.15, sec);
   topStage.spin(forward);
   mainIntake.spin(forward);
-  wait(1.5, sec); // 1.5
+  wait(1.2, sec); // 1.5
   toggleIntakeFlap(); //CLOSE
 
   //GRAB MATCH LOADS
@@ -1087,14 +1100,14 @@ void Auton_7() //SCORES TOP MIDDLE REAL
   // wait(.1, sec);
   chassis.driveDistanceWithOdomTime(-5,500);
   chassis.turnToAngleTime(180,400,10);
-  chassis.turnToAngleTime(270,1100,10);
+  chassis.turnToAngleTime(272,1100,10);
   chassis.movetopos(-53, -45, 270);
   chassis.driveDistanceWithOdomTime(8,400);
   matchLoad.set(true);
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
-  wait(2.3,sec);
+  wait(3,sec);
   matchLoad.set(false);
   mainIntake.stop();
   colorSort.stop();
@@ -1120,11 +1133,6 @@ void Auton_7() //SCORES TOP MIDDLE REAL
   colorSort.spin(forward, 100, percent);
   topStage.spin(forward, 36.5, percent); // 55 // 45 // 36
   wait(2.3, sec); // 1.8 before change
-
-  mainIntake.stop();
-  colorSort.stop();
-  topStage.stop();
-
   
 }
 
@@ -1137,8 +1145,8 @@ void Auton_8() //SCORES LOW MIDDLE REAL
   topStage.setVelocity(100, percent);
   bottomStage.setVelocity(100, percent);
   chassis.setPosition(-46,-8,0);
-  chassis.setDriveMaxVoltage(10);
-  chassis.setTurnMaxVoltage(8);
+  chassis.setDriveMaxVoltage(12);
+  chassis.setTurnMaxVoltage(10);
   toggleLift();
   wait(.2, sec);
   toggleLift();
@@ -1148,38 +1156,41 @@ void Auton_8() //SCORES LOW MIDDLE REAL
   mainIntake.spin(forward);
 
   //DRIVE TO MATCH LOAD
-  chassis.driveDistanceWithOdom(-38);
-  chassis.setDriveMaxVoltage(8);
-  chassis.turnToAngle(270);
-  wait(.1, sec);
+  chassis.driveDistanceWithOdomTime(-38,1500);
   mainIntake.stop();
   matchLoad.set(false);
-  chassis.movetopos(-61.5, -43.6, 270);
+  chassis.turnToAngleTime(270,1000,10);
+  chassis.movetopos(-55, -47, 270);
+  chassis.driveDistanceWithOdomTime(4,400);
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
   matchLoad.set(true);
-  wait(2, sec);
+  wait(1.5, sec);
+  mainIntake.stop();
+  colorSort.stop();
+  topStage.stop();
 
   //OUTTAKE 3 BALLS
-  chassis.driveDistanceWithOdom(-6);
-  chassis.turnToAngle(200);
-  wait(.1, sec);
+  chassis.driveDistanceWithOdomTime(-5,400);
+  chassis.turnToAngleTime(145,500,10);
+  toggleLift(); // up
   mainIntake.spin(reverse, 50, percent);
-  wait(.8, sec);
+  wait(.6, sec);
   mainIntake.stop();
   mainIntake.spin(forward);
 
   //LOAD INTO LONG GOAL
-  chassis.turnToAngle(90);
-  wait(.1, sec);
+  chassis.turnToAngleTime(180,500,10);
+  chassis.turnToAngle(95);
+  // wait(.1, sec);
   mainIntake.stop();
   colorSort.stop();
   topStage.stop();
   matchLoad.set(false);
-  toggleLift();
-  wait(.1, sec);
-  chassis.movetopos(-24.5, -45, 90);
+  // wait(.1, sec);
+  // chassis.movetopos(-24.5, -45, 90);
+  chassis.driveDistanceWithOdomTime(21,750); //22
   toggleIntakeFlap(); //OPEN
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -1187,38 +1198,38 @@ void Auton_8() //SCORES LOW MIDDLE REAL
   wait(1, sec);
   topStage.spin(reverse);
   mainIntake.spin(reverse);
-  wait(.2, sec);
+  wait(.15, sec);
   topStage.spin(forward);
   mainIntake.spin(forward);
-  wait(1.7, sec); // 1.5
+  wait(1.2, sec); // 1.5
   toggleIntakeFlap(); //CLOSE
 
   //GRAB MATCH LOADS
-  chassis.driveDistanceWithOdomTime(-6, 1000); // -7
+  chassis.driveDistanceWithOdomTime(-5, 400); // -7
   mainIntake.stop();
   colorSort.stop();
   topStage.stop();
   toggleLift(); //DOWN
-  wait(.1, sec);
-  chassis.driveDistanceWithOdom(-6);
-  chassis.turnToAngle(270);
-  chassis.setDriveMaxVoltage(8);
-  chassis.movetopos(-65.5, -43, 270);
+  // wait(.1, sec);
+  chassis.driveDistanceWithOdomTime(-5,500);
+  chassis.turnToAngleTime(180,400,10);
+  chassis.turnToAngleTime(272,1100,10);
+  chassis.movetopos(-53, -45, 270);
+  chassis.driveDistanceWithOdomTime(8,400);
   matchLoad.set(true);
   mainIntake.spin(forward);
   colorSort.spin(forward);
   topStage.spin(forward);
-  wait(3.5,sec);
+  wait(3,sec);
   matchLoad.set(false);
   mainIntake.stop();
   colorSort.stop();
   topStage.stop();
 
   //DRIVE TO MIDDLE AND SCORE
-  chassis.driveDistanceWithOdom(-4);
-  chassis.turnToAngle(45);
-  wait(.1, sec);
-  chassis.movetopos(-10,-10,46);
+  chassis.driveDistanceWithOdomTime(-4, 400);
+  chassis.turnToAngleTime(44, 1000, 10);
+  chassis.movetopos(-14,-12,44);
   mainIntake.spin(reverse, 17, percent); // 15 // 35
   colorSort.spin(reverse, 100, percent); // 90 // 100
   topStage.spin(reverse, 100, percent);
