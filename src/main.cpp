@@ -184,7 +184,6 @@ void autonomous()
     default:
       break;
   }
-  Auton_3();
 }
 
 /// @brief Runs during the UserControl section of the competition
