@@ -155,35 +155,38 @@ void autonomous()
 
   setDriveTrainConstants();
 
-  switch (lastPressed) 
-  {
-    case 0:
-      Auton_1();
-      break;
-    case 1:
-      Auton_2();
-      break;
-    case 2:
-      Auton_3();
-      break;
-    case 3:
-      Auton_4();
-      break;
-    case 4:
-      Auton_5();
-      break;
-    case 5:
-      Auton_6();
-      break;
-    case 6:
-      Auton_7();
-      break;
-    case 7:
-      Auton_8();
-      break;
-    default:
-      break;
-  }
+  chassis.setPosition(0, 0, 0);
+  chassis.moveable();
+
+  // switch (lastPressed) 
+  // {
+  //   case 0:
+  //     Auton_1();
+  //     break;
+  //   case 1:
+  //     Auton_2();
+  //     break;
+  //   case 2:
+  //     Auton_3();
+  //     break;
+  //   case 3:
+  //     Auton_4();
+  //     break;
+  //   case 4:
+  //     Auton_5();
+  //     break;
+  //   case 5:
+  //     Auton_6();
+  //     break;
+  //   case 6:
+  //     Auton_7();
+  //     break;
+  //   case 7:
+  //     Auton_8();
+  //     break;
+  //   default:
+  //     break;
+  // }
 }
 
 /// @brief Runs during the UserControl section of the competition
