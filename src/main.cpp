@@ -60,6 +60,7 @@ void Auton_6();
 void Auton_7();
 void Auton_8();
 int odomDebugThread();
+void PAutonTest();
 
 void toggleLift();
 void toggleIntakeFlap();
@@ -1263,4 +1264,54 @@ int odomDebugThread() {
     vex::this_thread::sleep_for(100);
   }
   return 0;
+}
+
+void PAutonTest(){
+  std::string filename = "PID_Tuning.csv";
+  std::string headerName = "";
+  float pValues[] ={0.0, 0.2, 0.4, 0.6, 0.8, 1.0};
+
+  chassis.setPosition(0,0,0);
+  chassis.setDriveMaxVoltage(12);
+  chassis.setTurnMaxVoltage(10);
+
+  //Set PID Values
+  for(int k=0; k<6;k++){
+    chassis.setDriveConstants(pValues[k], 0, 0, 0.75, 200, 2500);
+    chassis.setTurnConstants(0.25, 0, 0, 2, 200, 2500);
+
+    headerName = "P:";
+    headerName += pValues[k];
+    headerName += "; I:0; D:0";
+
+    writeToCard(filename, headerName);
+    writeNewLineToCard(filename);
+
+    for(int i=0;i<10;i++){
+      //Test Y
+      chassis.turnToAngle(0);
+      chassis.driveDistanceWithOdom(72);
+      writeToCard(filename,chassis.chassisOdometry.getYPosition()-72);
+      writeCommaToCard(filename);
+      chassis.driveDistanceWithOdom(-72);
+      writeToCard(filename,chassis.chassisOdometry.getYPosition());
+      writeCommaToCard(filename);  
+    }
+    writeNewLineToCard(filename);
+    for(int i=0;i<10;i++){
+      //Turn and test X
+      chassis.turnToAngle(90);
+      chassis.driveDistanceWithOdom(72);
+      writeToCard(filename,chassis.chassisOdometry.getXPosition()-72);
+      writeCommaToCard(filename);
+      chassis.driveDistanceWithOdom(-72);
+      writeToCard(filename,chassis.chassisOdometry.getXPosition());
+      writeCommaToCard(filename);
+    }
+
+    chassis.turnToAngle(0);
+    writeNewLineToCard(filename);
+
+  }
+  
 }
