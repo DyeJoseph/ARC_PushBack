@@ -184,6 +184,7 @@ void autonomous()
     default:
       break;
   }
+  Auton_1();
 }
 
 /// @brief Runs during the UserControl section of the competition
@@ -354,7 +355,7 @@ void setDriveTrainConstants()
         .7,  // Kp - Proportion Constant
         0.0000, // Ki - Integral Constant
         1, // Kd - Derivative Constant
-        0.5, // Settle Error
+        1, // Settle Error
         200, // Time to Settle
         2500 // End Time 5000
     );  
@@ -377,14 +378,24 @@ void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
 {   
 
 
-    // mainIntake.setVelocity(100, percent);
-    // colorSort.setVelocity(100, percent);
-    // topStage.setVelocity(100, percent);
-    // bottomStage.setVelocity(100, percent);
-    // chassis.setPosition(0,0,0);
-    // chassis.setDriveMaxVoltage(12);
-    // chassis.setTurnMaxVoltage(10);
+    mainIntake.setVelocity(100, percent);
+    colorSort.setVelocity(100, percent);
+    topStage.setVelocity(100, percent);
+    bottomStage.setVelocity(100, percent);
+    chassis.setPosition(0,0,0);
+    chassis.setDriveMaxVoltage(6);
+    chassis.setTurnMaxVoltage(6);
     
+    // chassis.movetopos(24,24, 90);
+    // chassis.movetopos(0,0, 270);
+    // chassis.turnToAngle(0);
+    chassis.moveToTarget(24, 24, 0);
+    chassis.moveToTarget(0,0,0);
+
+    //chassis.turnToPosition(0, 24);
+    wait(5000, sec);
+
+
     // // chassis.driveDistanceWithOdom(12);
     // // chassis.driveDistanceWithOdom(12);
     // // chassis.driveDistanceWithOdom(12);
@@ -447,6 +458,7 @@ void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
     // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 5";
     // //odomDebugEnabled = false;
     // chassis.moveable();
+
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.
@@ -992,7 +1004,7 @@ void Auton_6() //DOUBLE LOAD TOP
   chassis.driveDistanceWithOdomTime(-6, 1000);
   chassis.turnToAngleTime(270, 1000, 10);
   chassis.movetopos(-55, -47, 270);
-  chassis.driveDistanceWithOdomTime(4, 400);
+  chassis.driveDistanceWithOdomTime(6, 400);
   matchLoad.set(true);
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -1051,8 +1063,8 @@ void Auton_7() //SCORES TOP MIDDLE REAL
   // wait(.1, sec);
   mainIntake.stop();
   matchLoad.set(false);
-  chassis.turnToAngleTime(270,1000,10);
-  chassis.movetopos(-55, -48, 270);
+  chassis.turnToAngleTime(269,1000,10);
+  chassis.movetopos(-55, -48, 269);
   chassis.driveDistanceWithOdomTime(4,400);
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -1083,6 +1095,7 @@ void Auton_7() //SCORES TOP MIDDLE REAL
   // wait(.1, sec);
   // chassis.movetopos(-24.5, -45, 90);
   chassis.driveDistanceWithOdomTime(21,750); //22
+  chassis.driveDistanceWithOdomTime(4, 400);
   toggleIntakeFlap(); //OPEN
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -1107,7 +1120,7 @@ void Auton_7() //SCORES TOP MIDDLE REAL
   chassis.turnToAngleTime(180,400,10);
   chassis.turnToAngleTime(272,1100,10);
   chassis.movetopos(-53, -45, 270);
-  chassis.driveDistanceWithOdomTime(8,400);
+  chassis.driveDistanceWithOdomTime(10,400);
   matchLoad.set(true);
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -1166,7 +1179,7 @@ void Auton_8() //SCORES LOW MIDDLE REAL
   mainIntake.stop();
   matchLoad.set(false);
   chassis.turnToAngleTime(270,1000,10);
-  chassis.movetopos(-55, -48, 270);
+  chassis.movetopos(-55, -48.5, 270);
   chassis.driveDistanceWithOdomTime(4,400);
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -1221,7 +1234,7 @@ void Auton_8() //SCORES LOW MIDDLE REAL
   chassis.turnToAngleTime(180,400,10);
   chassis.turnToAngleTime(272,1100,10);
   chassis.movetopos(-53, -45, 270);
-  chassis.driveDistanceWithOdomTime(8,400);
+  chassis.driveDistanceWithOdomTime(10,400);
   matchLoad.set(true);
   mainIntake.spin(forward);
   colorSort.spin(forward);

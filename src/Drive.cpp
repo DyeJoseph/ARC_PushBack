@@ -737,160 +737,405 @@ void Drive::setPosition(float x, float y, float heading){
     }
 }
 
-void Drive::movetopos(float x, float y, float angle) {
-    const float lead = 0.4f;                // carrot lead factor (larger = slower smoother approach, smaller = tighter more aggresive)
-    const float close_range = 7.5f;         // inches: when we enter "close/settle" mode
-    const float early_exit_range = 0.0f;    // inches: set >0 if you want earlier exit past target line
+void Drive::movetopos(float x, float y, float targetHeading) {
+    // ===== Tunables =====
+    const float lead = 0.15f;            // carrot distance factor
+    const float closeRange = 10.0f;      // inches
+    const float dt_ms = 10.0f;
 
-    // Speed/limits
-    const float max_drive = driveMaxVoltage;   // volts
-    const float max_turn  = turnMaxVoltage;    // volts
-    const float min_turn = 1.0f;               // volts
-    const float dt_ms = 10.0f;                 // how often loop updates
+    const float maxDrive = driveMaxVoltage;
+    const float maxTurn  = turnMaxVoltage;
+    const float minTurn  = 1.0f;
 
-    // Exit conditions
-    const float settle_dist = driveSettleError;   // inches
-    const float settle_ang  = turnSettleError;    // degrees
-    const int   settle_time = driveTimeToSettle;  // ms
-    const int   timeout_ms  = driveEndTime;       // ms
+    const float settleDist = driveSettleError;
+    const float settleAng  = turnSettleError;
+    const int   settleTime = driveTimeToSettle;
+    const int   timeout_ms = driveEndTime;
 
-    // PIDs (use your tuned values)
-    PID drivePID(0.7, 0.0001, 1.7, settle_dist, settle_time, timeout_ms); //timeout_ms
-    PID headingPID(0.3, 0.0001, 1.5, settle_ang,  settle_time, timeout_ms); //timeout_ms
+    PID drivePID(0.7, 0.0001, 1.7, settleDist, settleTime, timeout_ms);
+    PID turnPID (0.3, 0.0001, 1.5, settleAng,  settleTime, timeout_ms);
 
-    // Persistent loop variables (like LemLib)
+    auto sgn = [](float v) { return (v >= 0.0f) ? 1.0f : -1.0f; };
+
     bool close = false;
-    bool prevSameSide = false;
-    int elapsed_ms = 0;
-    int settled_ms = 0;
+    int elapsed = 0;
+    int settled = 0;
 
-    auto sgn = [](float v) -> float { return (v >= 0.0f) ? 1.0f : -1.0f; };
-
-    // IMPORTANT: manual settle + timeout (matches LemLib intent)
-    while (elapsed_ms < timeout_ms) {
+    while (elapsed < timeout_ms) {
         updatePosition();
 
-        const float robotX = chassisOdometry.getXPosition();
-        const float robotY = chassisOdometry.getYPosition();
-        const float robotH = chassisOdometry.getHeading(); // deg
+        const float rx = chassisOdometry.getXPosition();
+        const float ry = chassisOdometry.getYPosition();
+        const float rh = chassisOdometry.getHeading(); // deg, 0° = +Y
 
-        // Distance to target (true lateral error)
-        const float dx = x - robotX;
-        const float dy = y - robotY;
-        const float dist_to_target = hypot(dx, dy);
+        // ===== Vector to target =====
+        const float dx = x - rx;
+        const float dy = y - ry;
+        const float dist = hypot(dx, dy);
 
-        // Enter close mode once (never leave)
-        if (!close && dist_to_target < close_range) {
+        if (!close && dist < closeRange)
             close = true;
-        }
 
-        // Carrot point: when close, carrot = target
+        // ===== Carrot point =====
         float carrotX = x;
         float carrotY = y;
+
         if (!close) {
-            const float carrot_dist = lead * dist_to_target;
-            carrotX = x - sin(degToRad(angle)) * carrot_dist;
-            carrotY = y - cos(degToRad(angle)) * carrot_dist;
+            const float carrotDist = lead * dist;
+            const float fx = sin(degToRad(targetHeading));
+            const float fy = cos(degToRad(targetHeading));
+
+            carrotX = x - fx * carrotDist;
+            carrotY = y - fy * carrotDist;
         }
 
-        // Angle to carrot (your 0°=+Y convention)
-        const float cdx = carrotX - robotX;
-        const float cdy = carrotY - robotY;
-        const float carrot_heading = atan2(cdx, cdy) * 180.0f / (float)M_PI;
+        // ===== Heading to carrot =====
+        const float cdx = carrotX - rx;
+        const float cdy = carrotY - ry;
+        const float carrotHeading = atan2(cdx, cdy) * 180.0f / M_PI;
 
-        // Travel heading error (toward carrot) and final heading error (pose)
-        const float travel_err = inTermsOfNegative180To180(carrot_heading - robotH);
-        const float final_err  = inTermsOfNegative180To180(angle - robotH);
+        const float travelErr =
+            inTermsOfNegative180To180(carrotHeading - rh);
+        const float finalErr =
+            inTermsOfNegative180To180(targetHeading - rh);
 
-        // LemLib-style errors:
-        // lateralError: use distance-to-target, but apply sign/cos scaling based on travel direction
-        const float scalar = cos(degToRad(travel_err));
-        float lateralError = dist_to_target;
+        // ===== Lateral (drive) error =====
+        float lateralError;
+        std::cout << "\ncdx: " << cdx << " cdy: " << cdy;
+        std::cout << "\ndx: " << dx << " dy: " << dy << ", Dist: " << dist;
+        if (!close) {
+            // Signed distance only (prevents orbiting)
+            lateralError = dist * sgn(cos(degToRad(travelErr)));
+        } else {
+            // True projection onto heading
+            lateralError = dist * cos(degToRad(travelErr));
 
-        if (close) lateralError *= scalar;       // only use cosine magnitude while settling
-        else       lateralError *= sgn(scalar);   // far away, only use the sign (prevents stalling/circles)
-        
-        
-        /*if (close && dist_to_target > .5f)
-            lateralError *= scalar;
-        else
-            lateralError = dist_to_target;*/
+            // Prevent collapse near 90°
+            if (fabs(lateralError) < 0.25f)
+                lateralError = 0.25f * sgn(lateralError);
+        }
 
-        // angularError: when close, target final angle; else target carrot heading
-        float angularError = close ? final_err : travel_err;
+        // ===== Angular error =====
+        const float angularError = close ? finalErr : travelErr;
 
-
-        // ===== Exit conditions (LemLib-style): must be close AND both errors settled =====
+        // ===== Settle logic =====
         if (close) {
-            const bool dist_ok = fabs(dist_to_target) < settle_dist;
-            const bool ang_ok  = fabs(angularError)   < settle_ang;
+            const bool distOK = fabs(dist) < settleDist;
+            const bool angOK  = fabs(angularError) < settleAng;
 
-            if (dist_ok && ang_ok) settled_ms += (int)dt_ms;
-            else if (settled_ms > 0)
-                settled_ms -= (int)dt_ms;
+            if (distOK && angOK) settled += dt_ms;
+            else settled = 0;
 
-            if (settled_ms >= settle_time) {
-            std::cout << "\nSETTTTTTTTTTTTTTTTTTTTTTTTLE";
-            break;  // SETTLED
-    }
-}
-
-        // ===== Early exit if crossed target line while close (optional) =====
-        {
-            // line through target oriented with target heading:
-            // (y - y0)*(-sinθ) <= (x - x0)*cosθ + early_exit_range
-
-            const float final_heading_err = fabs(inTermsOfNegative180To180(angle - robotH));
-            const bool heading_ok = final_heading_err < settle_ang;  // 1.5° in your case
-
-            const float s = sin(degToRad(angle));
-            const float c = cos(degToRad(angle));
-
-            const bool robotSide  = (robotY - y) * (-s) <= (robotX - x) * (c) + early_exit_range;
-            const bool carrotSide = (carrotY - y) * (-s) <= (carrotX - x) * (c) + early_exit_range;
-            const bool sameSide = (robotSide == carrotSide);
-
-            /*if (!sameSide && prevSameSide && close && heading_ok) {
-                std::cout << "Yes I SETTLED-----------------" << std::endl;
+            if (settled >= settleTime){
                 break;
-            }*/
-            prevSameSide = sameSide;
+                std::cout << "\nSettle\n";
+            }
         }
 
         // ===== PID outputs =====
-        float drive_output   = drivePID.compute(lateralError);
-        float heading_output = headingPID.compute(angularError);
+        float driveOut = drivePID.compute(lateralError);
+        float turnOut  = turnPID.compute(angularError);
 
-        // Clamp
-        drive_output   = clamp(drive_output,   -max_drive, max_drive);
-        if (fabs(drive_output) < 1.0f) 
-            drive_output = sgn(drive_output) * 1.0f;
+        driveOut = clamp(driveOut, -maxDrive, maxDrive);
+        turnOut  = clamp(turnOut,  -maxTurn,  maxTurn);
 
-        heading_output = clamp(heading_output, -max_turn, max_turn);
+        // Minimum turn only
+        if (fabs(turnOut) > 0 && fabs(turnOut) < minTurn)
+            turnOut = sgn(turnOut) * minTurn;
 
-        // ---- MIN TURN FLOOR ----
-        if (fabs(heading_output) > 0.0f && fabs(heading_output) < min_turn) {
-            heading_output = sgn(heading_output) * min_turn;
+        // Minimum drive ONLY when far
+        if (!close && fabs(driveOut) < 1.0f)
+            driveOut = sgn(driveOut) * 1.0f;
+
+        // ===== Mix =====
+        const float left  = driveOut + turnOut;
+        const float right = driveOut - turnOut;
+
+        driveMotors(left, right);
+        elapsed += dt_ms;
+        if (elapsed > timeout_ms){
+            std::cout << "\nTimeout\n";
+            break;
         }
-;
 
-        // Mix
-        const float left_voltage  = drive_output + heading_output;
-        const float right_voltage = drive_output - heading_output;
-
-        driveMotors(left_voltage, right_voltage);
-
-        vex::task::sleep((int)dt_ms);
-        elapsed_ms += (int)dt_ms;
+        vex::task::sleep(dt_ms);
     }
 
-    if (elapsed_ms >= timeout_ms) {
-        std::cout << "TIMEOUT------------------" << std::endl;
+    brake();
+}
+/*
+void Drive::movetopos(float x, float y, float targetHeading) {
+    // ===== Tunables =====
+    const float approachOffset = 7.0f;          // inches behind target
+    const float offsetRadius   = 3.0f;
+    const float finalRadius    = driveSettleError;
+    const float headingTol     = turnSettleError;
+
+    const float turnOnlyAngle  = 100.0f;        // deg
+
+    const float dt_ms = 10.0f;
+    const int   timeout_ms = driveEndTime;
+
+    const float maxDrive = driveMaxVoltage;
+    const float maxTurn  = turnMaxVoltage;
+    const float minTurn  = 1.0f;
+
+    PID drivePID(0.7, 0.0, 1.4);
+    PID turnPID (0.35, 0.0, 1.6);
+
+    auto sgn = [](float v) { return (v >= 0.0f) ? 1.0f : -1.0f; };
+
+    int elapsed = 0;
+
+    while (elapsed < timeout_ms) {
+        updatePosition();
+
+        const float rx = chassisOdometry.getXPosition();
+        const float ry = chassisOdometry.getYPosition();
+        const float rh = chassisOdometry.getHeading(); // deg, 0° = +Y
+
+        // ===== Offset point =====
+        const float fx = sin(degToRad(targetHeading));
+        const float fy = cos(degToRad(targetHeading));
+
+        const float ox = x - fx * approachOffset;
+        const float oy = y - fy * approachOffset;
+
+        // ===== Errors =====
+        const float dxO = ox - rx;
+        const float dyO = oy - ry;
+        const float distToOffset = hypot(dxO, dyO);
+
+        const float dxF = x - rx;
+        const float dyF = y - ry;
+        const float distToFinal = hypot(dxF, dyF);
+
+        const float offsetHeading =
+            atan2(dxO, dyO) * 180.0f / M_PI;
+
+        const float offsetHeadingErr =
+            inTermsOfNegative180To180(offsetHeading - rh);
+
+        const float finalHeadingErr =
+            inTermsOfNegative180To180(targetHeading - rh);
+
+        // ===== SETTLE =====
+        if (distToFinal < finalRadius &&
+            fabs(finalHeadingErr) < headingTol) {
+
+            std::cout << "\n[MoveToPos] Settled"
+                      << " | Dist: " << distToFinal
+                      << " | HeadErr: " << finalHeadingErr
+                      << " | Time: " << elapsed << "ms";
+
+            driveMotors(0, 0);
+            break;
+        }
+
+        float driveOut = 0;
+        float turnOut  = 0;
+
+        // ===== Final heading lock =====
+        if (distToOffset < offsetRadius &&
+            fabs(finalHeadingErr) > headingTol) {
+
+            turnOut = turnPID.compute(finalHeadingErr);
+        }
+
+        // ===== Turn-only if backwards =====
+        else if (distToOffset > offsetRadius &&
+                 fabs(offsetHeadingErr) > turnOnlyAngle) {
+
+            turnOut = turnPID.compute(offsetHeadingErr);
+        }
+
+        // ===== Final precision drive =====
+        else if (distToOffset < offsetRadius &&
+                 fabs(finalHeadingErr) < headingTol) {
+
+            float forward = dxF * fx + dyF * fy;
+
+            driveOut = drivePID.compute(forward) * 0.6f;
+            turnOut  = turnPID.compute(finalHeadingErr) * 0.6f;
+        }
+
+        // ===== Main drive to offset =====
+        else {
+            float lateralError =
+                distToOffset * cos(degToRad(offsetHeadingErr));
+
+            driveOut = drivePID.compute(lateralError);
+            turnOut  = turnPID.compute(offsetHeadingErr);
+        }
+
+        // ===== Clamp =====
+        driveOut = clamp(driveOut, -maxDrive, maxDrive);
+        turnOut  = clamp(turnOut,  -maxTurn,  maxTurn);
+
+        if (fabs(turnOut) > 0 && fabs(turnOut) < minTurn)
+            turnOut = sgn(turnOut) * minTurn;
+
+        // ===== Mix =====
+        const float left  = driveOut + turnOut;
+        const float right = driveOut - turnOut;
+
+        driveMotors(left, right);
+
+        elapsed += dt_ms;
+        vex::task::sleep(dt_ms);
     }
 
-    std::cout << "X POS: " << chassisOdometry.getXPosition()
-              << " Y POS: " << chassisOdometry.getYPosition() 
-              << " HEADING: " << chassisOdometry.getHeading() << std::endl;
+    // ===== TIMEOUT PRINT =====
+    if (elapsed >= timeout_ms) {
+        std::cout << "\n[MoveToPos] TIMEOUT"
+                  << " | Target(" << x << ", " << y << ")"
+                  << " | FinalHeading: " << targetHeading;
+    }
 
+    brake();
+}*/
+
+void Drive::moveToTarget(float x, float y, float targetHeading){
+    const float approachOffset = 10.0f; //How far away the robot goes from the final point to align
+    const float preciseOffset =1.0f; //When the robot switches to precise mode
+
+    const float settleDist = driveSettleError; //Drive error
+    const float settleAng  = turnSettleError; //Turn error
+
+    const float turnOnlyAngle = 35.0f; //If robot is more than ___ deg away from angle it will turn first, prevent backward arching
+
+    const float dt_ms = 10.0f;                      //Loop Timing
+    const int   settleTime = driveTimeToSettle;      //Settle time
+    const int timeout_ms = driveEndTime;            //Timeout Time
+
+    const float maxDrive = driveMaxVoltage;         //Max Drive Volt
+    const float maxTurn  = turnMaxVoltage;          //Max Turn Volt
+    const float minTurn  = 1.0f;                    //Min Turn Volt
+    const float minDrive = 1.0f;                    //Min Drive Volt
+
+    bool precise = false;
+
+    auto sgn = [](float v) { return (v >= 0.0f) ? 1.0f : -1.0f; }; //Returns if a number is positive or negative)
+
+    PID drivePID(0.7, 0.0001, 1.7, 3, settleTime, 5000);
+    PID turnPID (0.3, 0.0001, 1.5, settleAng,  settleTime, 5000);
+
+    int elapsed = 0;
+    //Main Loop
+    while(elapsed < timeout_ms){
+        updatePosition();
+
+        const float currX = chassisOdometry.getXPosition();
+        const float currY = chassisOdometry.getYPosition();
+        const float currHeading = chassisOdometry.getHeading();
+
+        const float offsetX = x;
+        const float offsetY = y;
+        //offset
+        if (!precise){
+            const float finalX = sin(degToRad(targetHeading));              //calculates where the offset position is
+            const float finalY = cos(degToRad(targetHeading));
+            const float offsetX = x - finalX * approachOffset;
+            const float offsetY = y - finalY * approachOffset;
+        }
+
+        //error
+        const float distOffsetX = offsetX - currX;                      //calculates distance to offset position
+        const float distOffsetY = offsetY - currY;
+        const float distToOffset = hypot(distOffsetX, distOffsetY);
+
+        const float distFinalX = x - currX;                             //calculates distance to final position
+        const float distFinalY = y - currY;
+        const float distToFinal = hypot(distFinalX, distFinalY);
+
+        const float offsetHeading = atan2(distOffsetX, distOffsetY) * 180.0f / M_PI;            //General direction a robot must go        
+        const float offsetHeadingErr = inTermsOfNegative180To180(offsetHeading - currHeading);  //Shortest path to turn robot to offset
+        const float finalHeadingErr = inTermsOfNegative180To180(targetHeading - currHeading);   //Turns the robot to the final heading when it gets close
+
+        if (!precise && distToOffset < preciseOffset && fabs(offsetHeadingErr) < .75f) {
+            precise = true;
+            std::cout << "\n\nSWITCH\n\n";
+        }
+
+        float driveOut = 0;
+        float turnOut  = 0;
+
+        if (distToFinal < settleDist && fabs(finalHeadingErr) < settleAng) {
+                std::cout << "MoveToTarget Settled"
+                        << " , Dist: " << distToFinal
+                        << " , HeadErr: " << finalHeadingErr
+                        << " , Time: " << elapsed << "ms" << std::endl;
+                driveMotors(0, 0);
+                break;
+            }
+
+        // Precise Mode (When the distance left is less than precise offset and heading is less than settle angle error)
+        if (precise){
+
+            float forward = distFinalX * cos(degToRad(currHeading)) + distFinalY * sin(degToRad(currHeading));
+            
+
+            driveOut = drivePID.compute(forward) * 0.6f;    //Drop drive and turn to 60% power to be "precise"
+            turnOut  = turnPID.compute(finalHeadingErr) * 0.6f;
+
+        }else{
+            
+            //Final Heading Set (When Distance left is less than our precise value, and my heading is greater than my settle error)
+            if (distToOffset < preciseOffset && fabs(finalHeadingErr) > settleAng) {
+                driveOut = 0;
+                turnOut = turnPID.compute(finalHeadingErr);
+            }
+
+            // Turn Only (If distance left is greater than my precise offset distance and offset heading is greater than the turnonly value you gave)
+            else if (distToOffset > preciseOffset && fabs(offsetHeadingErr) > turnOnlyAngle) {
+                turnOut = turnPID.compute(offsetHeadingErr);
+            }
+            else{
+                // Main Drive (If no other if statements catch)
+            float forwardError = distToOffset * cos(degToRad(offsetHeadingErr));    //adjust hows much the drive power is based on angle of robot
+            //float speedScale = clamp(distToOffset / 18.0f, 0.25f, 1.0f);
+            driveOut = drivePID.compute(forwardError);
+            turnOut  = turnPID.compute(offsetHeadingErr);
+            }
+
+        }
+
+
+        //Clamping 
+        driveOut = clamp(driveOut, -maxDrive, maxDrive);
+        turnOut  = clamp(turnOut,  -maxTurn,  maxTurn);
+        if (fabs(driveOut) > 0 && fabs(driveOut) < minDrive)
+            driveOut = sgn(driveOut) * minDrive;
+        if (fabs(turnOut) > 0 && fabs(turnOut) < minTurn)       //Prevents deadzone of too low voltage
+            turnOut = sgn(turnOut) * minTurn;
+
+        // ===== Mix =====
+        const float left  = driveOut + turnOut;                 //Adjusts how robot will move, left, right, straight...
+        const float right = driveOut - turnOut;
+
+        driveMotors(left, right);                               //Actually drives the motors of the robot
+        std::cout << "\nValues "
+                  << " , CurrPos(" << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << ")"
+                  << " , Target: " << distToFinal
+                  << " , DriveVolts(" << driveOut << ", " << turnOut << ")"
+                  << " , Heading: " << chassisOdometry.getHeading()
+                  << " , Precise: " << precise
+                  << " , distToOffset: " << distToOffset
+                << " , CurrHeading: " << currHeading
+                << " , Err: " << offsetHeadingErr << "\n";
+
+            //timeout
+        if (elapsed >= timeout_ms) {
+            std::cout << "\nMoveToTarget TIMEOUT"
+                    << " , Target(" << x << ", " << y << ")"
+                    << " , Actual(" << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << ")"
+                    << " , FinalHeading: " << targetHeading
+                    << " , ActualHeading: " << chassisOdometry.getHeading();
+
+        }
+        elapsed += dt_ms;                                       //Adds to elapsed and waits dt_ms to run again
+        vex::task::sleep(dt_ms);
+
+    }
     brake();
 }

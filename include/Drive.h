@@ -85,5 +85,6 @@ class Drive
     void updatePosition();
     void setPosition(float x, float y, float heading);
     void movetopos(float x, float y, float angle);
+    void moveToTarget(float x, float y, float targetHeading);
 
 };
