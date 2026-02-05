@@ -1290,10 +1290,10 @@ void PAutonTest(){
     for(int i=0;i<10;i++){
       //Test Y
       chassis.turnToAngle(0);
-      chassis.driveDistanceWithOdom(72);
-      writeToCard(filename,chassis.chassisOdometry.getYPosition()-72);
+      chassis.driveDistanceWithOdom(24);
+      writeToCard(filename,chassis.chassisOdometry.getYPosition()-24);
       writeCommaToCard(filename);
-      chassis.driveDistanceWithOdom(-72);
+      chassis.driveDistanceWithOdom(-24);
       writeToCard(filename,chassis.chassisOdometry.getYPosition());
       writeCommaToCard(filename);  
     }
@@ -1301,10 +1301,10 @@ void PAutonTest(){
     for(int i=0;i<10;i++){
       //Turn and test X
       chassis.turnToAngle(90);
-      chassis.driveDistanceWithOdom(72);
-      writeToCard(filename,chassis.chassisOdometry.getXPosition()-72);
+      chassis.driveDistanceWithOdom(24);
+      writeToCard(filename,chassis.chassisOdometry.getXPosition()-24);
       writeCommaToCard(filename);
-      chassis.driveDistanceWithOdom(-72);
+      chassis.driveDistanceWithOdom(-24);
       writeToCard(filename,chassis.chassisOdometry.getXPosition());
       writeCommaToCard(filename);
     }
