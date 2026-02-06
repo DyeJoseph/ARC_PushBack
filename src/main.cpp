@@ -37,7 +37,7 @@ using namespace vex;
     motor_group(LFT, LFB, LBB, LBT), // Left drive train motors
     motor_group(RFT, RFB, RBB, RBT), // Right drive train motors
     PORT20,               // Inertial Sensor Port
-    2.66,              // The diameter size of the wheel in inches
+    2.66,              // The diameter size of the wheel in inches 2.66
     1,                   // 
     12,                   // The maximum amount of the voltage used in the drivebase (1 - 12)
     odomType,
@@ -383,14 +383,18 @@ void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
     topStage.setVelocity(100, percent);
     bottomStage.setVelocity(100, percent);
     chassis.setPosition(0,0,0);
-    chassis.setDriveMaxVoltage(6);
-    chassis.setTurnMaxVoltage(6);
+    chassis.setDriveMaxVoltage(12);
+    chassis.setTurnMaxVoltage(12);
     
     // chassis.movetopos(24,24, 90);
     // chassis.movetopos(0,0, 270);
     // chassis.turnToAngle(0);
     chassis.moveToTarget(24, 24, 0);
+    wait(2, sec);
+    chassis.moveToTarget(0, 48, 0);
+    wait(2, sec);
     chassis.moveToTarget(0,0,0);
+    wait(2, sec);
 
     //chassis.turnToPosition(0, 24);
     wait(5000, sec);
