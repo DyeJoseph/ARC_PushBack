@@ -155,7 +155,7 @@ void autonomous()
 
   setDriveTrainConstants();
 
-  switch (lastPressed) 
+  /*switch (lastPressed) 
   {
     case 0:
       Auton_1();
@@ -183,7 +183,7 @@ void autonomous()
       break;
     default:
       break;
-  }
+  }*/
   Auton_1();
 }
 
@@ -352,18 +352,18 @@ void setDriveTrainConstants()
 {
     // Set the Drive PID values for the DriveTrain
     chassis.setDriveConstants(
-        .7,  // Kp - Proportion Constant
-        0.0000, // Ki - Integral Constant
-        1, // Kd - Derivative Constant
-        1, // Settle Error
+        .85,  // Kp - Proportion Constant
+        0.0, // Ki - Integral Constant
+        2.5, // Kd - Derivative Constant
+        .5, // Settle Error
         200, // Time to Settle
         2500 // End Time 5000
     );  
 
     // Set the Turn PID values for the DriveTrain
     chassis.setTurnConstants(
-        .24,    // Kp - Proportion Constant
-        0.0001,      // Ki - Integral Constant
+        0.22,    // Kp - Proportion Constant
+        0.0,      // Ki - Integral Constant
         1.5,      // Kd - Derivative Constant 
         .75, //1.25    // Settle Error
         200,    // Time to Settle
@@ -385,84 +385,165 @@ void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
     chassis.setPosition(0,0,0);
     chassis.setDriveMaxVoltage(12);
     chassis.setTurnMaxVoltage(12);
-    
-    // chassis.movetopos(24,24, 90);
-    // chassis.movetopos(0,0, 270);
-    // chassis.turnToAngle(0);
-    chassis.moveToTarget(24, 24, 0);
-    wait(2, sec);
-    chassis.moveToTarget(0, 48, 0);
-    wait(2, sec);
-    chassis.moveToTarget(0,0,0);
-    wait(2, sec);
 
-    //chassis.turnToPosition(0, 24);
-    wait(5000, sec);
+    //DRIVE TEST 1
+    // std::cout << "\nSTARTING AUTON\n";
+    // chassis.driveDistanceWithOdom(6);     // pos: 6
+    // chassis.driveDistanceWithOdom(5);     // pos: 11
+    // chassis.driveDistanceWithOdom(18);    // pos: 29
+    // chassis.driveDistanceWithOdom(-7);    // pos: 22
+    // chassis.driveDistanceWithOdom(20);    // pos: 42
+    // chassis.driveDistanceWithOdom(-6);    // pos: 36
+    // chassis.driveDistanceWithOdom(-25);   // pos: 11
+    // chassis.driveDistanceWithOdom(7);     // pos: 18
+    // chassis.driveDistanceWithOdom(30);    // pos: 48 
+    // chassis.driveDistanceWithOdom(-6);    // pos: 42
+    // chassis.driveDistanceWithOdom(-35);   // pos: 7
+    // chassis.driveDistanceWithOdom(-7);    // pos: 0
+    // chassis.driveDistanceWithOdom(10);    // pos: 10
+    // chassis.driveDistanceWithOdom(-5);    // pos: 5
+    // chassis.driveDistanceWithOdom(15);    // pos: 20
+    // chassis.driveDistanceWithOdom(-10);   // pos: 10
+    // chassis.driveDistanceWithOdom(-5);    // pos: 5
+    // chassis.driveDistanceWithOdom(5);     // pos: 10
+    // chassis.driveDistanceWithOdom(-10);   // pos: 0
 
+    //DRIVE TEST 2
+    // std::cout << "\nSTARTING AUTON\n";
+    // chassis.driveDistanceWithOdom(8);     // pos: 8
+    // chassis.driveDistanceWithOdom(12);    // pos: 20
+    // chassis.driveDistanceWithOdom(15);    // pos: 35
+    // chassis.driveDistanceWithOdom(-10);   // pos: 25
+    // chassis.driveDistanceWithOdom(18);    // pos: 43
+    // chassis.driveDistanceWithOdom(-8);    // pos: 35
+    // chassis.driveDistanceWithOdom(-20);   // pos: 15
+    // chassis.driveDistanceWithOdom(10);    // pos: 25
+    // chassis.driveDistanceWithOdom(23);    // pos: 48
+    // chassis.driveDistanceWithOdom(-12);   // pos: 36
+    // chassis.driveDistanceWithOdom(-30);   // pos: 6
+    // chassis.driveDistanceWithOdom(-6);    // pos: 0
+    // chassis.driveDistanceWithOdom(14);    // pos: 14
+    // chassis.driveDistanceWithOdom(-9);    // pos: 5
+    // chassis.driveDistanceWithOdom(20);    // pos: 25
+    // chassis.driveDistanceWithOdom(-15);   // pos: 10
+    // chassis.driveDistanceWithOdom(-5);    // pos: 5
+    // chassis.driveDistanceWithOdom(-5);    // pos: 0
 
-    // // chassis.driveDistanceWithOdom(12);
-    // // chassis.driveDistanceWithOdom(12);
-    // // chassis.driveDistanceWithOdom(12);
-    // // chassis.driveDistanceWithOdom(12);
+    //DRIVE TEST 3
+    // std::cout << "\nSTARTING AUTON\n";
+    // chassis.driveDistanceWithOdom(10);    // pos: 10
+    // chassis.driveDistanceWithOdom(15);    // pos: 25
+    // chassis.driveDistanceWithOdom(12);    // pos: 37
+    // chassis.driveDistanceWithOdom(-9);    // pos: 28
+    // chassis.driveDistanceWithOdom(18);    // pos: 46
+    // chassis.driveDistanceWithOdom(-11);   // pos: 35
+    // chassis.driveDistanceWithOdom(-25);   // pos: 10
+    // chassis.driveDistanceWithOdom(8);     // pos: 18
+    // chassis.driveDistanceWithOdom(30);    // pos: 48
+    // chassis.driveDistanceWithOdom(-14);   // pos: 34
+    // chassis.driveDistanceWithOdom(-24);   // pos: 10
+    // chassis.driveDistanceWithOdom(-10);   // pos: 0
+    // chassis.driveDistanceWithOdom(16);    // pos: 16
+    // chassis.driveDistanceWithOdom(-6);    // pos: 10
+    // chassis.driveDistanceWithOdom(20);    // pos: 30
+    // chassis.driveDistanceWithOdom(-15);   // pos: 15
+    // chassis.driveDistanceWithOdom(-10);   // pos: 5
+    // chassis.driveDistanceWithOdom(-5);    // pos: 0
 
-    // // chassis.driveDistanceWithOdom(24);
-    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // // chassis.driveDistanceWithOdom(24);
-    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // // chassis.driveDistanceWithOdom(24);
-    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // // chassis.turnToAngle(180);
-    // // chassis.driveDistanceWithOdom(24);
-    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // // chassis.driveDistanceWithOdom(24);
-    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // // chassis.driveDistanceWithOdom(24);
-    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // // chassis.turnToAngle(0);
-    // // std::cout << "\n" << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << ", " << chassis.chassisOdometry.getHeading() << "";
-    // // chassis.movetopos(0,24,0);
-    // // chassis.movetopos(0,48,0);
-    // // chassis.turnToAngle(180);
-    // // chassis.movetopos(0,24,180);
-    // // chassis.movetopos(0,0,180);
-    // // chassis.turnToAngle(0);
-    
-
-    // // chassis.turnToAngle(90);
-    // // chassis.turnToAngle(180);
-    // // chassis.turnToAngle(270);
-    // // chassis.turnToAngle(0);
-    // // chassis.turnToAngle(50);
-    // // chassis.turnToAngle(295);
-    // // chassis.turnToAngle(12);
-    // // chassis.turnToAngle(224);
-    // // chassis.turnToAngle(165);
-    // // chassis.turnToAngle(43);
-    // // chassis.turnToAngle(304);
-    // // chassis.turnToAngle(178);
-    // // chassis.turnToAngle(0);
-    // //thread odomThread(odomDebugThread);
-    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 1";
-    // chassis.movetopos(0, 24, 0);
-    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 1.5";
+    //TURN TEST 1
+    // std::cout << "\nSTARTING AUTON\n";
     // chassis.turnToAngle(45);
-    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 2";
-    // chassis.movetopos(24,48,45);
-    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 2.5";
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(120);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(30);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(275);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(50);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(310);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
     // chassis.turnToAngle(180);
-    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 3";
-    // chassis.movetopos(24, 24, 180);
-    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 3.5";
-    // chassis.movetopos(24, 0, 180);
-    // chassis.turnToAngle(270);
-    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 4";
-    // chassis.movetopos(0,0, 270);
-    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 4.5";
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(90);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(350);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(60);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(200);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(10);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(330);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(25);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(140);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(5);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(300);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(15);
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
     // chassis.turnToAngle(0);
-    // std::cout << "HIIIIIIIIIIIIIIIIIIIIT 5";
-    // //odomDebugEnabled = false;
-    // chassis.moveable();
+    // std::cout << chassis.chassisOdometry.getHeading() << std::endl;
+    // chassis.turnToAngle(0);
 
+    //TURN TEST 2
+    // std::cout << "\nSTARTING AUTON\n";
+    // chassis.turnToAngle(60);
+    // chassis.turnToAngle(180);
+    // chassis.turnToAngle(5);
+    // chassis.turnToAngle(270);
+    // chassis.turnToAngle(90);
+    // chassis.turnToAngle(300);
+    // chassis.turnToAngle(15);
+    // chassis.turnToAngle(225);
+    // chassis.turnToAngle(350);
+    // chassis.turnToAngle(40);
+    // chassis.turnToAngle(310);
+    // chassis.turnToAngle(50);
+    // chassis.turnToAngle(200);
+    // chassis.turnToAngle(75);
+    // chassis.turnToAngle(330);
+    // chassis.turnToAngle(120);
+    // chassis.turnToAngle(10);
+    // chassis.turnToAngle(280);
+    // chassis.turnToAngle(140);
+    // chassis.turnToAngle(0);
+
+    //TURN TEST 3
+    // std::cout << "\nSTARTING AUTON\n";
+    // chassis.turnToAngle(30);
+    // chassis.turnToAngle(150);
+    // chassis.turnToAngle(5);
+    // chassis.turnToAngle(270);
+    // chassis.turnToAngle(45);
+    // chassis.turnToAngle(320);
+    // chassis.turnToAngle(60);
+    // chassis.turnToAngle(210);
+    // chassis.turnToAngle(10);
+    // chassis.turnToAngle(340);
+    // chassis.turnToAngle(25);
+    // chassis.turnToAngle(190);
+    // chassis.turnToAngle(80);
+    // chassis.turnToAngle(355);
+    // chassis.turnToAngle(100);
+    // chassis.turnToAngle(5);
+    // chassis.turnToAngle(270);
+    // chassis.turnToAngle(60);
+    // chassis.turnToAngle(350);
+    // chassis.turnToAngle(0);
+
+
+
+      std::cout << "X: " << chassis.chassisOdometry.getXPosition() 
+        << " Y: " << chassis.chassisOdometry.getYPosition() 
+        << " Heading: " << chassis.chassisOdometry.getHeading() 
+        << std::endl;
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.

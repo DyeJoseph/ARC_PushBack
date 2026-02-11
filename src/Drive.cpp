@@ -286,11 +286,21 @@ void Drive::turnToAngle(float angle, float maxVoltage)
         float output = turnPID.compute(error);
 
         //Minimum output threshold for turning
-        if(fabs(output) < 1.55)
+        if(fabs(output) < 0.85)
             if(output < 0)
-                output = -1.55;
+                output = -1.4;
             else
-                output = 1.55;
+                output = 1.4;
+        else if (fabs(output) < 1.5)
+             if(output < 0)
+                output = -3.4;
+            else
+                output = 3.4;
+        else if (fabs(output) < 5)
+            if(output < 0)
+                output = -5.4;
+            else
+                output = 5.4;
         else
             output = clamp(output, -maxVoltage, maxVoltage);
 
@@ -867,22 +877,22 @@ void Drive::movetopos(float x, float y, float targetHeading) {
 void Drive::moveToTarget(float x, float y, float targetHeading){
     const float settleDist = driveSettleError; //Drive error
     const float settleAng  = turnSettleError; //Turn error
-    const float turnOnlyAngle = 45.0f; //If robot is more than ___ deg away from angle it will turn first, prevent backward arching
+    const float turnOnlyAngle = 38.0f; //If robot is more than ___ deg away from angle it will turn first, prevent backward arching
 
     const float dt_ms = 10.0f;                      //Loop Timing
     const int timeout_ms = 10000;            //Timeout Time
 
     const float maxDrive = driveMaxVoltage;         //Max Drive Volt
     const float maxTurn  = turnMaxVoltage;          //Max Turn Volt
-    const float minTurn  = 1.5f;                    //Min Turn Volt
+    const float minTurn  = 1.4f;                    //Min Turn Volt
     const float minDrive = 2.0f;                    //Min Drive Volt
 
     //Returns positive or negative 1 based on value
-    auto sgn = [](float v) { return (v >= 0.0f) ? 1.0f : -1.0f; };
+    auto sgn = [](float v) { return (v >= 0.0f) ? 10.0f : -1.0f; };
 
     //PID Constants
-    PID drivePID(0.7, 0.0001, 1.7, settleDist, driveTimeToSettle, driveEndTime);
-    PID turnPID (0.3, 0.0001, 1.5, settleAng,  driveTimeToSettle, driveEndTime);
+    PID drivePID(0.6, 0.0001, 1.7, settleDist, driveTimeToSettle, driveEndTime);
+    PID turnPID (0.4, 0.0001, 1.5, settleAng,  driveTimeToSettle, driveEndTime);
 
     int elapsed = 0;
 
@@ -932,13 +942,13 @@ void Drive::moveToTarget(float x, float y, float targetHeading){
         float turnOut  = 0;
         
         //How far to drive, reverse if needed
-        float forward = dist * cos(degToRad(headingError));
+        float forward = dist * cos(degToRad(headingError)); //
         if (reverse){
             forward = -forward;
         }
 
         //Turn only, prevents arcs
-        if (dist < settleDist * 2) {
+        if (dist < settleDist * 2 && fabs(finalHeadingErr) > settleAng){
             driveOut = 0;
             turnOut  = turnPID.compute(finalHeadingErr);
         }
@@ -949,23 +959,29 @@ void Drive::moveToTarget(float x, float y, float targetHeading){
             driveOut = drivePID.compute(forward);
             turnOut  = turnPID.compute(headingError);
         }
+        
 
         //Slow down when closer to target(Precision)
-        float slowScale = clamp(dist / 20.0f, .25f, 1.0f);
+        /*float slowScale = clamp(dist / 20.0f, 0.15f, 1.0f);
         if (dist >= settleDist * 2.0f) {
             driveOut *= slowScale;
             turnOut  *= slowScale;
-        }
+        }*/
+
+        /*float slowScale = clamp(dist / 10.0f, 0.15f, 1.0f);
+        float turnScale  = clamp(fabs(finalHeadingErr) / 100.0f, 0.25f, 1.0f);
+        driveOut *= slowScale;
+        turnOut  *= turnScale;*/
 
         //Clamping 
         driveOut = clamp(driveOut, -maxDrive, maxDrive);
         turnOut  = clamp(turnOut,  -maxTurn,  maxTurn);
 
         //Minimum Voltage
-        if (fabs(driveOut) > 0 && fabs(driveOut) < minDrive)
-            driveOut = sgn(driveOut) * minDrive;
-        if (fabs(turnOut) > 0 && fabs(turnOut) < minTurn)
-            turnOut = sgn(turnOut) * minTurn;
+        // if (fabs(driveOut) > 0 && fabs(driveOut) < minDrive)
+        //     driveOut = sgn(driveOut) * minDrive;
+        // if (fabs(turnOut) > 0 && fabs(turnOut) < minTurn)
+        //     turnOut = sgn(turnOut) * minTurn;
 
         //Mix drive and turn to adjust how robot will drive
         const float left  = driveOut + turnOut;      
@@ -977,8 +993,7 @@ void Drive::moveToTarget(float x, float y, float targetHeading){
         //           << " , CurrPos(" << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << ")"
         //           << " , Target: " << dist
         //           << " , DriveVolts(" << driveOut << ", " << turnOut << ")"
-        //           << " , Heading: " << chassisOdometry.getHeading()
-        //         << " , CurrHeading: " << currHeading << std::endl;
+        //           << " , Heading: " << chassisOdometry.getHeading();
 
         //Adds to Elapsed time for timeout
         elapsed += dt_ms;  
