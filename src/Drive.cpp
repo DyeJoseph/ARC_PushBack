@@ -762,8 +762,8 @@ void Drive::movetopos(float x, float y, float targetHeading) {
     const int   settleTime = driveTimeToSettle;
     const int   timeout_ms = driveEndTime;
 
-    PID drivePID(0.7, 0.0001, 1.7, settleDist, settleTime, timeout_ms);
-    PID turnPID (0.3, 0.0001, 1.5, settleAng,  settleTime, timeout_ms);
+    PID drivePID(0.85, 0.0, 2.5, .5, 200, 2500);
+    PID turnPID (0.22, 0.0, 1.5, .75,  200, 2500);
 
     auto sgn = [](float v) { return (v >= 0.0f) ? 1.0f : -1.0f; };
 
@@ -811,8 +811,6 @@ void Drive::movetopos(float x, float y, float targetHeading) {
 
         // ===== Lateral (drive) error =====
         float lateralError;
-        std::cout << "\ncdx: " << cdx << " cdy: " << cdy;
-        std::cout << "\ndx: " << dx << " dy: " << dy << ", Dist: " << dist;
         if (!close) {
             // Signed distance only (prevents orbiting)
             lateralError = dist * sgn(cos(degToRad(travelErr)));
