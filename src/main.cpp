@@ -748,7 +748,7 @@ void Auton_3() //1 MINUTE SKI
     mainIntake.spin(forward);
     colorSort.spin(forward);
     topStage.spin(forward, 100, percent);
-    wait(1.7, sec);
+    wait(1.3, sec);
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
@@ -787,14 +787,16 @@ void Auton_3() //1 MINUTE SKI
     mainIntake.spin(forward);
     colorSort.spin(forward);
     topStage.spin(forward, 100, percent);
-    wait(1.4, sec);
+    wait(1.15, sec);
+    toggleIntakeFlap(); //CLOSE
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
-    toggleIntakeFlap(); //CLOSE
+
 
 
     //GRAB 6 FAR MATCH LOADER
+    mainIntake.spin(forward);
     chassis.driveDistanceWithOdom(-12);
     std::cout << "\nHIT 12, X: " << chassis.chassisOdometry.getXPosition() << ", Y: " << chassis.chassisOdometry.getYPosition() << ", H: " << chassis.chassisOdometry.getHeading();
     chassis.turnToAngle(132);
@@ -826,6 +828,13 @@ void Auton_3() //1 MINUTE SKI
     topStage.stop();
     matchLoad.set(false); //CLOSE
     chassis.turnToAngle(274);
+    if(chassis.chassisOdometry.getYPosition() < -47){
+      chassis.turnToAngleTime(277, 200, 10);
+      std::cout << "\nTURNING TO 277\n";
+    }else{
+      chassis.turnToAngleTime(274, 200, 10);
+        std::cout << "\nTURNING TO 274\n";
+    }
     chassis.driveDistanceWithOdom(22);
     chassis.turnToAngleTime(270, 200, 10);
     std::cout << "\nHIT 18, X: " << chassis.chassisOdometry.getXPosition() << ", Y: " << chassis.chassisOdometry.getYPosition() << ", H: " << chassis.chassisOdometry.getHeading();
@@ -839,7 +848,7 @@ void Auton_3() //1 MINUTE SKI
     mainIntake.spin(forward);
     colorSort.spin(forward);
     topStage.spin(forward, 100, percent);
-    wait(.9, sec);
+    wait(.8, sec);
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
@@ -865,7 +874,7 @@ void Auton_3() //1 MINUTE SKI
 
     //OPTION 1 GRAB 2 RED FROM MIDDLE LINE AND LOAD 7 INTO TOP MID
     //OPTION 2 LOAD 5 RED IN 
-    chassis.driveDistanceWithOdom(-11);
+    chassis.driveDistanceWithOdom(-12);
     std::cout << "\nHIT 22, X: " << chassis.chassisOdometry.getXPosition() << ", Y: " << chassis.chassisOdometry.getYPosition() << ", H: " << chassis.chassisOdometry.getHeading();
     matchLoad.set(false); //CLOSE
     colorSort.stop();
@@ -881,23 +890,30 @@ void Auton_3() //1 MINUTE SKI
     chassis.driveDistanceWithOdomTime(6, 200);
     std::cout <<  "\nMy Timeout: ";
     chassis.driveDistanceWithOdomTime(-4, 100);
-    mainIntake.spin(reverse);
-    colorSort.spin(reverse);
-    topStage.spin(reverse);
-    wait(.1, sec);
-    mainIntake.spin(forward, 100, percent);
-    colorSort.spin(forward, 100, percent);
-    topStage.spin(forward, 70, percent);
-    wait(2, sec);
+    if(myTimer.time(sec) < 47){
+      mainIntake.spin(reverse);
+      colorSort.spin(reverse);
+      topStage.spin(reverse);
+      wait(.1, sec);
+      mainIntake.spin(forward, 100, percent);
+      colorSort.spin(forward, 100, percent);
+      topStage.spin(forward, 70, percent);
+      wait(2, sec);
+    }
 
-    chassis.driveDistanceWithOdom(-20);
+    chassis.driveDistanceWithOdom(-6);
     colorSort.stop();
     topStage.stop();
     toggleDropDown(); //UP
     chassis.turnToAngle(270);
-    chassis.driveDistanceWithOdom(87);
+    chassis.driveDistanceWithOdom(28);
+    chassis.turnToAngle(330);
+    chassis.driveDistanceWithOdom(5);
+    wait(2, sec);
+    chassis.driveDistanceWithOdom(-5);
+    chassis.turnToAngle(260);
+    chassis.driveDistanceWithOdom(52);
     chassis.turnToAngle(350);
-    chassis.driveDistanceWithOdom(-6);
     while (myTimer.time(sec) <= 58){
       wait(10, msec);
     }
