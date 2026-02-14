@@ -16,7 +16,7 @@ Odom::Odom(float forwardRightWheelDiameter, float forwardLeftWheelDiameter, floa
     this->forwardLeftRotationDistance = forwardLeftRotationDistance;
     this->lateralRotationDistance = lateralRotationDistance;     
 
-}
+} 
 
 /// @brief Constructor for odometry with one forward rotation sensor
 /// @param forwardWheelDiameter Forward rotation wheel diameter 
