@@ -1278,7 +1278,12 @@ void Auton_6() //DOUBLE LOAD TOP
   wait(.1, sec);
   mainIntake.stop();
   matchLoad.set(false);
-  chassis.driveDistanceWithOdomTime(12,1000); //11
+  chassis.driveDistanceWithOdomTime(11.5,1000); //11
+
+  chassis.setDriveMaxVoltage(6);
+  chassis.driveDistanceWithOdomTime(5, 200);
+  chassis.setDriveMaxVoltage(12);
+
   toggleLift();
   // chassis.movetopos(-55, -47, 270);
   // chassis.driveDistanceWithOdomTime(4, 400);
@@ -1306,7 +1311,12 @@ void Auton_6() //DOUBLE LOAD TOP
   matchLoad.set(false);
   // toggleLift(); // UP
   wait(.1, sec);
-  chassis.driveDistanceWithOdomTime(22.5, 1000); // 22.5
+  chassis.driveDistanceWithOdomTime(22, 1000); // 22.5
+
+  chassis.setDriveMaxVoltage(6);
+  chassis.driveDistanceWithOdomTime(5, 200);
+  chassis.setDriveMaxVoltage(12);
+
   // chassis.movetopos(-31, -48.5, 94);
   toggleIntakeFlap(); //OPEN
   mainIntake.spin(forward);
@@ -1318,7 +1328,8 @@ void Auton_6() //DOUBLE LOAD TOP
   wait(.2, sec);
   topStage.spin(forward);
   mainIntake.spin(forward);
-  wait(1.3, sec); 
+  wait(1.5, sec); 
+  chassis.driveDistanceWithOdomTime(5,100);
   toggleIntakeFlap(); // CLOSE
 
   //GRAB MATCH LOADS
@@ -1328,13 +1339,17 @@ void Auton_6() //DOUBLE LOAD TOP
   topStage.stop();
   toggleLift(); //DOWN
   
-  chassis.turnToAngle(271);
+  chassis.turnToAngle(269);
   // chassis.turnToAngleTime(270, 1000, 10);
-  chassis.driveDistanceWithOdomTime(21, 1100);
+  chassis.driveDistanceWithOdomTime(22, 1100);
+
+  chassis.setDriveMaxVoltage(6);
+  chassis.driveDistanceWithOdomTime(5, 200);
+  chassis.setDriveMaxVoltage(12);
+
   // chassis.movetopos(-55, -47, 270);
 
   toggleLift();
-  chassis.driveDistanceWithOdomTime(3, 400); // 2
   matchLoad.set(true);
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -1348,12 +1363,17 @@ void Auton_6() //DOUBLE LOAD TOP
   //LOAD TOP GOAL AGAIN
   chassis.driveDistanceWithOdomTime(-5, 300);
   // chassis.turnToAngleTime(180, 500, 10);  
-  chassis.turnToAngleTime(92, 1000, 10);
+  chassis.turnToAngleTime(97, 1000, 10);
   wait(.1, sec);
   // toggleLift();
   wait(.1, sec);
 
-  chassis.driveDistanceWithOdomTime(22.5, 1000);
+  chassis.driveDistanceWithOdomTime(22, 1000);
+
+  chassis.setDriveMaxVoltage(6);
+  chassis.driveDistanceWithOdomTime(5, 100);
+  chassis.setDriveMaxVoltage(12);
+
   // chassis.movetopos(-31, -48.5, 94);
 
   toggleIntakeFlap(); //OPEN
@@ -1367,6 +1387,7 @@ void Auton_6() //DOUBLE LOAD TOP
   topStage.spin(forward);
   mainIntake.spin(forward);
   wait(1.7, sec); // 1.5
+  chassis.driveDistanceWithOdomTime(5,100);
 
 }
 
@@ -1383,6 +1404,10 @@ void Auton_7() //SCORES TOP MIDDLE REAL
     chassis.setDriveMaxVoltage(12);
     chassis.setTurnMaxVoltage(12);
 
+    toggleLift();
+    wait(.2, sec);
+    toggleLift();
+
     //Grab Other Bots Match Load
     matchLoad.set(true);
     mainIntake.spin(forward);
@@ -1392,7 +1417,13 @@ void Auton_7() //SCORES TOP MIDDLE REAL
     matchLoad.set(false);
 
     //Intake 6 From Match Load
-    chassis.driveDistanceWithOdomTime(15, 1000);
+
+  
+    chassis.driveDistanceWithOdomTime(9.5, 1000); //15
+    chassis.setDriveMaxVoltage(6);
+    chassis.driveDistanceWithOdomTime(5, 150);
+    chassis.setDriveMaxVoltage(12);
+
     mainIntake.spin(forward);
     colorSort.spin(forward);
     topStage.spin(forward);
@@ -1407,14 +1438,19 @@ void Auton_7() //SCORES TOP MIDDLE REAL
     mainIntake.stop();
     mainIntake.spin(forward);
     
-    //Load Into 5 Red Into Long Goal
+    //Load Into 5 Into Long Goal
     chassis.turnToAngle(93);
     mainIntake.stop();
     colorSort.stop();
     topStage.stop();
     matchLoad.set(false);
     toggleLift(); //UP
-    chassis.driveDistanceWithOdomTime(25, 1000);// 25
+    chassis.driveDistanceWithOdomTime(21.5, 1000);// 21
+
+    chassis.setDriveMaxVoltage(6);
+    chassis.driveDistanceWithOdomTime(5, 100);
+    chassis.setDriveMaxVoltage(12);
+
     toggleIntakeFlap(); //OPEN
     mainIntake.spin(forward);
     colorSort.spin(forward);
@@ -1424,6 +1460,7 @@ void Auton_7() //SCORES TOP MIDDLE REAL
     wait(.2, sec);
     mainIntake.spin(forward);
     wait(1.6, sec); // 1.5
+    chassis.driveDistanceWithOdomTime(5,100);
 
     //Grab 7 Match Loads
     toggleIntakeFlap(); //CLOSE
@@ -1434,8 +1471,13 @@ void Auton_7() //SCORES TOP MIDDLE REAL
     toggleLift(); //DOWN
     chassis.turnToAngle(272); // 270
     wait(0.2, sec);
-    chassis.turnToAngleTime(271, 350, 10);
-    chassis.driveDistanceWithOdomTime(25.5, 1000); // 24
+    chassis.turnToAngleTime(273, 350, 10);
+    chassis.driveDistanceWithOdomTime(18, 1000); // 25.5
+
+    chassis.setDriveMaxVoltage(6);
+    chassis.driveDistanceWithOdomTime(7, 250);
+    chassis.setDriveMaxVoltage(12);
+
     matchLoad.set(true);
     mainIntake.spin(forward);
     colorSort.spin(forward);
@@ -1446,11 +1488,12 @@ void Auton_7() //SCORES TOP MIDDLE REAL
     colorSort.stop();
     topStage.stop();
 
+
  
     // LOADS TOP MIDDLE INSTEAD
     chassis.driveDistanceWithOdom(-5);
-    chassis.turnToAngle(25);
-    chassis.driveDistanceWithOdom(76); //77
+    chassis.turnToAngle(32); // 25
+    chassis.driveDistanceWithOdom(73.5); //77
     chassis.turnToAngle(134);
     topStage.setBrake(hold);
     // toggleDropDown(); // down
@@ -1458,7 +1501,7 @@ void Auton_7() //SCORES TOP MIDDLE REAL
     // toggleLift(); // down
     wait(0.5, sec);
     toggleIntakeFlap(); //up
-    chassis.driveDistanceWithOdomTime(16, 1000); // 15
+    chassis.driveDistanceWithOdomTime(6, 1000); // 15 // 12
     mainIntake.spin(forward, 100, percent);
     colorSort.spin(forward, 100, percent);
     topStage.spin(forward, 43, percent); //65 // 55 // 45
@@ -1498,7 +1541,12 @@ void Auton_8() //SCORES LOW MIDDLE REAL
   matchLoad.set(false);
   chassis.turnToAngleTime(272,1000,10);
 
-  chassis.driveDistanceWithOdomTime(14,1000);
+  chassis.driveDistanceWithOdomTime(11,700);
+
+  chassis.setDriveMaxVoltage(6);
+  chassis.driveDistanceWithOdomTime(5, 100);
+  chassis.setDriveMaxVoltage(12);
+
   // chassis.movetopos(-55, -48.5, 270);
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -1528,7 +1576,12 @@ void Auton_8() //SCORES LOW MIDDLE REAL
   matchLoad.set(false);
   // wait(.1, sec);
   // chassis.movetopos(-24.5, -45, 90);
-  chassis.driveDistanceWithOdomTime(21,750); //22
+  chassis.driveDistanceWithOdomTime(20,750); //22
+
+  chassis.setDriveMaxVoltage(6);
+  chassis.driveDistanceWithOdomTime(5, 100);
+  chassis.setDriveMaxVoltage(12);
+
   toggleIntakeFlap(); //OPEN
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -1553,9 +1606,14 @@ void Auton_8() //SCORES LOW MIDDLE REAL
   
   chassis.turnToAngleTime(271,1100,10);
 
-  chassis.driveDistanceWithOdomTime(25.5,1000);
+  chassis.driveDistanceWithOdomTime(21.5,1000);
+
+  chassis.setDriveMaxVoltage(6);
+  chassis.driveDistanceWithOdomTime(5, 100);
+  chassis.setDriveMaxVoltage(12);
+
   // chassis.movetopos(-53, -45, 270);
-  chassis.driveDistanceWithOdomTime(10,400);
+  // chassis.driveDistanceWithOdomTime(10,400);
   matchLoad.set(true);
   mainIntake.spin(forward);
   colorSort.spin(forward);
@@ -1568,9 +1626,9 @@ void Auton_8() //SCORES LOW MIDDLE REAL
 
   //DRIVE TO MIDDLE AND SCORE
   chassis.driveDistanceWithOdomTime(-5, 400);
-  chassis.turnToAngleTime(44, 1000, 10);
+  chassis.turnToAngleTime(50, 1000, 10); //44
 
-  chassis.driveDistanceWithOdom(67);
+  chassis.driveDistanceWithOdom(49);
   // chassis.movetopos(-14,-12,44);
   mainIntake.spin(reverse, 17, percent); // 15 // 35
   colorSort.spin(reverse, 100, percent); // 90 // 100
