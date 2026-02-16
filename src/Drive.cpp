@@ -1,5 +1,9 @@
 #include "Drive.h"
 
+/* ================= */
+/* DRIVE CONSTRUCTOR */
+/* ================= */
+
 /// @brief Constructor
 /// @param leftDrive Left side motors of the drive base
 /// @param rightDrive Right side motors of the drive base
@@ -18,8 +22,6 @@ inertialSensor(inertial(inertialPORT))
     this->turnMaxVoltage = maxVoltage;
     this->odomType = odomType;
 
-    // this->chassisOdometry = Odom(2, -1.0, -1.0);
-
     switch(odomType){
         case NO_ODOM:
             this->chassisOdometry = Odom(wheelDiameter, wheelDiameter, 0, odomPod1Offset, odomPod2Offset, 0);
@@ -36,15 +38,29 @@ inertialSensor(inertial(inertialPORT))
     }
 }
 
+
+/* ============ */
+/* SET VOLTAGES */
+/* ============ */
+
+/// @brief 
+/// @param maxVoltage Maximum voltage for the drive base
 void Drive::setDriveMaxVoltage(float maxVoltage)
 {
     driveMaxVoltage = maxVoltage;
 }
 
+/// @brief 
+/// @param maxVoltage Maximum voltage for turning
 void Drive::setTurnMaxVoltage(float maxVoltage)
 {
     turnMaxVoltage = maxVoltage;
 }
+
+
+/* ============= */
+/* SET CONSTANTS */
+/* ============= */
 
 /// @brief Sets the PID constants for the Drive distance 
 /// @param Kp Proportion Constant
@@ -78,9 +94,15 @@ void Drive::setTurnConstants(float Kp, float Ki, float Kd, float settleError, fl
     turnSettleError = settleError;
     turnTimeToSettle = timeToSettle;
     turnEndTime = endTime;
+
 }
 
 
+/* =========== */
+/* DRIVE TYPES */
+/* =========== */
+
+/// @brief Arcade drive control, uses the left joystick for forward/backward and the right joystick for turning
 void Drive::arcade()
 {
     int leftY = 0;
@@ -99,7 +121,7 @@ void Drive::arcade()
     rightDrive.spin(forward, leftY-rightX, percent);
 }
 
-
+/// @brief Tank drive control, uses the left joystick for the left side of the drive train and the right joystick for the right side of the drive train
 void Drive::tank(){
     int leftY = 0;
     int rightX = 0;
@@ -121,15 +143,162 @@ void Drive::tank(){
     rightDrive.spin(forward, rightX, percent);
 }
 
-/// @brief Gets the current position of the drive base
-/// @return Returns the position in inches
-float Drive::getCurrentMotorPosition()
-{
-    float leftPosition = degToInches(leftDrive.position(degrees), wheelDiameter);
-    float rightPosition = degToInches(rightDrive.position(degrees), wheelDiameter);
 
-    return (leftPosition + rightPosition) / 2;
+/* ======== */
+/* STOPPING */
+/* ======== */
+
+/// @brief Brakes the drivetrain 
+void Drive::brake()
+{
+    brake(true, true);
 }
+
+/// @brief Brakes the drivetrain
+/// @param type The type of brakeType
+void Drive::brake(brakeType type)
+{
+    brake(true, true, type);
+}
+
+/// @brief Brakes individual sides of the drive train using hold by default
+/// @param left Left side of the drive train brake
+/// @param right Right side of the drive train brake
+void Drive::brake(bool left, bool right)
+{
+    brake(left, right, hold);
+}
+
+/// @brief Brakes individual sides of the drive train using brake type
+/// @param left Left side of the drive train brake
+/// @param right Right side of the drive train brake
+/// @param type The type of brakeType
+void Drive::brake(bool left, bool right, brakeType type)
+{
+    if(left)
+        leftDrive.stop(type);
+    if(right)
+        rightDrive.stop(type);
+}
+
+/* ======= */
+/* TURNING */
+/* ======= */
+
+/// @brief Turns the robot a set amount of degrees
+/// @param turnDegrees A number in degrees the robot should rotate
+void Drive::turn(float turnDegrees){
+    turnToAngle(turnDegrees + inertial1.heading());
+}
+
+/// @brief Turns the robot a set amount of degrees with a max voltage
+/// @param turnDegrees A number in degrees the robot should rotate
+/// @param maxVoltage The max amount of voltage used to turn
+void Drive::turn(float turnDegrees, float maxVoltage){
+    turnToAngle(turnDegrees + inertial1.heading(), maxVoltage);
+}
+
+/// @brief Turns to an absolute specific angle
+/// @param angle The angle to turn to in degrees (0 - 360)
+void Drive::turnToAngle(float angle)
+{
+    turnToAngle(angle, turnMaxVoltage);
+}
+
+/// @brief Turns to an absolute specific angle with a max voltage
+/// @param angle The angle to turn to in degrees (0 - 360)
+/// @param maxVoltage The max amount of voltage used to turn
+void Drive::turnToAngle(float angle, float maxVoltage)
+{
+    updatePosition();
+    angle = inTermsOfNegative180To180(angle);
+    PID turnPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
+    do
+    {
+        float error = inTermsOfNegative180To180(inertial1.heading()-angle);
+        float output = turnPID.compute(error);
+
+        //Minimum output threshold for turning
+        if(fabs(output) < 0.85)
+            if(output < 0)
+                output = -1.4;
+            else
+                output = 1.4;
+        else if (fabs(output) < 1.5)
+             if(output < 0)
+                output = -3.4;
+            else
+                output = 3.4;
+        else if (fabs(output) < 5)
+            if(output < 0)
+                output = -5.4;
+            else
+                output = 5.4;
+        else
+            output = clamp(output, -maxVoltage, maxVoltage);
+
+        driveMotors(-output, output);
+        task::sleep(10);
+    }while(!turnPID.isSettled());
+    brake();
+    updatePosition();
+}
+
+/// @brief Turns to an absolute specific angle with max voltage and end time
+/// @param angle The angle to turn to in degrees (0-360)
+/// @param maxVoltage The max amount of voltage used to turn
+/// @param endTime The maximum time allowed to turn
+void Drive::turnToAngle(float angle, float maxVoltage, float endTime){
+    updatePosition();
+    angle = inTermsOfNegative180To180(angle);
+    PID turnPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, endTime);
+    do
+    {
+        float error = inTermsOfNegative180To180(inertial1.heading()-angle);
+        float output = turnPID.compute(error);
+
+        //Minimum output threshold for turning
+        if(fabs(output) < 0.85)
+            if(output < 0)
+                output = -1.4;
+            else
+                output = 1.4;
+        else if (fabs(output) < 1.5)
+             if(output < 0)
+                output = -3.4;
+            else
+                output = 3.4;
+        else if (fabs(output) < 5)
+            if(output < 0)
+                output = -5.4;
+            else
+                output = 5.4;
+        else
+            output = clamp(output, -maxVoltage, maxVoltage);
+
+        driveMotors(-output, output);
+        task::sleep(10);
+    }while(!turnPID.isSettled());
+    brake();
+    updatePosition();
+}
+
+/// @brief 
+/// @param desX Target X position
+/// @param desY Target Y position
+void Drive::turnToPosition(float desX, float desY){
+    updatePosition();
+    float deltaX = desX-chassisOdometry.getXPosition();
+    float deltaY = desY-chassisOdometry.getYPosition();
+    float angle = atan2(deltaX, deltaY) * (180.0/M_PI);
+    turnToAngle(angle);
+    updatePosition();
+}
+
+
+/* ================ */
+/* STRAIGHT DRIVING */
+/* ================ */
 
 /// @brief Spins the drive train motors given the values, this function defaults to using volts
 /// @param leftUnit Units of movement in volts for the left side of the drive train
@@ -165,39 +334,6 @@ void Drive::driveMotors(float leftUnit, float rightUnit, MotorSpinType spinType)
         leftDrive.spin(forward, leftUnit, rpm);
         rightDrive.spin(forward, rightUnit, rpm);
     }
-}
-
-/// @brief Brakes the drivetrain 
-void Drive::brake()
-{
-    brake(true, true);
-}
-
-/// @brief Brakes the drivetrain
-/// @param type The type of brakeType
-void Drive::brake(brakeType type)
-{
-    brake(true, true, type);
-}
-
-/// @brief Brakes individual sides of the drive train using hold by default
-/// @param left Left side of the drive train brake
-/// @param right Right side of the drive train brake
-void Drive::brake(bool left, bool right)
-{
-    brake(left, right, hold);
-}
-
-/// @brief Brakes individual sides of the drive train using brake type
-/// @param left Left side of the drive train brake
-/// @param right Right side of the drive train brake
-/// @param type The type of brakeType
-void Drive::brake(bool left, bool right, brakeType type)
-{
-    if(left)
-        leftDrive.stop(type);
-    if(right)
-        rightDrive.stop(type);
 }
 
 /// @brief Uses the drivetrain to drive the given distance in inches
@@ -252,139 +388,8 @@ void Drive::driveDistance(float distance, float maxVoltage)
     updatePosition();
 }
 
-/// @brief Turns the robot a set amount of degrees
-/// @param turnDegrees A number in degrees the robot should rotate
-void Drive::turn(float turnDegrees){
-    turnToAngle(turnDegrees + inertial1.heading());
-}
-
-/// @brief Turns the robot a set amount of degrees
-/// @param turnDegrees A number in degrees the robot should rotate
-/// @param maxVoltage The max amount of voltage used to turn
-void Drive::turn(float turnDegrees, float maxVoltage){
-    turnToAngle(turnDegrees + inertial1.heading(), maxVoltage);
-}
-
-/// @brief Turns to an absolute specific angle
-/// @param angle The angle to turn to in degrees (0 - 360)
-void Drive::turnToAngle(float angle)
-{
-    turnToAngle(angle, turnMaxVoltage);
-}
-
-/// @brief Turns to an absolute specific angle
-/// @param angle The angle to turn to in degrees (0 - 360)
-/// @param maxVoltage The max amount of voltage used to turn
-void Drive::turnToAngle(float angle, float maxVoltage)
-{
-    updatePosition();
-    angle = inTermsOfNegative180To180(angle);
-    PID turnPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
-    do
-    {
-        float error = inTermsOfNegative180To180(inertial1.heading()-angle);
-        float output = turnPID.compute(error);
-
-        //Minimum output threshold for turning
-        if(fabs(output) < 0.85)
-            if(output < 0)
-                output = -1.4;
-            else
-                output = 1.4;
-        else if (fabs(output) < 1.5)
-             if(output < 0)
-                output = -3.4;
-            else
-                output = 3.4;
-        else if (fabs(output) < 5)
-            if(output < 0)
-                output = -5.4;
-            else
-                output = 5.4;
-        else
-            output = clamp(output, -maxVoltage, maxVoltage);
-
-        driveMotors(-output, output);
-        task::sleep(10);
-    }while(!turnPID.isSettled());
-    brake();
-    updatePosition();
-}
-
-void Drive::turnToAngleD(float angle, float maxVoltage, float turnKdUpdate)
-{
-    updatePosition();
-    angle = inTermsOfNegative180To180(angle);
-    PID turnPID(turnKp, turnKi, turnKdUpdate, turnSettleError, turnTimeToSettle, turnEndTime);
-    do
-    {
-        float error = inTermsOfNegative180To180(inertial1.heading()-angle);
-        float output = turnPID.compute(error);
-
-        //Minimum output threshold for turning
-        if(fabs(output) < 2)
-            if(output < 0)
-                output = -2.5;
-            else
-                output = 2.5;
-        else
-            output = clamp(output, -maxVoltage, maxVoltage);
-
-        driveMotors(-output, output);
-        task::sleep(10);
-    }while(!turnPID.isSettled());
-    brake();
-    updatePosition();
-}
-
-void Drive::turnToAngleTime(float angle, float timeLimit, float maxVoltage)
-{
-    updatePosition();
-    angle = inTermsOfNegative180To180(angle);
-    PID turnPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, timeLimit);
-    do
-    {
-        float error = inTermsOfNegative180To180(inertial1.heading()-angle);
-        float output = turnPID.compute(error);
-
-        //Minimum output threshold for turning
-        if(fabs(output) < 2)
-            if(output < 0)
-                output = -2.5;
-            else
-                output = 2.5;
-        else
-            output = clamp(output, -maxVoltage, maxVoltage);
-
-        driveMotors(-output, output);
-        task::sleep(10);
-    }while(!turnPID.isSettled());
-    brake();
-    updatePosition();
-}
-
-/// @brief Turns sharply to a specific location and moves to it
-/// @param desX Desired X position
-/// @param desY Desired Y position
-
-void Drive::moveToPosition(float desX, float desY){
-    // Calculate the angle to turn to
-    float deltaX = desX - chassisOdometry.getXPosition();
-    float deltaY = desY - chassisOdometry.getYPosition();
-
-
-    // Turn to the target angle
-    turnToPosition(desX, desY);
-
-    // Calculate the distance to the target position
-    float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
-
-    // Drive the calculated distance
-    driveDistanceWithOdom(distance);
-}
-
-
-
+/// @brief Drive a certain distance using the odometry wheels
+/// @param distance How far the robot (in inches) needs to drive
 void Drive::driveDistanceWithOdom(float distance){
     // Creates PID objects for linear and angular output
     PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime);
@@ -441,63 +446,10 @@ void Drive::driveDistanceWithOdom(float distance){
     updatePosition();
 }
 
-void Drive::driveDistanceWithOdomSettle(float distance, float settleTime, float settleError){
-    // Creates PID objects for linear and angular output
-    PID linearPID(driveKp, driveKi, driveKd, settleError, settleTime, driveEndTime);
-    PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
-
-    updatePosition();
-
-    // --- Starting pose (field coordinates & heading) ---
-    float startHeadingDeg = inertial1.heading();
-    float startHeadingRad = degToRad(startHeadingDeg);
-
-    // Unit forward direction based on starting heading
-    float dirX = sin(startHeadingRad);
-    float dirY = cos(startHeadingRad);
-
-    // Starting position in field coordinates
-    float startX = chassisOdometry.getXPosition();
-    float startY = chassisOdometry.getYPosition();
-
-    // Target point in field coordinates (distance along starting heading)
-    float targetX = startX + dirX * distance;
-    float targetY = startY + dirY * distance;
-
-    while (!linearPID.isSettled())
-    {
-        updatePosition();
-
-        // Odom-based pose
-        float curX = chassisOdometry.getXPosition();
-        float curY = chassisOdometry.getYPosition();
-
-        float dx = targetX - curX;
-        float dy = targetY - curY;
-
-        // Signed error along the original heading:
-        float linearError  = dx * dirX + dy * dirY;
-        float angularError = degTo180(startHeadingDeg - inertial1.heading());
-
-        float linearOutput  = linearPID.compute(linearError);
-        float angularOutput = angularPID.compute(angularError);
-
-        linearOutput  = clamp(linearOutput,  -driveMaxVoltage, driveMaxVoltage);
-        angularOutput = clamp(angularOutput, -driveMaxVoltage, driveMaxVoltage);
-
-        driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
-
-        updatePosition();
-        wait(10, msec);
-    }
-
-    // Make absolutely sure we stop
-    brake();
-    driveMotors(0, 0);
-    updatePosition();
-}
-
-void Drive::driveDistanceWithOdomTime(float distance, float timeLimit){
+/// @brief Drive a certain distance using the odometry wheels with a time limit
+/// @param distance How far the robot (in inches) needs to drive
+/// @param timeLimit The maximum time allowed to drive
+void Drive::driveDistanceWithOdom(float distance, float timeLimit){
     // Creates PID objects for linear and angular output
     PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, timeLimit);
     PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
@@ -553,8 +505,11 @@ void Drive::driveDistanceWithOdomTime(float distance, float timeLimit){
     updatePosition();
 }
 
-
-void Drive::driveDistanceWithOdomTime(float distance, float timeLimit, float maxVoltage){
+/// @brief Drive a certain distance using the odometry wheels with a time limit and max voltage
+/// @param distance  How far the robot (in inches) needs to drive
+/// @param timeLimit The maximum time allowed to drive
+/// @param maxVoltage The maximum voltage the robot can run at
+void Drive::driveDistanceWithOdom(float distance, float timeLimit, float maxVoltage){
     // Creates PID objects for linear and angular output
     PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, timeLimit);
     PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
@@ -610,44 +565,89 @@ void Drive::driveDistanceWithOdomTime(float distance, float timeLimit, float max
     updatePosition();
 }
 
+/// @brief Drive a certain distance using the odometry wheels with a time limit, max voltage, settle time, and settle error
+/// @param distance How far the robot (in inches) needs to drive
+/// @param timeLimit The maximum time allowed to drive
+/// @param maxVoltage The maximum voltage the robot can run at
+/// @param settleTime How long the robot is allowed to settle
+/// @param settleError How big the settle error is to allow the robot to settle
+void Drive::driveDistanceWithOdom(float distance, float timeLimit, float maxVoltage, float settleTime, float settleError){
+    // Creates PID objects for linear and angular output
+    PID linearPID(driveKp, driveKi, driveKd, settleError, settleTime, timeLimit);
+    PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
 
+    updatePosition();
 
+    // --- Starting pose (field coordinates & heading) ---
+    float startHeadingDeg = inertial1.heading();
+    float startHeadingRad = degToRad(startHeadingDeg);
 
-void Drive::moveable(){
-    //updates odom and printx x and y position
-    while (true) {
-        brake(coast);
+    // Unit forward direction based on starting heading
+    float dirX = sin(startHeadingRad);
+    float dirY = cos(startHeadingRad);
+
+    // Starting position in field coordinates
+    float startX = chassisOdometry.getXPosition();
+    float startY = chassisOdometry.getYPosition();
+
+    // Target point in field coordinates (distance along starting heading)
+    float targetX = startX + dirX * distance;
+    float targetY = startY + dirY * distance;
+
+    while (!linearPID.isSettled())
+    {
         updatePosition();
-        float x = chassisOdometry.getXPosition();
-        float y = chassisOdometry.getYPosition();
-        float heading = chassisOdometry.getHeading();
-        // float x = rotation1.position(degrees);
-        // float y = rotation2.position(degrees);
-        // std::cout << "X: " << x << ", Y: " << y << std::endl;
-        Brain.Screen.clearScreen();
-        Brain.Screen.setCursor(1,1);
-        Brain.Screen.print("X: ");
-        Brain.Screen.print(x);
-        Brain.Screen.newLine();
-        Brain.Screen.print("Y: ");
-        Brain.Screen.print(y);
-        Brain.Screen.print(heading);
-        //std::cout << "\nHeading: " << chassisOdometry.getHeading();
-        //std::cout << "\nx: " << x;
-        //std::cout << "\ny: " << y;
-        wait(50, msec); 
+
+        // Odom-based pose
+        float curX = chassisOdometry.getXPosition();
+        float curY = chassisOdometry.getYPosition();
+
+        float dx = targetX - curX;
+        float dy = targetY - curY;
+
+        // Signed error along the original heading:
+        float linearError  = dx * dirX + dy * dirY;
+        float angularError = degTo180(startHeadingDeg - inertial1.heading());
+
+        float linearOutput  = linearPID.compute(linearError);
+        float angularOutput = angularPID.compute(angularError);
+
+        linearOutput  = clamp(linearOutput,  -maxVoltage, maxVoltage);
+        angularOutput = clamp(angularOutput, -maxVoltage, maxVoltage);
+
+        driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
+
+        updatePosition();
+        wait(10, msec);
     }
+
+    // Make absolutely sure we stop
+    brake();
+    driveMotors(0, 0);
+    updatePosition();
 }
 
 
+/* ============= */
+/* OTHER DRIVING */
+/* ============= */
 
-void Drive::turnToPosition(float desX, float desY){
-    updatePosition();
-    float deltaX = desX-chassisOdometry.getXPosition();
-    float deltaY = desY-chassisOdometry.getYPosition();
-    float angle = atan2(deltaX, deltaY) * (180.0/M_PI);
-    turnToAngle(angle);
-    updatePosition();
+/// @brief Turns sharply to a specific location and moves to it
+/// @param desX Desired X position
+/// @param desY Desired Y position
+void Drive::moveToPosition(float desX, float desY){
+    // Calculate the angle to turn to
+    float deltaX = desX - chassisOdometry.getXPosition();
+    float deltaY = desY - chassisOdometry.getYPosition();
+
+    // Turn to the target angle
+    turnToPosition(desX, desY);
+
+    // Calculate the distance to the target position
+    float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
+
+    // Drive the calculated distance
+    driveDistanceWithOdom(distance);
 }
 
 /// @brief Turns along a set curve
@@ -678,75 +678,10 @@ void Drive::bezierTurn(float curX, float curY, float midX, float midY, float des
     delete [] pts;
 }
 
-void Drive::updatePosition(){
-    switch(odomType){
-        float left, right, heading;
-        case NO_ODOM:
-            left = leftDrive.position(degrees);
-            right = rightDrive.position(degrees);
-            heading = inertial1.heading();
-            chassisOdometry.updatePositionTwoForward(right, left, heading);
-            break;
-        case HORIZONTAL_AND_VERTICAL:
-            left = rotation1.position(degrees);
-            right = rotation2.position(degrees);
-            heading = inertial1.heading();
-            chassisOdometry.updatePositionOneForward(left, right, heading);
-            break;
-        case TWO_VERTICAL:
-            left = rotation1.position(degrees);
-            right = rotation2.position(degrees);
-            heading = inertial1.heading();
-            chassisOdometry.updatePositionTwoForward(right, left, heading);
-            break;
-        case TWO_AT_45:
-            left = rotation1.position(degrees);
-            right = rotation2.position(degrees);
-            heading = inertial1.heading();
-            chassisOdometry.updatePositionTwoAt45(left, right, heading);
-            break;
-    }
-}
-
-// void Drive::setPosition(float x, float y, float heading){
-//     chassisOdometry.setPosition(x, y, heading);
-// }
-
-
-void Drive::setPosition(float x, float y, float heading){
-    // Reset odom pose
-    chassisOdometry.setPosition(x, y, heading);
-    inertial1.setHeading(heading, degrees);
-
-    // Sync odom encoder baselines with the actual sensors
-    switch (odomType) {
-        case NO_ODOM:
-            // Using drive motors as odom
-            chassisOdometry.setForwardRightDegrees(rightDrive.position(degrees));
-            chassisOdometry.setForwardLeftDegrees(leftDrive.position(degrees));
-            chassisOdometry.setLateralDegrees(0);
-            break;
-
-        case HORIZONTAL_AND_VERTICAL:
-            // Using rotation1 and rotation2
-            chassisOdometry.setForwardLeftDegrees(rotation1.position(degrees));
-            chassisOdometry.setLateralDegrees(rotation2.position(degrees));
-            // If you have a second forward sensor, set it here too
-            break;
-
-        case TWO_AT_45:
-            // Whatever sensors you're using in this mode
-            // Example (if both are vertical tracking wheels):
-            chassisOdometry.setForwardRightDegrees(rotation1.position(degrees));
-            chassisOdometry.setForwardLeftDegrees(rotation2.position(degrees));
-            chassisOdometry.setLateralDegrees(0);
-            break;
-
-        default:
-            break;
-    }
-}
-
+/// @brief Drive to a specific X and Y coordinate and ends at a target heading using "carrot" positions
+/// @param x Target X position
+/// @param y Target Y position
+/// @param targetHeading Target heading position to end facing towards
 void Drive::movetopos(float x, float y, float targetHeading) {
     // ===== Tunables =====
     const float lead = 0.15f;            // carrot distance factor
@@ -872,6 +807,10 @@ void Drive::movetopos(float x, float y, float targetHeading) {
     brake();
 }
 
+/// @brief Drive to a specific X and Y coordinate and ends at a target heading
+/// @param x Target X position
+/// @param y Target Y position
+/// @param targetHeading Target heading position to end facing towards
 void Drive::moveToTarget(float x, float y, float targetHeading){
     const float settleDist = driveSettleError; //Drive error
     const float settleAng  = turnSettleError; //Turn error
@@ -1008,4 +947,115 @@ void Drive::moveToTarget(float x, float y, float targetHeading){
 
         }
     brake();
+}
+
+
+/* =========== */
+/* POSITIONING */
+/* =========== */
+
+/// @brief Gets the current position of the drive base
+/// @return Returns the position in inches
+float Drive::getCurrentMotorPosition()
+{
+    float leftPosition = degToInches(leftDrive.position(degrees), wheelDiameter);
+    float rightPosition = degToInches(rightDrive.position(degrees), wheelDiameter);
+
+    return (leftPosition + rightPosition) / 2;
+}
+
+/// @brief Sets brakes to coast and displays position location to the robot brain
+void Drive::moveable(){
+    //updates odom and printx x and y position
+    while (true) {
+        brake(coast);
+        updatePosition();
+        float x = chassisOdometry.getXPosition();
+        float y = chassisOdometry.getYPosition();
+        float heading = chassisOdometry.getHeading();
+        // float x = rotation1.position(degrees);
+        // float y = rotation2.position(degrees);
+        // std::cout << "X: " << x << ", Y: " << y << std::endl;
+        Brain.Screen.clearScreen();
+        Brain.Screen.setCursor(1,1);
+        Brain.Screen.print("X: ");
+        Brain.Screen.print(x);
+        Brain.Screen.newLine();
+        Brain.Screen.print("Y: ");
+        Brain.Screen.print(y);
+        Brain.Screen.print(heading);
+        //std::cout << "\nHeading: " << chassisOdometry.getHeading();
+        //std::cout << "\nx: " << x;
+        //std::cout << "\ny: " << y;
+        wait(50, msec); 
+    }
+}
+
+/// @brief Updates the position of the robot
+void Drive::updatePosition(){
+    switch(odomType){
+        float left, right, heading;
+        case NO_ODOM:
+            left = leftDrive.position(degrees);
+            right = rightDrive.position(degrees);
+            heading = inertial1.heading();
+            chassisOdometry.updatePositionTwoForward(right, left, heading);
+            break;
+        case HORIZONTAL_AND_VERTICAL:
+            left = rotation1.position(degrees);
+            right = rotation2.position(degrees);
+            heading = inertial1.heading();
+            chassisOdometry.updatePositionOneForward(left, right, heading);
+            break;
+        case TWO_VERTICAL:
+            left = rotation1.position(degrees);
+            right = rotation2.position(degrees);
+            heading = inertial1.heading();
+            chassisOdometry.updatePositionTwoForward(right, left, heading);
+            break;
+        case TWO_AT_45:
+            left = rotation1.position(degrees);
+            right = rotation2.position(degrees);
+            heading = inertial1.heading();
+            chassisOdometry.updatePositionTwoAt45(left, right, heading);
+            break;
+    }
+}
+
+/// @brief Sets the current location of the robot
+/// @param x Current X location
+/// @param y Current Y location
+/// @param heading Current heading
+void Drive::setPosition(float x, float y, float heading){
+    // Reset odom pose
+    chassisOdometry.setPosition(x, y, heading);
+    inertial1.setHeading(heading, degrees);
+
+    // Sync odom encoder baselines with the actual sensors
+    switch (odomType) {
+        case NO_ODOM:
+            // Using drive motors as odom
+            chassisOdometry.setForwardRightDegrees(rightDrive.position(degrees));
+            chassisOdometry.setForwardLeftDegrees(leftDrive.position(degrees));
+            chassisOdometry.setLateralDegrees(0);
+            break;
+
+        case HORIZONTAL_AND_VERTICAL:
+            // Using rotation1 and rotation2
+            chassisOdometry.setForwardLeftDegrees(rotation1.position(degrees));
+            chassisOdometry.setLateralDegrees(rotation2.position(degrees));
+            // If you have a second forward sensor, set it here too
+            break;
+
+        case TWO_AT_45:
+            // Whatever sensors you're using in this mode
+            // Example (if both are vertical tracking wheels):
+            chassisOdometry.setForwardRightDegrees(rotation1.position(degrees));
+            chassisOdometry.setForwardLeftDegrees(rotation2.position(degrees));
+            chassisOdometry.setLateralDegrees(0);
+            break;
+
+        default:
+            break;
+    }
 }

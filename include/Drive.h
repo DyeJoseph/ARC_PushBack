@@ -11,7 +11,6 @@ enum MotorSpinType {VOLTS, PERCENTAGE, DPS, RPM};
 class Drive
 {
     private:
-
     motor_group leftDrive, rightDrive;
     inertial inertialSensor;
 
@@ -23,7 +22,6 @@ class Drive
     float driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime;
     float turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime;
 
-    
     int odomType;
         
     public:
@@ -41,50 +39,34 @@ class Drive
     void arcade();
     void tank();
 
-    float getCurrentMotorPosition();
-
-    void driveMotors(float leftVolts, float rightVolts);
-    void driveMotors(float leftVolts, float rightVolts, MotorSpinType spinType);
-
     void brake();
     void brake(brakeType);
     void brake(bool left, bool right);
     void brake(bool left, bool right, brakeType);
 
+    void turn(float turnDegrees);
+    void turn(float turnDegrees, float maxVoltage);
+    void turnToAngle(float angle);
+    void turnToAngle(float angle, float maxVoltage);
+    void turnToAngle(float angle, float maxVoltage, float time);
+    void turnToPosition(float desX, float desY);
+
+    void driveMotors(float leftVolts, float rightVolts);
+    void driveMotors(float leftVolts, float rightVolts, MotorSpinType spinType);
     void driveDistance(float distance);
     void driveDistance(float distance, float maxVoltage);
     void driveDistanceWithOdom(float distance);
-    void driveDistanceWithOdomTime(float distance, float timeLimit);
-    void driveDistanceWithOdomTime(float distance, float timeLimit, float maxVoltage);
-    void driveDistanceWithOdomSettle(float distance, float settleTime, float settleError);
+    void driveDistanceWithOdom(float distance, float timeLimit);
+    void driveDistanceWithOdom(float distance, float timeLimit, float maxVoltage);
+    void driveDistanceWithOdom(float distance, float timeLimit, float maxVoltage, float settleTime, float settleError);
 
-
-
-    void moveable();
-
-
-
-
-
-    void setMaxVoltage(float volts);
-    float getMaxVoltage();
-
-    void turn(float turnDegrees);
-    void turn(float turnDegrees, float maxVoltage);
-
-    void turnToAngle(float angle);
-    void turnToAngle(float angle, float maxVoltage);
-    void turnToAngleTime(float angle, float timeLimit, float maxVoltage);
-    void turnToAngleD(float angle, float maxVoltage, float turnKdUpdate);
-    
     void moveToPosition(float, float);
-    void turnToPosition(float desX, float desY);
-
     void bezierTurn(float, float, float, float, float, float, int);
-
-    void updatePosition();
-    void setPosition(float x, float y, float heading);
     void movetopos(float x, float y, float angle);
     void moveToTarget(float x, float y, float targetHeading);
 
+    float getCurrentMotorPosition();
+    void moveable();
+    void updatePosition();
+    void setPosition(float x, float y, float heading);
 };
