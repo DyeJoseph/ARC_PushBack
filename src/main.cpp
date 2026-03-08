@@ -160,43 +160,41 @@ void autonomous()
   // chassis.moveable();
   PAutonTest();
 
-  // switch (lastPressed) 
-  // {
-  //   case 0:
-  //     Auton_1();
-  //     break;
-  //   case 1:
-  //     Auton_2();
-  //     break;
-  //   case 2:
-  //     Auton_3();
-  //     break;
-  //   case 3:
-  //     Auton_4();
-  //     break;
-  //   case 4:
-  //     Auton_5();
-  //     break;
-  //   case 5:
-  //     Auton_6();
-  //     break;
-  //   case 6:
-  //     Auton_7();
-  //     break;
-  //   case 7:
-  //     Auton_8();
-  //     break;
-  //   default:
-  //     break;
-  // }
+  switch (lastPressed) 
+  {
+    case 0:
+      Auton_1();
+      break;
+    case 1:
+      Auton_2();
+      break;
+    case 2:
+      Auton_3();
+      break;
+    case 3:
+      Auton_4();
+      break;
+    case 4:
+      Auton_5();
+      break;
+    case 5:
+      Auton_6();
+      break;
+    case 6:
+      Auton_7();
+      break;
+    case 7:
+      Auton_8();
+      break;
+    default:
+      break;
+  }
 }
 
 /// @brief Runs during the UserControl section of the competition
 void usercontrol() 
 {
   drawSponsors();
- 
-  
 
   // User control code here, inside the loop
   bool flapState = false;
@@ -1298,28 +1296,26 @@ void PAutonTest(){
     
     writeNewLineToCard(filename);
 
-    for(int i=0;i<10;i++){
+    for(int i=0;i<20;i++){
       //Test Y
       std::cout << "i1: " << i << std::endl;
       chassis.turnToAngle(0);
+      chassis.setPosition(0,0,0);
       chassis.driveDistanceWithOdom(24);
       writeToCard(filename,chassis.chassisOdometry.getYPosition()-24);
       writeCommaToCard(filename);
       chassis.driveDistanceWithOdom(-24);
-      writeToCard(filename,chassis.chassisOdometry.getYPosition());
-      writeCommaToCard(filename);  
     }
     writeNewLineToCard(filename);
-    for(int i=0;i<10;i++){
+    for(int i=0;i<20;i++){
       //Turn and test X
       std::cout << "i2: " << i << std::endl;
       chassis.turnToAngle(90);
+      chassis.setPosition(0,0,90);
       chassis.driveDistanceWithOdom(24);
       writeToCard(filename,chassis.chassisOdometry.getXPosition()-24);
       writeCommaToCard(filename);
       chassis.driveDistanceWithOdom(-24);
-      writeToCard(filename,chassis.chassisOdometry.getXPosition());
-      writeCommaToCard(filename);
     }
 
     chassis.turnToAngle(0);
@@ -1446,8 +1442,10 @@ void PAutonGenerator(float distance){
     //If avgError is more than the acceptable, decrease P
     if(yAvgError > acceptableError && xAvgError > acceptableError){
       if(crossCountY > numIterations/3 && crossCountX > numIterations/3){
+        std::cout << "YAVG: " << yAvgError << ", XAVG: " << xAvgError << "; DECREASING P" << std::endl;
         pValue *= decrementRatio;
       }else{
+        std::cout << "YAVG: " << yAvgError << ", XAVG: " << xAvgError << "; INCREASING P" << std::endl;
         pValue *= incrementRatio;
       }
     }

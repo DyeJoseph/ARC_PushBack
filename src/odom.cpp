@@ -8,7 +8,8 @@
 /// @param forwardRightRotationDistance Distance the forward right wheel is from the center (in)
 /// @param forwardLeftRotationDistance Distance the forward left wheel is from the center (in)
 /// @param lateralRotationDistance Distance the lateral wheel is from the center (in)
-Odom::Odom(float forwardRightWheelDiameter, float forwardLeftWheelDiameter, float lateralWheelDiameter, float forwardRightRotationDistance, float forwardLeftRotationDistance, float lateralRotationDistance){
+Odom::Odom(float forwardRightWheelDiameter, float forwardLeftWheelDiameter, float lateralWheelDiameter, 
+           float forwardRightRotationDistance, float forwardLeftRotationDistance, float lateralRotationDistance){
     this->forwardRightWheelDiameter = forwardRightWheelDiameter;
     this->forwardLeftWheelDiameter = forwardLeftWheelDiameter;
     this->lateralWheelDiameter = lateralWheelDiameter;

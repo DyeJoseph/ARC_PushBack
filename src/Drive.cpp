@@ -376,25 +376,25 @@ void Drive::moveToPosition(float desX, float desY){
 
 
 void Drive::driveDistanceWithOdom(float distance){
-    // Creates PID objects for linear and angular output
+    //Creates PID objects for linear and angular output
     PID linearPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime);
     PID angularPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
 
     updatePosition();
 
-    // --- Starting pose (field coordinates & heading) ---
+    //Starting pose (field coordinates & heading)
     float startHeadingDeg = inertial1.heading();
     float startHeadingRad = degToRad(startHeadingDeg);
 
-    // Unit forward direction based on starting heading
+    //Unit forward direction based on starting heading
     float dirX = sin(startHeadingRad);
     float dirY = cos(startHeadingRad);
 
-    // Starting position in field coordinates
+    //Starting position in field coordinates
     float startX = chassisOdometry.getXPosition();
     float startY = chassisOdometry.getYPosition();
 
-    // Target point in field coordinates (distance along starting heading)
+    //Target point in field coordinates (distance along starting heading)
     float targetX = startX + dirX * distance;
     float targetY = startY + dirY * distance;
 
@@ -402,14 +402,14 @@ void Drive::driveDistanceWithOdom(float distance){
     {
         updatePosition();
 
-        // Odom-based pose
+        //Odom-based pose
         float curX = chassisOdometry.getXPosition();
         float curY = chassisOdometry.getYPosition();
 
         float dx = targetX - curX;
         float dy = targetY - curY;
 
-        // Signed error along the original heading:
+        //Signed error along the original heading:
         float linearError  = dx * dirX + dy * dirY;
         float angularError = degTo180(startHeadingDeg - inertial1.heading());
 
@@ -425,7 +425,6 @@ void Drive::driveDistanceWithOdom(float distance){
         wait(10, msec);
     }
 
-    // Make absolutely sure we stop
     brake();
     driveMotors(0, 0);
     updatePosition();
@@ -611,9 +610,6 @@ void Drive::moveable(){
         float x = chassisOdometry.getXPosition();
         float y = chassisOdometry.getYPosition();
         float heading = chassisOdometry.getHeading();
-        // float x = rotation1.position(degrees);
-        // float y = rotation2.position(degrees);
-        // std::cout << "X: " << x << ", Y: " << y << std::endl;
         Brain.Screen.clearScreen();
         Brain.Screen.setCursor(1,1);
         Brain.Screen.print("X: ");
@@ -622,9 +618,6 @@ void Drive::moveable(){
         Brain.Screen.print("Y: ");
         Brain.Screen.print(y);
         Brain.Screen.print(heading);
-        //std::cout << "\nHeading: " << chassisOdometry.getHeading();
-        //std::cout << "\nx: " << x;
-        //std::cout << "\ny: " << y;
         wait(50, msec); 
     }
 }
@@ -698,11 +691,6 @@ void Drive::updatePosition(){
     }
 }
 
-// void Drive::setPosition(float x, float y, float heading){
-//     chassisOdometry.setPosition(x, y, heading);
-// }
-
-
 void Drive::setPosition(float x, float y, float heading){
     // Reset odom pose
     chassisOdometry.setPosition(x, y, heading);
@@ -758,7 +746,7 @@ void Drive::movetopos(float x, float y, float angle) {
     PID drivePID(0.7, 0.0001, 1.7, settle_dist, settle_time, timeout_ms); //timeout_ms
     PID headingPID(0.3, 0.0001, 1.5, settle_ang,  settle_time, timeout_ms); //timeout_ms
 
-    // Persistent loop variables (like LemLib)
+    // Persistent loop variables
     bool close = false;
     bool prevSameSide = false;
     int elapsed_ms = 0;
@@ -766,7 +754,7 @@ void Drive::movetopos(float x, float y, float angle) {
 
     auto sgn = [](float v) -> float { return (v >= 0.0f) ? 1.0f : -1.0f; };
 
-    // IMPORTANT: manual settle + timeout (matches LemLib intent)
+    // IMPORTANT: manual settle + timeout
     while (elapsed_ms < timeout_ms) {
         updatePosition();
 

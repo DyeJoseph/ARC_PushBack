@@ -1,5 +1,7 @@
 #include "screen.h"
 
+// ----------------+ Button Class +---------------- //
+
 /// @brief Button Constructor
 /// @param name Button label
 /// @param color Color of the button
@@ -43,6 +45,8 @@ bool Button::checkPress(){
     return false;
 }
 
+// ----------------+ Text Class +---------------- //
+
 /// @brief Constructor for text object
 /// @param words Words to be printed
 /// @param x X location
@@ -64,6 +68,8 @@ void Text::printText(){
     Brain.Screen.setPenColor(textColor);
     Brain.Screen.print(words.c_str());
 }
+
+// ----------------+ Screen Functions +---------------- //
 
 /// @brief Creates all 9 buttons for the autonomous route selection screen
 /// @param colors Colors of the buttons
