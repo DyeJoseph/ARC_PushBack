@@ -8,7 +8,8 @@
 /// @param forwardRightRotationDistance Distance the forward right wheel is from the center (in)
 /// @param forwardLeftRotationDistance Distance the forward left wheel is from the center (in)
 /// @param lateralRotationDistance Distance the lateral wheel is from the center (in)
-Odom::Odom(float forwardRightWheelDiameter, float forwardLeftWheelDiameter, float lateralWheelDiameter, float forwardRightRotationDistance, float forwardLeftRotationDistance, float lateralRotationDistance){
+Odom::Odom(float forwardRightWheelDiameter, float forwardLeftWheelDiameter, float lateralWheelDiameter, 
+           float forwardRightRotationDistance, float forwardLeftRotationDistance, float lateralRotationDistance){
     this->forwardRightWheelDiameter = forwardRightWheelDiameter;
     this->forwardLeftWheelDiameter = forwardLeftWheelDiameter;
     this->lateralWheelDiameter = lateralWheelDiameter;
@@ -194,28 +195,18 @@ void Odom::updatePositionTwoAt45(float currentLeftDegrees, float currentRightDeg
         deltaRight += rightRotationDistance*degToRad(deltaHeading);
     }
 
-    // //Gives answer in radians
-    // float deltaY = (deltaLeft + deltaRight) / sqrt(2.0);
-    // float deltaX = (deltaLeft - deltaRight) / sqrt(2.0);
-
-
-    float deltaX = (deltaLeft + deltaRight) / 1.3382612;
-    float deltaY = (deltaLeft - deltaRight) / 1.4862896;
-
-    // std::cout << "DeltaX: " << deltaX << ", DeltaY: " << deltaY << std::endl;
+    float deltaX = (deltaLeft + deltaRight) / sqrt(2);
+    float deltaY = (deltaLeft - deltaRight) / 1.343503;
 
     //Update x and y positions and heading
     float avgHeading = degToRad(getHeading()+deltaHeading/2.0);
-    float globalDeltaX = deltaY * cos(avgHeading) + deltaX * sin(avgHeading);
-    float globalDeltaY = deltaY * sin(avgHeading) + deltaX * cos(avgHeading);
-
-    // std::cout << "globalDeltaX: " << globalDeltaX << ", globalDeltaY: " << globalDeltaY << std::endl;
-    // std::cout << "X: " << getXPosition() << ", Y: " << getYPosition() << ", Heading: " << headingGyro << std::endl;
+    float globalDeltaY = deltaX * cos(avgHeading) - deltaY * sin(avgHeading);
+    float globalDeltaX = deltaX * sin(avgHeading) + deltaY * cos(avgHeading);
 
     setPosition((globalDeltaX+getXPosition()), (globalDeltaY+getYPosition()), headingGyro);
     
     //Update variables to store new location information
-    forwardDegreesR = currentRightDegrees;
-    forwardDegreesL = currentLeftDegrees;
-    heading = headingGyro;
+    this->forwardDegreesR = currentRightDegrees;
+    this->forwardDegreesL = currentLeftDegrees;
+    this->heading = headingGyro;
 }

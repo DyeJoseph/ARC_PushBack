@@ -60,6 +60,7 @@ void Auton_6();
 void Auton_7();
 void Auton_8();
 int odomDebugThread();
+void PAutonTest();
 
 void toggleLift();
 void toggleIntakeFlap();
@@ -153,7 +154,11 @@ void autonomous()
   inertial1.resetHeading();
   wait(100, msec);
 
-  setDriveTrainConstants();
+  // setDriveTrainConstants();
+
+  // chassis.setPosition(0, 0, 0);
+  // chassis.moveable();
+  PAutonTest();
 
   switch (lastPressed) 
   {
@@ -195,8 +200,6 @@ void autonomous()
 void usercontrol() 
 {
   drawSponsors();
- 
-  
 
   // User control code here, inside the loop
   bool flapState = false;
@@ -1654,4 +1657,200 @@ int odomDebugThread() {
     vex::this_thread::sleep_for(100);
   }
   return 0;
+}
+
+/*
+  too low p = undershoot
+*/
+
+/// @brief Moves the robot in straight lines along both X and Y axis recording error alongside a changing P value
+void PAutonTest(){
+  std::string filename = "PID_Tuning.csv";
+  std::string headerName = "";
+  float pValues[] ={0.1, 0.2, 0.4, 0.6, 0.8, 1.0};
+  int numPValues = 6;
+
+  chassis.setPosition(0,0,0);
+  chassis.setDriveMaxVoltage(12);
+  chassis.setTurnMaxVoltage(10);
+
+  //Set PID Values
+  for(int k=0; k<numPValues;k++){
+    chassis.setPosition(0,0,0);
+    std::cout << "p: " << pValues[k] << std::endl;
+    
+    chassis.setDriveConstants(pValues[k], 0, 0, 0.75, 200, 2500);
+    chassis.setTurnConstants(0.25, 0, 0, 2, 200, 2500);
+
+    headerName = "P:";
+    writeToCard(filename, headerName);
+    writeToCard(filename, pValues[k]);
+    headerName = "; I:0; D:0";
+    writeToCard(filename, headerName);
+    
+    writeNewLineToCard(filename);
+
+    for(int i=0;i<20;i++){
+      //Test Y
+      std::cout << "i1: " << i << std::endl;
+      chassis.turnToAngle(0);
+      chassis.setPosition(0,0,0);
+      chassis.driveDistanceWithOdom(24);
+      writeToCard(filename,chassis.chassisOdometry.getYPosition()-24);
+      writeCommaToCard(filename);
+      chassis.driveDistanceWithOdom(-24);
+    }
+    writeNewLineToCard(filename);
+    for(int i=0;i<20;i++){
+      //Turn and test X
+      std::cout << "i2: " << i << std::endl;
+      chassis.turnToAngle(90);
+      chassis.setPosition(0,0,90);
+      chassis.driveDistanceWithOdom(24);
+      writeToCard(filename,chassis.chassisOdometry.getXPosition()-24);
+      writeCommaToCard(filename);
+      chassis.driveDistanceWithOdom(-24);
+    }
+
+    chassis.turnToAngle(0);
+    writeNewLineToCard(filename);
+
+  }
+  
+}
+
+/// @brief Automatically computes the best P value given a certain distance
+/// @param distance distance to cover
+void PAutonGenerator(float distance){
+  //P value
+  float pValue = 0.1;
+  
+  //PID constants
+  float iValue = 0.0;
+  float dValue = 0.0;
+  float settleError = 0.75;
+  float timeToSettle = 200;
+  float endTime = 2500;
+
+  //Storage
+  std::vector<float> yErrors;
+  std::vector<float> xErrors;
+  float yAvgError;
+  float xAvgError;
+  int crossCountY = 0;
+  int crossCountX = 0;
+  float prevError = 0.0;
+  bool hasPrevError = false;
+
+  //Number of times for loops to iterate
+  int numIterations = 10;
+
+  //Ratios/Conditionals for P
+  float incrementRatio = 1.5;
+  float decrementRatio = 0.8;
+  float acceptableError = 0.01 * distance;
+
+  //SD Card variables
+  std::string filename = "PTest.csv";
+  std::ostringstream oss;
+
+  float actualError = acceptableError+1; //Set higher than acceptableError so while loop will initally run
+
+  chassis.setPosition(0, 0, 0);
+  
+  while(fabs(actualError) > acceptableError){
+    chassis.setDriveConstants(pValue, iValue, dValue, settleError, timeToSettle, endTime);
+
+    oss << "Current P: " << pValue;
+    writeToCard(filename, oss.str());
+    oss.str("");
+    oss.clear();
+    writeNewLineToCard(filename);
+
+    //Test on Y-axis
+    for(int i=0; i<numIterations;i++){
+      chassis.turnToAngle(0);
+      chassis.setPosition(0, 0, 0);
+      chassis.driveDistanceWithOdom(distance);
+      writeToCard(filename, chassis.chassisOdometry.getYPosition()-distance);
+      writeCommaToCard(filename);
+      yErrors.push_back(chassis.chassisOdometry.getYPosition()-distance);
+      if(hasPrevError && prevError * yErrors.at(yErrors.size()-1) < 0){
+        crossCountY++;
+      }
+      prevError = yErrors.at(yErrors.size()-1);
+      hasPrevError = true;
+
+      chassis.driveDistanceWithOdom(-distance);
+    }
+    writeNewLineToCard(filename);
+
+    //Average errors
+    yAvgError = 0.0;
+    for(int i=0;i<yErrors.size();i++){
+      yAvgError += fabs(yErrors.at(i));
+    }
+    yAvgError /= yErrors.size();
+
+    oss << "AVG ERR FOR P=" << pValue << " ON Y-AXIS: " << yAvgError;
+    writeToCard(filename, oss.str());
+    oss.str("");
+    oss.clear();
+    writeNewLineToCard(filename);
+
+    //-----------------------------------------------------------//
+
+    hasPrevError = false;
+    prevError = 0.0;
+    //Test on X-axis
+    for(int i=0; i<numIterations;i++){
+      chassis.turnToAngle(90);
+      chassis.setPosition(0, 0, 90);
+      chassis.driveDistanceWithOdom(distance);
+      writeToCard(filename, chassis.chassisOdometry.getXPosition()-distance);
+      writeCommaToCard(filename);
+      xErrors.push_back(chassis.chassisOdometry.getXPosition()-distance);
+      if(hasPrevError && prevError * xErrors.at(xErrors.size()-1) < 0){
+        crossCountX++;
+      }
+      prevError = xErrors.at(xErrors.size()-1);
+      hasPrevError = true;
+
+      chassis.driveDistanceWithOdom(-distance);
+    }
+    writeNewLineToCard(filename);
+
+    //Average errors
+    xAvgError = 0.0;
+    for(int i=0;i<xErrors.size();i++){
+      xAvgError += fabs(xErrors.at(i));
+    }
+    xAvgError /= xErrors.size();
+
+    oss << "AVG ERR FOR P=" << pValue << " ON X-AXIS: " << xAvgError;
+    writeToCard(filename, oss.str());
+    oss.str("");
+    oss.clear();
+    writeNewLineToCard(filename);
+
+    //If avgError is more than the acceptable, decrease P
+    if(yAvgError > acceptableError && xAvgError > acceptableError){
+      if(crossCountY > numIterations/3 && crossCountX > numIterations/3){
+        std::cout << "YAVG: " << yAvgError << ", XAVG: " << xAvgError << "; DECREASING P" << std::endl;
+        pValue *= decrementRatio;
+      }else{
+        std::cout << "YAVG: " << yAvgError << ", XAVG: " << xAvgError << "; INCREASING P" << std::endl;
+        pValue *= incrementRatio;
+      }
+    }
+
+    yErrors.clear();
+    xErrors.clear();
+    crossCountY = 0;
+    crossCountX = 0;
+    hasPrevError = false;
+    prevError = 0.0;
+
+    actualError = std::max(yAvgError, xAvgError);
+  }
 }

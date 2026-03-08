@@ -8,6 +8,8 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <sstream>
+#include <vector>
 
 
 #include "v5.h"
