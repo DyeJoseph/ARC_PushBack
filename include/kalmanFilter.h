@@ -76,4 +76,8 @@ class KalmanFilter{
 
         void setMeasurements(float deltaOdomX, float deltaOdomY, float globalOdomX, float globalOdomY, float globalDriveX, float globalDriveY, float globalDriveHeading, float deltaInertial, float inertialHeading);
         void setNoiseVariance(float, float, float);
+
+        float getFilteredX();
+        float getFilteredY();
+        float getFilteredHeading();
 };

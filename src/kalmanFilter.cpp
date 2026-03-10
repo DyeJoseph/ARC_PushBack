@@ -206,7 +206,21 @@ void KalmanFilter::setNoiseVariance(float xVariance, float yVariance, float thet
     this->noiseVariance[1] = yVariance;
     this->noiseVariance[2] = thetaVariance;
 }
-
+/// @brief Get the filtered x-pos from stateVector
+/// @return Computed x-pos
+float KalmanFilter::getFilteredX(){
+    return stateVector[0];
+}
+/// @brief Get the filtered y-pos from stateVector
+/// @return Computed y-pos
+float KalmanFilter::getFilteredY(){
+    return stateVector[1];
+}
+/// @brief Get the filtered heading from stateVector
+/// @return Computed heading
+float KalmanFilter::getFilteredHeading(){
+    return stateVector[2];
+}
 
 /// @brief The main filter function to compute an adjusted x, y, and heading position
 void KalmanFilter::filter(){
