@@ -14,6 +14,10 @@ class Odom
         float xPosition;
         float yPosition;
         float heading;
+
+        float prevX;
+        float prevY;
+        float prevHeading;
     
     public:
         //Wheel diameters for the odometry pods
