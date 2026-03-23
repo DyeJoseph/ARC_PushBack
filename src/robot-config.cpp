@@ -21,6 +21,9 @@ motor RBB = motor(PORT3, ratio6_1, false);
 motor RBT = motor(PORT2, ratio6_1, true);
 ///////////////////////////////////////////
 
+motor_group leftDrive = motor_group(LFT, LFB, LBB, LBT); // Left drive train motors
+motor_group rightDrive = motor_group(RFT, RFB, RBB, RBT);
+
 //////////// Odometry Sensors ////////////
 rotation rotation1 = rotation(PORT13);
 rotation rotation2 = rotation(PORT12);

@@ -238,6 +238,7 @@ void KalmanFilter::filter(){
         updateKalmanGains(this->covariancePrediction, this->odomMeasurementMatrix, this->odomNoise);
         partialPositionUpdate(innovation, stateVector);
         updateCovariance(this->covariancePrediction);
+        isFirstPass = false;
     }else{
         updateKalmanGains(this->covarianceMatrix, this->odomMeasurementMatrix, this->odomNoise);
         partialPositionUpdate(this->odomNoise, this->stateVector);

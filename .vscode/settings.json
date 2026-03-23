@@ -39,5 +39,6 @@
 		"type_traits": "cpp",
 		"utility": "cpp",
 		"typeinfo": "cpp"
-	}
+	},
+	"livePreview.defaultPreviewPath": "/pid_tuner_ui3.html"
 }
