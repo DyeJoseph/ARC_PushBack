@@ -43,6 +43,7 @@ class Drive
         void tank();
 
         float getCurrentMotorPosition();
+        int getOdomType() const {return odomType;}
 
         void driveMotors(float leftVolts, float rightVolts);
         void driveMotors(float leftVolts, float rightVolts, MotorSpinType spinType);
