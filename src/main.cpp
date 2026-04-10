@@ -221,6 +221,7 @@ void usercontrol()
   bottomColorSort.setLight(ledState::on);
   bottomColorSort.brightness(true);
   bottomColorSort.integrationTime(20);
+  
   while (1) {
 
       if(driver)
