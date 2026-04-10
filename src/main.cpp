@@ -201,7 +201,7 @@ void autonomous()
 void usercontrol() 
 {
   //REMOVE "//" BELOW to run Semi-Automatic PID Test
-  semiPIDTest();
+  // semiPIDTest();
 
   drawSponsors();
 
@@ -213,20 +213,13 @@ void usercontrol()
   chassis.brake(coast);
   mainIntake.setStopping(coast);
 
-  mainIntake.setVelocity(85, percent);
-  colorSort.setVelocity(100, percent);
-  topStage.setVelocity(100, percent);
-
-  Controller1.ButtonL1.pressed(toggleLift);
-  // Controller1.ButtonUp.pressed(toggleIntakeFlap);
-  // Controller1.ButtonDown.pressed(slowIntake);
-  Controller1.ButtonRight.pressed(toggleColorSort);
-  Controller1.ButtonL2.pressed(toggleDropDown);
-  Controller1.ButtonL2.released(toggleDropDown);
+  intake.setVelocity(100, percent);
+  colorSortIntake.setVelocity(100, percent);
 
   //For Skills Auton
 
   bottomColorSort.setLight(ledState::on);
+  bottomColorSort.brightness(true);
   bottomColorSort.integrationTime(20);
   while (1) {
 
@@ -241,63 +234,25 @@ void usercontrol()
         lastSeen = 1;
       }
 
-      if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
-        mainIntake.spin(forward);
-        topStage.spin(forward, 50, percent);
-        flapState = false;
-        if(lastSeen == teamColor || !isColorSorting){
-          colorSort.spin(forward);
+      if(Controller1.ButtonR1.pressing()){
+        intake.spin(forward);
+        if(lastSeen == teamColor){
+          colorSortIntake.spin(reverse);
         }else{
-          colorSort.spin(reverse);
+          colorSortIntake.spin(forward);
         }
-      }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
-        mainIntake.spin(reverse);
-        topStage.spin(reverse);
-        colorSort.spin(forward, 25, percent);
-      }else if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
-        mainIntake.spin(forward);
-        topStage.spin(forward);
-        flapState = true;
-        colorSort.spin(fwd);
-      }else if(Controller1.ButtonDown.pressing()){
-        mainIntake.spin(reverse, 35, percent);
-        topStage.spin(reverse);
-        colorSort.spin(forward, 20, percent);
-      }else if(Controller1.ButtonUp.pressing()){
-        mainIntake.spin(forward);
-        topStage.spin(forward, 35, percent);
-        flapState = true;
-        if(lastSeen == teamColor || !isColorSorting){
-          colorSort.spin(forward);
+      }else if(Controller1.ButtonR2.pressing()){
+        intake.spin(reverse);
+        if(lastSeen == teamColor){
+          colorSortIntake.spin(reverse);
         }else{
-          colorSort.spin(reverse);
+          colorSortIntake.spin(forward);
         }
       }else{
-        mainIntake.stop();
-        colorSort.stop();
-        topStage.stop();
-      }
-      if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing() && !Controller1.ButtonUp.pressing()){
-        flapState = false;
+        colorSortIntake.stop();
+        intake.stop();
       }
 
-      if(Controller1.ButtonA.pressing()){
-        matchLoad.set(true);
-        mainIntake.spin(forward);
-        topStage.spin(forward, 50, percent);
-        if(lastSeen == teamColor || !isColorSorting){
-          colorSort.spin(forward);
-        }else
-          colorSort.spin(reverse);
-      }else{
-        matchLoad.set(false);
-        if(!Controller1.ButtonR1.pressing() && !Controller1.ButtonDown.pressing() && !Controller1.ButtonR2.pressing() && !Controller1.ButtonUp.pressing()){
-          mainIntake.stop();
-          colorSort.stop();
-          topStage.stop();
-        }
-      }
-      intakeFlap.set(flapState);
     wait(20, msec);
   }
     

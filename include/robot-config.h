@@ -43,3 +43,9 @@ extern digital_out intakeLift;
 extern digital_out dropDown;
 
 extern optical bottomColorSort;
+
+extern motor intake1;
+extern motor intake2;
+extern motor_group intake;
+
+extern motor colorSortIntake;
