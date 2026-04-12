@@ -6,74 +6,51 @@
 brain Brain;
 controller Controller1;
 
-///////////////////////////////////////////
-
-//////////// Drive Train Motors ////////////
-
-///////////////////////////////////////////
-
-
-//////////// Odometry Sensors ////////////
-
-/////////////////////////////////////////
-
-//////////// Inertial Sensors ////////////
-
-/////////////////////////////////////////
-motor intake1 = motor(PORT1,ratio6_1, false);
-motor intake2 = motor(PORT2,ratio6_1, true);
-motor_group intake = motor_group(intake1, intake2);
-motor colorSortIntake = motor(PORT3, ratio6_1, true);
-
-//Pistons
-
 //Color Sort Opticals
 optical bottomColorSort = optical(PORT6);
 
+// Drivetrain motors
+motor LT1 = motor(PORT16, ratio6_1, false);
+motor LT2 = motor(PORT17, ratio6_1, true);
+motor LT3 = motor(PORT18, ratio6_1, false);
+motor LT4 = motor(PORT19, ratio6_1, true);
+motor LT5 = motor(PORT20, ratio6_1, false);
 
+motor RT1 = motor(PORT11, ratio6_1, true);
+motor RT2 = motor(PORT12, ratio6_1, false);
+motor RT3 = motor(PORT13, ratio6_1, true);
+motor RT4 = motor(PORT14, ratio6_1, false);
+motor RT5 = motor(PORT15, ratio6_1, true);
 
-motor LFT = motor(PORT9, ratio6_1, false);
-motor LFB = motor(PORT7, ratio6_1, true);
-motor LBB = motor(PORT8, ratio6_1, true);
-motor LBT = motor(PORT10, ratio6_1, false);
-
-motor RFT = motor(PORT4, ratio6_1, true);
-motor RFB = motor(PORT21, ratio6_1, false);
-motor RBB = motor(PORT21, ratio6_1, false);
-motor RBT = motor(PORT21, ratio6_1, true);
-///////////////////////////////////////////
-
-motor_group leftDrive = motor_group(LFT, LFB, LBB, LBT); // Left drive train motors
-motor_group rightDrive = motor_group(RFT, RFB, RBB, RBT);
-
-//////////// Odometry Sensors ////////////
-rotation rotation1 = rotation(PORT13);
-rotation rotation2 = rotation(PORT12);
+motor_group leftDrive = motor_group(LT1, LT2, LT3, LT4, LT5);
+motor_group rightDrive = motor_group(RT1, RT2, RT3, RT4, RT5);
 
 /////////////////////////////////////////
 
-//////////// Inertial Sensors ////////////
-
-inertial inertial1 = inertial(PORT14);
-
 /////////////////////////////////////////
+motor bottomIntake = motor(PORT1,ratio6_1, false);
+motor topIntake = motor(PORT2,ratio6_1, true);
+motor_group intake = motor_group(bottomIntake, topIntake);
+motor colorSortIntake = motor(PORT3, ratio6_1, true);
 
-motor intakeL = motor(PORT5, ratio6_1, true);
-motor intakeR = motor(PORT6, ratio6_1, false);
-motor colorSort = motor(PORT19, ratio18_1, true);
-motor bottomStage = motor(PORT20, ratio6_1, false);
-motor topStage = motor(PORT18, ratio6_1, false); //not always spinning
+// Rotation Sensors
+rotation clockRotationSensor = rotation(PORT7);
 
-motor_group mainIntake = motor_group(intakeL, intakeR, bottomStage);
+// Clock motors
+motor rightCata = motor(PORT4, ratio18_1, false);
+motor leftCata = motor(PORT5, ratio18_1, true);
+motor_group catapult = motor_group(leftCata, rightCata);
 
-//Pistons
-
-/// @brief Pincers
-digital_out matchLoad = digital_out(Brain.ThreeWirePort.H);
-
+//Pneumatics
 digital_out intakeFlap = digital_out(Brain.ThreeWirePort.A);
-digital_out intakeLift = digital_out(Brain.ThreeWirePort.D);
+digital_out wings = digital_out(Brain.ThreeWirePort.A);
+digital_out intakeLift = digital_out(Brain.ThreeWirePort.A);
+digital_out frontIntake = digital_out(Brain.ThreeWirePort.A);
+digital_out matchLoad = digital_out(Brain.ThreeWirePort.A);
+digital_out midGoalBlocking = digital_out(Brain.ThreeWirePort.A);
+
+//Inertial
+inertial inertial1 = inertial(PORT10);
 
 
-digital_out dropDown = digital_out(Brain.ThreeWirePort.F);
 

@@ -6,46 +6,52 @@ using namespace vex;
 using signature = vision::signature;
 using code = vision::code;
 
+////////////// DO NOT REMOVE //////////////
+
+// Defines the Brain and Controller
 extern brain Brain;
 extern controller Controller1;
 
-extern motor LFT;
-extern motor LFB;
-extern motor LBB;
-extern motor LBT;
-
-extern motor RFT;
-extern motor RFB;
-extern motor RBB;
-extern motor RBT;
-
-extern motor_group rightDrive;
-extern motor_group leftDrive;
-
-extern rotation rotation1;
-extern rotation rotation2;
-
-extern inertial inertial1;
-
-extern motor intakeL;
-extern motor intakeR;
-extern motor colorSort;
-extern motor bottomStage;
-extern motor topStage;
-
-extern motor_group mainIntake;
-
-
-extern digital_out matchLoad;
-extern digital_out intakeFlap;
-extern digital_out intakeLift;
-
-extern digital_out dropDown;
-
+//Color Sort Opticals
 extern optical bottomColorSort;
 
-extern motor intake1;
-extern motor intake2;
-extern motor_group intake;
+// Drivetrain motors
+extern motor LT1;
+extern motor LT2;
+extern motor LT3;
+extern motor LT4;
+extern motor LT5;
 
+extern motor RT1;
+extern motor RT2;
+extern motor RT3;
+extern motor RT4;
+extern motor RT5;
+
+extern motor_group leftDrive;
+extern motor_group rightDrive;
+
+
+/////////////////////////////////////////
+extern motor bottomIntake;
+extern motor topIntake;
+extern motor_group intake;
 extern motor colorSortIntake;
+
+// Rotation Sensors
+extern rotation clockRotationSensor;
+
+//Clock motors
+extern motor rightCata;
+extern motor leftCata;
+extern motor_group catapult;
+
+//Pneumatics
+extern digital_out intakeFlap;
+extern digital_out wings;
+extern digital_out intakeLift;
+extern digital_out frontIntake;
+extern digital_out matchLoad;
+extern digital_out midGoalBlocking;
+
+extern inertial inertial1;

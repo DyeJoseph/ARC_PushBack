@@ -32,11 +32,14 @@ using namespace vex;
   int teamColor = 0; //red = 0, blue = 1
   int driver = 0; //Elliot = 0, Jacob = 1
 
+  bool liftState = 0;
+  bool isFiring = 0;
+
   // Define Values for the Chassis here:
   Drive chassis
   (
-    motor_group(LFT, LFB, LBB, LBT), // Left drive train motors
-    motor_group(RFT, RFB, RBB, RBT), // Right drive train motors
+    motor_group(LT1, LT2, LT3, LT4, LT5), // Left drive train motors
+    motor_group(RT1, RT2, RT3, RT4, RT5), // Right drive train motors
     PORT20,               // Inertial Sensor Port
     2.66,              // The diameter size of the wheel in inches 2.66
     1,                   // 
@@ -65,9 +68,11 @@ void semiPIDTest();
 
 void toggleLift();
 void toggleIntakeFlap();
-void slowIntake();
+void toggleFrontIntake();
 void toggleColorSort();
-void toggleDropDown();
+void toggleWings();
+void fireClock1();
+void fireClock2();
 
 //////////////////////////////////////////////////////////////////////
 
@@ -76,6 +81,9 @@ void toggleDropDown();
 void preAuton() 
 {
   setDriveTrainConstants();
+  bottomColorSort.integrationTime(10);
+  bottomColorSort.setLight(ledState::on);
+  bottomColorSort.brightness(true);
 
   chassis.brake(coast);       // make sure they aren’t holding weirdly
   chassis.driveMotors(0, 0);  
@@ -84,9 +92,9 @@ void preAuton()
   int currentScreen = START_SCREEN;
 
   // Calibrates/Resets the Brains sensors before the competition
-  inertial1.calibrate();
-  rotation1.resetPosition();
-  rotation2.resetPosition();
+  // inertial1.calibrate();
+  // rotation1.resetPosition();
+  // rotation2.resetPosition();
 
   vex::color colors[8] = {vex::color::red, vex::color::red, vex::color::red, vex::color::red, 
                           vex::color::blue, vex::color::blue, vex::color::blue, vex::color::blue};
@@ -149,9 +157,9 @@ void autonomous()
 {  
   drawSponsors();
   isInAuton = true;
-  rotation1.resetPosition();
-  rotation2.resetPosition();
-  inertial1.resetHeading();
+  // rotation1.resetPosition();
+  // rotation2.resetPosition();
+  // inertial1.resetHeading();
   wait(100, msec);
 
   // setDriveTrainConstants();
@@ -208,19 +216,39 @@ void usercontrol()
   // User control code here, inside the loop
   bool flapState = false;
   int lastSeen = teamColor;
-  
 
   chassis.brake(coast);
-  mainIntake.setStopping(coast);
+  intake.setStopping(coast);
 
   intake.setVelocity(100, percent);
   colorSortIntake.setVelocity(100, percent);
+  clockRotationSensor.resetPosition();
 
   //For Skills Auton
 
   bottomColorSort.setLight(ledState::on);
   bottomColorSort.brightness(true);
-  bottomColorSort.integrationTime(20);
+  bottomColorSort.integrationTime(10);
+
+  //Pressed functions
+  Controller1.ButtonL1.pressed(toggleLift);
+  // Controller1.ButtonL2.pressed(toggleFrontIntake);
+  Controller1.ButtonL2.pressed(toggleWings);
+  Controller1.ButtonL2.released(toggleWings);
+
+  Controller1.ButtonR1.pressed(fireClock1);
+  Controller1.ButtonR2.pressed(fireClock2);
+    /*
+      Catapult Controls:
+        R1 && R2 = fire (open flap)
+          if hood is up -> fullspeed
+          if hood is down -> halfspeed (slowed)
+        UP
+          fire at fullspeed (open flap)
+        DOWN
+          fire at halfspeed (slowed) (open flap)
+  
+  */
   
   while (1) {
 
@@ -253,6 +281,18 @@ void usercontrol()
         colorSortIntake.stop();
         intake.stop();
       }
+      if(Controller1.ButtonA.pressing()){
+        matchLoad.set(true);
+        colorSortIntake.spin(forward);
+        bottomIntake.spin(reverse);
+        if(lastSeen == teamColor){
+          topIntake.spin(forward);
+        }else{
+          topIntake.spin(reverse);
+        }
+      }else{
+        matchLoad.set(false);
+      }
 
     wait(20, msec);
   }
@@ -260,37 +300,72 @@ void usercontrol()
 }
 
 void toggleLift(){
-  static bool liftState = false;
   liftState = !liftState;
   intakeLift.set(liftState);
+}
+
+void toggleFrontIntake(){
+  static bool frontIntakeState = false;
+  frontIntakeState = !frontIntakeState;
+  frontIntake.set(frontIntakeState);
+}
+
+void toggleWings(){
+  static bool wingState = false;
+  wingState = !wingState;
+  wings.set(wingState);
+}
+
+void fireClock1(){
+  if(Controller1.ButtonR2.pressing() && !isFiring){
+    isFiring = true;
+    clockRotationSensor.resetPosition();
+    int spinSpeed = liftState ? 100 : 50;
+    intakeFlap.set(true);
+    int timeout = 0.0;
+    while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1000){
+      catapult.spin(forward, spinSpeed, percent);
+      timeout += 5;
+      wait(5, msec);
+    }
+    intakeFlap.set(false);
+    while(clockRotationSensor.position(degrees) >= 45.0 || fabs(catapult.velocity(vex::rpm)) >= 5){
+      catapult.spin(reverse, 100, percent);
+      wait(5, msec);
+    }
+    clockRotationSensor.resetPosition();
+    catapult.stop();
+    isFiring = false;
+  }
+}
+
+void fireClock2(){
+  if(Controller1.ButtonR1.pressing() && !isFiring){
+    isFiring = true;
+    clockRotationSensor.resetPosition();
+    int spinSpeed = liftState ? 100 : 50;
+    intakeFlap.set(true);
+    int timeout = 0.0;
+    while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1000){
+      catapult.spin(forward, spinSpeed, percent);
+      timeout += 5;
+      wait(5, msec);
+    }
+    intakeFlap.set(false);
+    while(clockRotationSensor.position(degrees) >= 45.0 || fabs(catapult.velocity(vex::rpm)) >= 5){
+      catapult.spin(reverse, 100, percent);
+      wait(5, msec);
+    }
+    clockRotationSensor.resetPosition();
+    catapult.stop();
+    isFiring = false;
+  }
 }
 
 void toggleIntakeFlap(){
   static bool staticFlap = false;
   staticFlap = !staticFlap;
   intakeFlap.set(staticFlap);
-}
-
-void toggleDropDown(){
-
-  static bool staticDrop = false;
-  staticDrop = !staticDrop;
-  dropDown.set(staticDrop);
-
-}
-
-void slowIntake(){
-  static bool isSlowed = false;
-  isSlowed = !isSlowed;
-  if(isSlowed){
-    mainIntake.setVelocity(50, percent);
-    colorSort.setVelocity(100, percent);
-    topStage.setVelocity(50, percent);
-  }else{
-    mainIntake.setVelocity(85, percent);
-    colorSort.setVelocity(100, percent);
-    topStage.setVelocity(100, percent);
-  }
 }
 
 void toggleColorSort(){

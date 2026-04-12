@@ -1001,22 +1001,22 @@ void Drive::updatePosition(){
             chassisOdometry.updatePositionTwoForward(right, left, heading);
             break;
         case HORIZONTAL_AND_VERTICAL:
-            left = rotation1.position(degrees);
-            right = rotation2.position(degrees);
-            heading = inertial1.heading();
-            chassisOdometry.updatePositionOneForward(left, right, heading);
+            // left = rotation1.position(degrees);
+            // right = rotation2.position(degrees);
+            // heading = inertial1.heading();
+            // chassisOdometry.updatePositionOneForward(left, right, heading);
             break;
         case TWO_VERTICAL:
-            left = rotation1.position(degrees);
-            right = rotation2.position(degrees);
-            heading = inertial1.heading();
-            chassisOdometry.updatePositionTwoForward(right, left, heading);
+            // left = rotation1.position(degrees);
+            // right = rotation2.position(degrees);
+            // heading = inertial1.heading();
+            // chassisOdometry.updatePositionTwoForward(right, left, heading);
             break;
         case TWO_AT_45:
-            left = rotation1.position(degrees);
-            right = rotation2.position(degrees);
-            heading = inertial1.heading();
-            chassisOdometry.updatePositionTwoAt45(left, right, heading);
+            // left = rotation1.position(degrees);
+            // right = rotation2.position(degrees);
+            // heading = inertial1.heading();
+            // chassisOdometry.updatePositionTwoAt45(left, right, heading);
             break;
     }
 }
@@ -1041,16 +1041,16 @@ void Drive::setPosition(float x, float y, float heading){
 
         case HORIZONTAL_AND_VERTICAL:
             // Using rotation1 and rotation2
-            chassisOdometry.setForwardLeftDegrees(rotation1.position(degrees));
-            chassisOdometry.setLateralDegrees(rotation2.position(degrees));
+            // chassisOdometry.setForwardLeftDegrees(rotation1.position(degrees));
+            // chassisOdometry.setLateralDegrees(rotation2.position(degrees));
             // If you have a second forward sensor, set it here too
             break;
 
         case TWO_AT_45:
             // Whatever sensors you're using in this mode
             // Example (if both are vertical tracking wheels):
-            chassisOdometry.setForwardRightDegrees(rotation1.position(degrees));
-            chassisOdometry.setForwardLeftDegrees(rotation2.position(degrees));
+            // chassisOdometry.setForwardRightDegrees(rotation1.position(degrees));
+            // chassisOdometry.setForwardLeftDegrees(rotation2.position(degrees));
             chassisOdometry.setLateralDegrees(0);
             break;
 
