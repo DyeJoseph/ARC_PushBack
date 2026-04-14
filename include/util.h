@@ -29,3 +29,4 @@ template <typename T>
 void writeToCard(std::string filename, T input);
 
 enum ODOM_TYPE{NO_ODOM=0, HORIZONTAL_AND_VERTICAL=1, TWO_VERTICAL=2, TWO_AT_45=3};
+enum COLORS{RED = 0, BLUE = 1};

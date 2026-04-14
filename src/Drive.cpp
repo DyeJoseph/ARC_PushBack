@@ -105,17 +105,18 @@ void Drive::setTurnConstants(float Kp, float Ki, float Kd, float settleError, fl
 /// @brief Arcade drive control, uses the left joystick for forward/backward and the right joystick for turning
 void Drive::arcade()
 {
-    int leftY = 0;
-    int rightX = 0;
+    double leftY = 0;
+    double rightX = 0;
+
     if(Controller1.Axis3.position(percent) >= 0)
-        leftY = pow(Controller1.Axis3.position(percent),2)/100;
+        leftY = pow(Controller1.Axis3.position(percent),1.5)/10;
     else
-        leftY = pow(Controller1.Axis3.position(percent),2)/-100;
+        leftY = pow(fabs(Controller1.Axis3.position(percent)),1.5)/-10;
     
     if(Controller1.Axis1.position(percent) >= 0)
-        rightX = pow(Controller1.Axis1.position(percent),2)/100;
+        rightX = pow(Controller1.Axis1.position(percent),1.5)/10;
     else
-        rightX = pow(Controller1.Axis1.position(percent),2)/-100;
+        rightX = pow(fabs(Controller1.Axis1.position(percent)),1.5)/-10;
 
     leftDrive.spin(forward, leftY+rightX, percent);
     rightDrive.spin(forward, leftY-rightX, percent);

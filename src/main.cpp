@@ -13,7 +13,7 @@
 #include "Drive.h"
 #include "semiPIDTuner.h"
 #include "images.h"
-
+#include "sensorConversion.h"
 
 using namespace vex;
 
@@ -24,7 +24,7 @@ using namespace vex;
 
   int odomType = TWO_AT_45;
 
-  bool isColorSorting = false;
+  bool isColorSorting = true;
   bool odomDebugEnabled = true;
 
   bool isInAuton = false;
@@ -34,6 +34,8 @@ using namespace vex;
 
   bool liftState = 0;
   bool isFiring = 0;
+  bool isSPRunning = false;
+
 
   // Define Values for the Chassis here:
   Drive chassis
@@ -71,8 +73,8 @@ void toggleIntakeFlap();
 void toggleFrontIntake();
 void toggleColorSort();
 void toggleWings();
-void fireClock1();
-void fireClock2();
+int fireClock();
+void SPClock();
 
 //////////////////////////////////////////////////////////////////////
 
@@ -160,6 +162,24 @@ void autonomous()
   // rotation1.resetPosition();
   // rotation2.resetPosition();
   // inertial1.resetHeading();
+
+  int port = 9;
+  vexGenericSerialEnable(port, 0);
+  vexGenericSerialBaudrate(port, 115200);
+
+  uint8_t buf[64];
+  float enc1;
+  float enc2;
+  float heading;
+
+  while (true) {
+    int n = vexGenericSerialReceive(port, buf, sizeof(buf));
+
+    getSensorReading(buf, n, enc1, enc2, heading);
+
+    wait(10, msec);
+  }
+
   wait(100, msec);
 
   // setDriveTrainConstants();
@@ -217,6 +237,8 @@ void usercontrol()
   bool flapState = false;
   int lastSeen = teamColor;
 
+  static vex::thread fireThread = vex::thread(fireClock);
+
   chassis.brake(coast);
   intake.setStopping(coast);
 
@@ -227,7 +249,6 @@ void usercontrol()
   //For Skills Auton
 
   bottomColorSort.setLight(ledState::on);
-  bottomColorSort.brightness(true);
   bottomColorSort.integrationTime(10);
 
   //Pressed functions
@@ -235,21 +256,9 @@ void usercontrol()
   // Controller1.ButtonL2.pressed(toggleFrontIntake);
   Controller1.ButtonL2.pressed(toggleWings);
   Controller1.ButtonL2.released(toggleWings);
+  Controller1.ButtonLeft.pressed(SPClock);
 
-  Controller1.ButtonR1.pressed(fireClock1);
-  Controller1.ButtonR2.pressed(fireClock2);
-    /*
-      Catapult Controls:
-        R1 && R2 = fire (open flap)
-          if hood is up -> fullspeed
-          if hood is down -> halfspeed (slowed)
-        UP
-          fire at fullspeed (open flap)
-        DOWN
-          fire at halfspeed (slowed) (open flap)
-  
-  */
-  
+  int blueMinHue = 200;
   while (1) {
 
       if(driver)
@@ -257,35 +266,48 @@ void usercontrol()
       else
         chassis.arcade();
 
-      if(bottomColorSort.color() == vex::color::red){
-        lastSeen = 0;
-      }else if(bottomColorSort.color() == vex::color::blue){
-        lastSeen = 1;
-      }
+      // OLD COLOR SORT
+      // if(bottomColorSort.color() == vex::color::red){
+      //   lastSeen = 0;
+      // }else if(bottomColorSort.color() == vex::color::blue){
+      //   lastSeen = 1;
+      // }
+
+      //Updated colorsort controls
+      int seenHue = bottomColorSort.hue();
+      if(seenHue < 20)
+        lastSeen = RED;
+      if(seenHue > blueMinHue && seenHue < 250)
+        lastSeen = BLUE;
 
       if(Controller1.ButtonR1.pressing()){
-        intake.spin(forward);
-        if(lastSeen == teamColor){
+        if(isColorSorting)
+          topIntake.spin(forward, 50, percent);
+        else
+          topIntake.spin(forward, 100, percent);
+
+        bottomIntake.spin(forward, 100, percent);
+        if(lastSeen == teamColor && isColorSorting){
           colorSortIntake.spin(reverse);
         }else{
           colorSortIntake.spin(forward);
         }
       }else if(Controller1.ButtonR2.pressing()){
         intake.spin(reverse);
-        if(lastSeen == teamColor){
-          colorSortIntake.spin(reverse);
-        }else{
-          colorSortIntake.spin(forward);
-        }
+        colorSortIntake.spin(forward, 10, percent);
       }else{
-        colorSortIntake.stop();
-        intake.stop();
+        if(isSPRunning){
+          bottomIntake.stop();
+        }else{
+          intake.stop();
+          colorSortIntake.stop();
+        }
       }
       if(Controller1.ButtonA.pressing()){
         matchLoad.set(true);
         colorSortIntake.spin(forward);
         bottomIntake.spin(reverse);
-        if(lastSeen == teamColor){
+        if(lastSeen == teamColor && isColorSorting){
           topIntake.spin(forward);
         }else{
           topIntake.spin(reverse);
@@ -316,50 +338,80 @@ void toggleWings(){
   wings.set(wingState);
 }
 
-void fireClock1(){
-  if(Controller1.ButtonR2.pressing() && !isFiring){
-    isFiring = true;
-    clockRotationSensor.resetPosition();
-    int spinSpeed = liftState ? 100 : 50;
-    intakeFlap.set(true);
-    int timeout = 0.0;
-    while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1000){
-      catapult.spin(forward, spinSpeed, percent);
-      timeout += 5;
-      wait(5, msec);
+int fireClock(){
+  while(1){
+    if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
+      intakeFlap.set(true);
+      int timeout = 0;
+      int spinSpeed = 100;
+      if(liftState){
+        //Hood is up
+        while(clockRotationSensor.position(degrees) <= 530.0 && timeout <= 750){ //Avg time to complete is ~550ms
+          catapult.spin(forward, 100, percent);
+          timeout += 10;
+          wait(10, msec);
+        }
+      }else{
+        //Hood is down
+        while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1250){ //Avg time to complete is ~1000ms
+          if(clockRotationSensor.position(degrees) >= 250.0){
+            //Decrease speed after first stage is complete
+            spinSpeed = 50.0;
+          } 
+          catapult.spin(forward, spinSpeed, percent);
+          timeout += 10;
+          wait(10, msec);
+        }
+      }
+      intakeFlap.set(false);
+      while(clockRotationSensor.position(degrees) >= 45.0 || fabs(catapult.velocity(vex::rpm)) >= 5){
+        catapult.spin(reverse, 100, percent);
+        timeout += 10;
+        wait(10, msec);
+      }
+      clockRotationSensor.resetPosition();
+      catapult.stop();
+     
     }
-    intakeFlap.set(false);
-    while(clockRotationSensor.position(degrees) >= 45.0 || fabs(catapult.velocity(vex::rpm)) >= 5){
-      catapult.spin(reverse, 100, percent);
-      wait(5, msec);
-    }
-    clockRotationSensor.resetPosition();
-    catapult.stop();
-    isFiring = false;
+    wait(20, msec);
   }
+  return 0;
 }
 
-void fireClock2(){
-  if(Controller1.ButtonR1.pressing() && !isFiring){
-    isFiring = true;
-    clockRotationSensor.resetPosition();
-    int spinSpeed = liftState ? 100 : 50;
-    intakeFlap.set(true);
-    int timeout = 0.0;
-    while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1000){
-      catapult.spin(forward, spinSpeed, percent);
-      timeout += 5;
-      wait(5, msec);
+void SPClock(){
+  static bool isPrimed = false;
+  int timeout = 0;
+  if(!isSPRunning){
+    isSPRunning = true;
+    if(!isPrimed){
+      catapult.setStopping(brake);
+      topIntake.spin(reverse);
+      colorSortIntake.spin(forward, 25, percent);
+      wait(800, msec);
+      topIntake.stop();
+      colorSortIntake.stop();
+      while(clockRotationSensor.position(degrees) <= 180.0 && timeout <= 500){
+        catapult.spin(forward, 100, percent);
+        timeout += 10;
+        wait(10, msec);
+      }
+      catapult.stop();
+      catapult.setStopping(coast);
+    }else{
+      while(clockRotationSensor.position(degrees) >= 45.0 || fabs(catapult.velocity(vex::rpm)) >= 5){
+        catapult.spin(reverse, 100, percent);
+        timeout += 10;
+        wait(10, msec);
+      }
+      catapult.stop();
+      clockRotationSensor.resetPosition();
     }
-    intakeFlap.set(false);
-    while(clockRotationSensor.position(degrees) >= 45.0 || fabs(catapult.velocity(vex::rpm)) >= 5){
-      catapult.spin(reverse, 100, percent);
-      wait(5, msec);
-    }
-    clockRotationSensor.resetPosition();
-    catapult.stop();
-    isFiring = false;
+    isPrimed = !isPrimed;
   }
+  isSPRunning = false;
+  intake.stop();
+  colorSortIntake.stop();
+  
 }
 
 void toggleIntakeFlap(){

@@ -1,4 +1,11 @@
 #include <stdint.h>
+#include "vex.h"
+#include "sensorConversion.h"
+
+extern "C" {
+  #include "v5_api.h"
+}
+using namespace vex;
 
 // ── packet layout ──────────────────────────────
 // byte  0    : 0xAA  (sync 1)
@@ -34,4 +41,39 @@ float getIMUHeading(uint8_t* b){
     uint16_t heading; //WORD
     heading = (uint16_t)(b[10] | b[11] << 8);
     return ((int)heading) / 10.0;
+}
+
+/// @brief Gets the reading for rotation sensors and IMU from 3rd party sensors
+/// @param buf Input bytearray
+/// @param n Number of bytes read
+/// @param enc1 Left encoder
+/// @param enc2 Right encoder
+/// @param heading Heading
+void getSensorReading(uint8_t *buf, int n, float &enc1, float &enc2, float &heading){
+    for (int i = 0; i < n - 12; i++) {
+      // look for sync bytes
+      if (buf[i] == 0xAA && buf[i+1] == 0x55) {
+
+        // extract values
+        enc1 = getLeftRotation(&buf[i]);
+        enc2 = getRightRotation(&buf[i]);
+        heading = getIMUHeading(&buf[i]);
+
+        uint8_t crc = buf[i+12];
+
+        // print values
+        Brain.Screen.setCursor(2,1);
+        Brain.Screen.print("enc1: %f      ", enc1);
+
+        Brain.Screen.setCursor(3,1);
+        Brain.Screen.print("enc2: %f      ", enc2);
+
+        Brain.Screen.setCursor(4,1);
+        Brain.Screen.print("head: %f      ", heading);
+
+        Brain.Screen.setCursor(5,1);
+        Brain.Screen.print("crc: %02X      ", crc);
+        break;
+      }
+    }
 }
