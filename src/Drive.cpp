@@ -127,17 +127,17 @@ void Drive::tank(){
     int leftY = 0;
     int rightX = 0;
     if(Controller1.Axis3.position(percent) >= 0)
-        leftY = pow(Controller1.Axis3.position(percent),2)/100;
+        leftY = pow(fabs(Controller1.Axis3.position(percent)),1.5)/10;
         //leftY = Controller1.Axis3.position(percent);
     else
-        leftY = pow(Controller1.Axis3.position(percent),2)/-100;
+        leftY = pow(fabs(Controller1.Axis3.position(percent)),1.5)/-10;
         //leftY = Controller1.Axis3.position(percent);
     
     if(Controller1.Axis2.position(percent) >= 0)
-        rightX = pow(Controller1.Axis2.position(percent),2)/100;
+        rightX = pow(fabs(Controller1.Axis2.position(percent)),1.5)/10;
         //rightX = Controller1.Axis2.position(percent);
     else
-        rightX = pow(Controller1.Axis2.position(percent),2)/-100;
+        rightX = pow(fabs(Controller1.Axis2.position(percent)),1.5)/-10;
         //rightX = Controller1.Axis2.position(percent);
 
     leftDrive.spin(forward, leftY, percent);
