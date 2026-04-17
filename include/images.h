@@ -4,5 +4,3 @@
 using namespace vex;
 
 void drawLogo();
-
-void drawSponsors();

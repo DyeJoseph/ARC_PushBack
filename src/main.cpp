@@ -77,6 +77,7 @@ void toggleWings();
 int fireClock();
 void splitPrimeClock();
 void splitReleaseClock();
+void autonFireClock();
 
 //////////////////////////////////////////////////////////////////////
 
@@ -159,8 +160,8 @@ void preAuton()
 /// @brief Runs during the Autonomous Section of the Competition
 void autonomous() 
 {  
-  drawSponsors();
   isInAuton = true;
+  drawLogo();
   // rotation1.resetPosition();
   // rotation2.resetPosition();
   // inertial1.resetHeading();
@@ -232,8 +233,7 @@ void usercontrol()
 {
   //REMOVE "//" BELOW to run Semi-Automatic PID Test
   // semiPIDTest();
-
-  drawSponsors();
+  drawLogo();
 
   // User control code here, inside the loop
   bool flapState = false;
@@ -248,6 +248,7 @@ void usercontrol()
   intake.setVelocity(100, percent);
   colorSortIntake.setVelocity(100, percent);
   clockRotationSensor.resetPosition();
+  intakeFlap.set(false);
 
   //For Skills Auton
 
@@ -264,7 +265,6 @@ void usercontrol()
 
   int blueMinHue = 200;
   while (1) {
-
       if(driver)
         chassis.tank();
       else
@@ -296,13 +296,11 @@ void usercontrol()
           topIntake.spin(forward, 100, percent);
 
         bottomIntake.spin(forward, 100, percent);
-        if((lastSeen == teamColor || timeSinceSeenWrong >= 2000) && isColorSorting){
+        if((lastSeen == teamColor || timeSinceSeenWrong >= 1250) && isColorSorting){
           colorSortIntake.spin(forward);
         }else{
           colorSortIntake.spin(reverse);
         }
-        std::cout << "COLOR: " << lastSeen << std::endl;
-        std::cout << "TIME: " << timeSinceSeenWrong << std::endl;
       }else if(Controller1.ButtonR2.pressing()){
         intake.spin(reverse);
         colorSortIntake.spin(forward, 10, percent);
@@ -318,7 +316,7 @@ void usercontrol()
         matchLoad.set(true);
         colorSortIntake.spin(forward);
         bottomIntake.spin(reverse);
-        if((lastSeen == teamColor || timeSinceSeenWrong >= 2000) && isColorSorting){
+        if((lastSeen == teamColor || timeSinceSeenWrong >= 1250) && isColorSorting){
           topIntake.spin(forward);
         }else{
           topIntake.spin(reverse);
@@ -326,32 +324,41 @@ void usercontrol()
       }else{
         matchLoad.set(false);
       }
+      if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
+        intakeFlap.set(true);
+      }else{
+        intakeFlap.set(false);
+      }
     timeSinceSeenWrong += 20;
     wait(20, msec);
   }
 }
 
+/// @brief Driver control function to toggle the intake hood
 void toggleLift(){
   liftState = !liftState;
   intakeLift.set(liftState);
 }
 
+/// @brief Driver control function to toggle the front intake
 void toggleFrontIntake(){
   static bool frontIntakeState = false;
   frontIntakeState = !frontIntakeState;
   frontIntake.set(frontIntakeState);
 }
 
+/// @brief Driver control function to toggle the descore mechanism
 void toggleWings(){
   static bool wingState = false;
   wingState = !wingState;
   wings.set(wingState);
 }
 
+/// @brief Driver control function to fire the clock (threaded) 
+/// @return Must return an integer for threads
 int fireClock(){
   while(1){
     if(Controller1.ButtonR1.pressing() && Controller1.ButtonR2.pressing()){
-      intakeFlap.set(true);
       int timeout = 0;
       int spinSpeed = 100;
       isPrimed = false;
@@ -374,8 +381,9 @@ int fireClock(){
           wait(10, msec);
         }
       }
-      intakeFlap.set(false);
       timeout = 0;
+      if(clockRotationSensor.position(degrees) < 100.0)
+        clockRotationSensor.setPosition(100.0, degrees);
       while(clockRotationSensor.position(degrees) >= 45.0 || fabs(catapult.velocity(vex::rpm)) >= 5){
         catapult.spin(reverse, 100, percent);
         timeout += 10;
@@ -392,6 +400,47 @@ int fireClock(){
   return 0;
 }
 
+/// @brief Non-threaded function to fire the clock in autonomous
+void autonFireClock(){
+  intakeFlap.set(true);
+  int timeout = 0;
+  int spinSpeed = 100;
+  isPrimed = false;
+  if(liftState){
+    //Hood is up
+    while(clockRotationSensor.position(degrees) <= 530.0 && timeout <= 750){ //Avg time to complete is ~550ms
+      catapult.spin(forward, 100, percent);
+      timeout += 10;
+      wait(10, msec);
+    }
+  }else{
+    //Hood is down
+    while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1250){ //Avg time to complete is ~1000ms
+      if(clockRotationSensor.position(degrees) >= 250.0){
+        //Decrease speed after first stage is complete
+        spinSpeed = 50.0;
+      } 
+      catapult.spin(forward, spinSpeed, percent);
+      timeout += 10;
+      wait(10, msec);
+    }
+  }
+  timeout = 0;
+  while(clockRotationSensor.position(degrees) >= 45.0 || fabs(catapult.velocity(vex::rpm)) >= 5){
+    catapult.spin(reverse, 100, percent);
+    timeout += 10;
+    if(timeout >= 500)
+      intakeFlap.set(false);
+    if(timeout >= 2000)
+      break;
+    wait(10, msec);
+  }
+  intakeFlap.set(false);
+  clockRotationSensor.resetPosition();
+  catapult.stop();
+}
+
+/// @brief Splits the loaded balls in half and primes the catapult
 void splitPrimeClock(){
   int timeout = 0;
   if(!isSPRunning && !isPrimed){
@@ -426,6 +475,7 @@ void splitPrimeClock(){
   }
 }
 
+/// @brief If primed, releases the prime
 void splitReleaseClock(){
   if(!isSPRunning && isPrimed){
     //Set running variable to true and create guard (in case of early exit)
@@ -451,12 +501,13 @@ void splitReleaseClock(){
   }
 }
 
-void toggleIntakeFlap(){
-  static bool staticFlap = false;
-  staticFlap = !staticFlap;
-  intakeFlap.set(staticFlap);
-}
+// void toggleIntakeFlap(){
+//   static bool staticFlap = false;
+//   staticFlap = !staticFlap;
+//   intakeFlap.set(staticFlap);
+// }
 
+/// @brief Function for toggling whether color sort is active
 void toggleColorSort(){
   isColorSorting = !isColorSorting;
 }
@@ -507,6 +558,13 @@ void setDriveTrainConstants()
 /// @brief Auton Slot 1 - Write code for route within this function.
 void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
 {   
+  /*  Plan for matchloading:
+    Take in all balls (no color sort, just full intake)
+    Prime catapult (separates/traps 4 red in top intake)
+    Reverse entire intake (slowly reverse color sort motor so it still goes out to front)
+    Once all ejected, take in 3-4 more balls
+    Score (spin out 2 then fire clock at high speed)
+  */
 
 }
 
