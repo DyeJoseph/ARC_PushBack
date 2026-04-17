@@ -529,30 +529,31 @@ int main()
   }
 }
 
+//Can be removed
 /// @brief Sets the PID values for the DriveTrain
-void setDriveTrainConstants()
-{
-    // Set the Drive PID values for the DriveTrain
-    chassis.setDriveConstants(
-        .9,  // Kp - Proportion Constant
-        0.0, // Ki - Integral Constant
-        2.5, // Kd - Derivative Constant
-        .5, // Settle Error
-        200, // Time to Settle
-        2500 // End Time 5000
-    );  
+// void setDriveTrainConstants()
+// {
+//     // Set the Drive PID values for the DriveTrain
+//     chassis.setDriveConstants(
+//         .9,  // Kp - Proportion Constant
+//         0.0, // Ki - Integral Constant
+//         2.5, // Kd - Derivative Constant
+//         .5, // Settle Error
+//         200, // Time to Settle
+//         2500 // End Time 5000
+//     );  
 
-    // Set the Turn PID values for the DriveTrain
-    chassis.setTurnConstants(
-        0.22,    // Kp - Proportion Constant
-        0.0,      // Ki - Integral Constant
-        1.5,      // Kd - Derivative Constant 
-        .75, //1.25    // Settle Error
-        200,    // Time to Settle
-        2500    // End Time
-    );
+//     // Set the Turn PID values for the DriveTrain
+//     chassis.setTurnConstants(
+//         0.22,    // Kp - Proportion Constant
+//         0.0,      // Ki - Integral Constant
+//         1.5,      // Kd - Derivative Constant 
+//         .75, //1.25    // Settle Error
+//         200,    // Time to Settle
+//         2500    // End Time
+//     );
     
-}
+// }
 
 //Auton Route Functions
 /// @brief Auton Slot 1 - Write code for route within this function.

@@ -11,10 +11,8 @@ enum MotorSpinType {VOLTS, PERCENTAGE, DPS, RPM};
 class Drive
 {
     private:
-
         motor_group leftDrive, rightDrive;
         inertial inertialSensor;
-
 
         float driveMaxVoltage;
         float turnMaxVoltage;
@@ -38,7 +36,9 @@ class Drive
 
         void setDriveConstants(float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
         void setTurnConstants(float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
-
+        void setDriveProfileForDistance(float distance, float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
+        void setTurnProfileForAngle(float angle, float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
+        
         void arcade();
         void tank();
 
