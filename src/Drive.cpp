@@ -10,20 +10,20 @@
 
 /// @brief Creates a array that holds the distances that the drive PID can be tuned for
 /// @param distance The distance to drive in inches
-std::array<float, 9> kDistances = {3.0f, 6.0f, 12.0f, 18.0f, 24.0f, 30.0f, 36.0f, 48.0f, 72.0f};
+std::array<float, 5> kDistances = {3.0f, /*6.0f*/ 12.0f, /*18.0f*/ 24.0f, /*30.0f*/ 36.0f, 48.0f /*72.0f*/};
 
 // Tuned drive profiles are stored globally so the tuner can update one bucket at runtime.
-std::array<PID, 9> drivePIDProfiles = {{
+std::array<PID, 5> drivePIDProfiles = {{
     // PID(Kp, Ki, Kd, settleError, timeToSettle, endTime)
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 3 inches
-    PID(1.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 6 inches
+    //PID(1.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 6 inches
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 12 inches
-    PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 18 inches
+    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 18 inches
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 24 inches
-    PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 30 inches
+    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 30 inches
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 36 inches
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 48 inches
-    PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f)   // 72 inches
+    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f)   // 72 inches
 }};
 
 /// @brief Selects the PID array index that is closest to the target distance
@@ -47,26 +47,26 @@ int getClosestDistanceProfileIndex(float distance) {
 
 /// @brief Retrieves the array with the PID profile for driving distances
 /// @return An array of PID profiles for each distance
-const std::array<PID, 9>& getDrivePIDProfiles() {
+const std::array<PID, 5>& getDrivePIDProfiles() {
     return drivePIDProfiles;
 }
 
 
 /// @brief Creates a array that holds the angles that the turn PID can be tuned for
 /// @param angle The angle to turn in degrees
-std::array<float, 8> kTurnAngles = {5.0f, 10.0f, 30.0f, 45.0f, 90.0f, 180.0f, 270.0f, 360.0f};
+std::array<float, 5> kTurnAngles = {5.0f, /*10.0f,*/ 30.0f, 45.0f, 90.0f, 180.0f, /*270.0f, 360.0f*/};
 
 // Tuned turn profiles are stored globally so the tuner can update one bucket at runtime.
-std::array<PID, 8> turnPIDProfiles = {{
+std::array<PID, 5> turnPIDProfiles = {{
     // PID(Kp, Ki, Kd, settleError, timeToSettle, endTime)
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 5 degrees
-    PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 10 degrees
+    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 10 degrees
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 30 degrees
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 45 degrees
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 90 degrees
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 180 degrees
-    PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 270 degrees
-    PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f)   // 360 degrees
+    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 270 degrees
+    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f)   // 360 degrees
 }};
 
 /// @brief Selects the PID array index that is closest to the target angle
@@ -90,7 +90,7 @@ int getClosestTurnProfileIndex(float angle) {
 
 /// @brief Retrieves the array with the PID profile for turning angles
 /// @return An array of PID profiles for each angle
-const std::array<PID, 8>& getTurnPIDProfiles() {
+const std::array<PID, 5>& getTurnPIDProfiles() {
     return turnPIDProfiles;
 }
 
@@ -328,7 +328,7 @@ void Drive::turnToAngle(float angle, float maxVoltage)
     updatePosition();
     angle = inTermsOfNegative180To180(angle);
     const int profileIndex = getClosestTurnProfileIndex(angle);
-    std::array<PID, 8> turnProfiles = getTurnPIDProfiles();
+    std::array<PID, 5> turnProfiles = getTurnPIDProfiles();
     PID turnPID = turnProfiles[profileIndex];
     do
     {
@@ -369,7 +369,7 @@ void Drive::turnToAngle(float angle, float maxVoltage, float endTime){
     updatePosition();
     angle = inTermsOfNegative180To180(angle);
     const int profileIndex = getClosestTurnProfileIndex(angle);
-    std::array<PID, 8> turnProfiles = getTurnPIDProfiles();
+    std::array<PID, 5> turnProfiles = getTurnPIDProfiles();
     PID turnPID = turnProfiles[profileIndex];
     do
     {
@@ -946,11 +946,6 @@ void Drive::moveToTarget(float x, float y, float targetHeading){
 
     const float maxDrive = driveMaxVoltage;         //Max Drive Volt
     const float maxTurn  = turnMaxVoltage;          //Max Turn Volt
-    const float minTurn  = 1.4f;                    //Min Turn Volt
-    const float minDrive = 2.0f;                    //Min Drive Volt
-
-    //Returns positive or negative 1 based on value
-    auto sgn = [](float v) { return (v >= 0.0f) ? 10.0f : -1.0f; };
 
     //PID Constants
     PID drivePID(0.6, 0.0001, 1.7, settleDist, driveTimeToSettle, driveEndTime);
