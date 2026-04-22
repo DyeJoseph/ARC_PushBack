@@ -60,8 +60,6 @@ class Drive
         void driveDistanceWithOdom(float distance, float timeLimit, float maxVoltage);
         void driveDistanceWithOdom(float distance, float timeLimit, float maxVoltage, float settleTime, float settleError);
             
-        void moveToTarget(float x, float y, float targetHeading);
-            
         void moveable();
 
         void setMaxVoltage(float volts);
