@@ -169,6 +169,12 @@ void Drive::setDriveKs(float ks)
     driveKs = ks;
 }
 
+void Drive::setStallDetection(float threshold, float timeout)
+{
+    stallThreshold = threshold;
+    stallTimeout   = timeout;
+}
+
 
 /* ============= */
 /* SET CONSTANTS */
@@ -500,6 +506,11 @@ void Drive::driveDistance(float distance, float maxVoltage)
 
     float prevLinearOutput = 0.0f;
 
+    // Stall detection: track position over time and bail if it hasn't changed.
+    float stallRefPos   = startPosition;
+    float stallTimer    = 0.0f;
+    bool  stallDetect   = (stallTimeout > 0.0f);
+
     // profileActive keeps the loop running until the profile finishes.
     // !linearPID.isSettled() is short-circuit-skipped while profileActive is true,
     // so isSettled() is only called (and "SETTLED" only printed) after the profile ends.
@@ -550,7 +561,25 @@ void Drive::driveDistance(float distance, float maxVoltage)
         linearOutput  = clamp(linearOutput,  -maxVoltage, maxVoltage);
         angularOutput = clamp(angularOutput, -maxVoltage, maxVoltage);
 
-        driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);;
+        driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
+        float pidContrib = linearOutput - feedforward;
+        std::cout << "pid:" << pidContrib << " ff:" << feedforward << " total:" << linearOutput << std::endl;
+
+        // Stall detection: reset the reference whenever the robot moves enough,
+        // otherwise accumulate time. Exit if stalled too long.
+        if (stallDetect) {
+            if (std::fabs(currentPos - stallRefPos) >= stallThreshold) {
+                stallRefPos = currentPos;
+                stallTimer  = 0.0f;
+            } else {
+                stallTimer += 10.0f;
+                if (stallTimer >= stallTimeout) {
+                    std::cout << "STALL------------------" << std::endl;
+                    break;
+                }
+            }
+        }
+
         wait(10, msec);
     }
 

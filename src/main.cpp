@@ -60,7 +60,7 @@ using namespace vex;
 
 void setDriveTrainConstants();
 void longToMatch();
-void prime();
+int prime();
 void unprime();
 void keepBottomThreeMatchLoad();
 void Auton_1();
@@ -550,9 +550,9 @@ int main()
 void setDriveTrainConstants()
 {
     chassis.setDriveConstants(
-        1.2,  // Kp
-        0.00005,  // Ki
-        4.6,  // Kd
+        1.0,  // Kp
+        0.0,  // Ki
+        16.0,  // Kd
         0.5,  // Settle Error
         200,  // Time to Settle
         5000  // End Time
@@ -570,7 +570,7 @@ void setDriveTrainConstants()
 
 //Easy use functions for auton
 //void unloadMatchLoader
-void prime(){
+int prime(){
   int timeout = 0;
   clockRotationSensor.setPosition(0, degrees);
   while(clockRotationSensor.position(degrees) <= 180.0 && timeout <= 500){
@@ -580,6 +580,7 @@ void prime(){
     }
     catapult.stop();
     catapult.setStopping(coast);
+    return 0;
 }
 
 void unprime(){
@@ -610,10 +611,9 @@ void keepBottomThreeMatchLoad(){
   // colorSortIntake.spin(forward, 100, percent);
   // chassis.driveDistance(-27);
   wait(900, msec);
-  prime();
+  vex::thread primeThread(prime);
   intake.spin(reverse, 10, percent);
   colorSortIntake.spin(forward, 15, percent);
-  wait(1000, msec);
   intake.stop();
 }
 //void match loader to goal
@@ -645,20 +645,20 @@ void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
 void Auton_2() // Wheel Diameter Calibration
 {   
 
-    chassis.setSCurveConstants(60.0f, 120.0f, 200.0f);
-    chassis.setDriveKff(12.0f / 200.0f);
+    chassis.setSCurveConstants(60.0f, 120.0f, 400.0f);
+    chassis.setDriveKff(12.0f / 78.9891f *.2f);
     chassis.setDriveKs(1.0f);
+    chassis.setStallDetection(0.05f, 500.0f);
 
-    //chassis.driveDistance(12);
-    //keepBottomThreeMatchLoad();
-    // longToMatch();
-    chassis.setPosition(0,0,0);
-    chassis.driveDistance(41);
+  
+     chassis.setPosition(0,0,0);
+    chassis.driveDistance(42);
     chassis.turnToAngle(270);
     matchLoad.set(true);
     intake.spin(forward, 100, pct);
     colorSortIntake.spin(forward, 100, percent);
-    chassis.driveDistance(-11.5);
+    chassis.setSCurveConstants(60.0f, 120.0f, 400.0f);
+    chassis.driveDistance(-12);
     keepBottomThreeMatchLoad();
     chassis.driveDistance(5);
     chassis.turnToAngle(275);
@@ -666,12 +666,10 @@ void Auton_2() // Wheel Diameter Calibration
     autonFireClock();
 
 
-    // chassis.setPosition(0,0,0);
-    // chassis.driveDistance(24);
-    // chassis.driveDistance(24);
-    // chassis.driveDistance(-48);
-    //smallDrivingTest(chassis);
-    //largeDrivingTest(chassis);
+    //chassis.driveDistance(24);
+
+
+
 
     std::cout << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
     

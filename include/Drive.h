@@ -28,6 +28,9 @@ class Drive
         float scurveMaxJerk  = 0.0f;  // in/s^3 — primary slip-reduction knob
         float driveKff       = 0.0f;  // V / (in/s) feedforward gain
         float driveKs        = 0.0f;  // V — static friction compensation (min voltage to move)
+
+        float stallThreshold = 0.5f;  // inches — minimum movement per stallTimeout to not be stalled
+        float stallTimeout   = 500.0f;// ms     — 0 disables stall detection
         
         int odomType;
             
@@ -47,6 +50,7 @@ class Drive
         void setSCurveConstants(float maxVel, float maxAccel, float maxJerk);
         void setDriveKff(float kff);
         void setDriveKs(float ks);
+        void setStallDetection(float threshold, float timeout);
         // void setDriveProfileForDistance(float distance, float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
         // void setTurnProfileForAngle(float angle, float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
         
