@@ -3,6 +3,7 @@
 #include "vex.h"
 #include "odom.h"
 #include "PID.h"
+#include "sensorConversion.h"
 
 using namespace vex;
 

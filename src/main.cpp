@@ -190,7 +190,7 @@ void autonomous()
   // }
 
   wait(100, msec);
-  Auton_2();
+  Auton_3();
   //Auton_1();
 
   //setDriveTrainConstants();
@@ -546,12 +546,19 @@ void setDriveTrainConstants()
     );
 
     chassis.setTurnConstants(
-        0.4,  // Kp
-        0.0,   // Ki
-        1.5,   // Kd
-        0.75,  // Settle Error
-        200,   // Time to Settle
-        2500   // End Time
+        // 0.4,  // Kp
+        // 0.0,   // Ki
+        // 1.5,   // Kd
+        // 0.75,  // Settle Error
+        // 200,   // Time to Settle
+        // 2500   // End Time
+
+        0.22,    // Kp - Proportion Constant
+        0.0,      // Ki - Integral Constant
+        1.5,      // Kd - Derivative Constant 
+        .75, //1.25    // Settle Error
+        200, 
+        1000 
     );
 }
 
@@ -660,7 +667,9 @@ void Auton_2() // Wheel Diameter Calibration
     chassis.driveDistance(5);
     chassis.turnToAngle(275);
     chassis.driveDistance(22);
+    intakeFlap.set(true);
     autonFireClock();
+    intakeFlap.set(false);
 
 
     //chassis.driveDistance(24);
@@ -699,7 +708,35 @@ void Auton_2() // Wheel Diameter Calibration
 /// @brief Auton Slot 3 - Write code for route within this function.
 void Auton_3() //1 MINUTE SKI
 {   
+  chassis.setSCurveConstants(60.0f, 120.0f, 400.0f);
+  chassis.setDriveKff(12.0f / 78.9891f *.2f);
+  chassis.setDriveKs(1.0f);
+  chassis.setStallDetection(0.05f, 500.0f);
+  chassis.setPosition(0,0,0);
 
+
+  chassis.driveDistance(42);
+  chassis.turnToAngle(270);
+  matchLoad.set(true);
+  intake.spin(forward, 100, pct);
+  colorSortIntake.spin(forward, 100, percent);
+  chassis.driveDistance(-12);
+  keepBottomThreeMatchLoad();
+  chassis.driveDistance(5);
+  chassis.turnToAngle(275);
+  chassis.driveDistance(22);
+  intakeFlap.set(true);
+  autonFireClock(20);
+  intakeFlap.set(false);
+  wait(1, sec);
+
+  chassis.setSCurveConstants(60.0f, 120.0f, 600.0f);
+  chassis.setDriveKff(12.0f / 78.9891f *.2f);
+  chassis.setDriveKs(1.0f);
+  chassis.setStallDetection(0.05f, 500.0f);
+  chassis.setPosition(0,0,270);
+  // chassis.driveDistance(24);
+  longGoalWingPush();
 }
 
 /// @brief Auton Slot 4 - Write code for route within this function.

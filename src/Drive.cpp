@@ -1020,6 +1020,13 @@ float Drive::getCurrentMotorPosition()
     return (leftPosition + rightPosition) / 2;
 }
 
+// float Drive::getCurrentMotorPosition(){
+//     float leftPosition = degToInches(getMotorEncoderPosition(LT1, LT2, LT3, LT4, LT5), wheelDiameter);
+//     float rightPosition = degToInches(getMotorEncoderPosition(RT1, RT2, RT3, RT4, RT5), wheelDiameter);
+
+//     return (leftPosition + rightPosition) / 2;
+// }
+
 /// @brief Sets brakes to coast and displays position location to the robot brain
 void Drive::moveable(){
     //updates odom and printx x and y position
