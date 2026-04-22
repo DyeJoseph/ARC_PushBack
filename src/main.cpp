@@ -63,6 +63,7 @@ void longToMatch();
 int prime();
 void unprime();
 void keepBottomThreeMatchLoad();
+void longGoalWingPush();
 void Auton_1();
 void Auton_2();
 void Auton_3();
@@ -190,6 +191,7 @@ void autonomous()
 
   wait(100, msec);
   Auton_2();
+  //Auton_1();
 
   //setDriveTrainConstants();
 
@@ -432,7 +434,7 @@ void autonFireClock(){
     }
   }else{
     //Hood is down
-    while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1250){ //Avg time to complete is ~1000ms
+    while(clockRotationSensor.position(degrees) <= 535.0 && timeout <= 1250){ //Avg time to complete is ~1000ms
       if(clockRotationSensor.position(degrees) >= 250.0){
         //Decrease speed after first stage is complete
         spinSpeed = 20.0;
@@ -552,7 +554,7 @@ void setDriveTrainConstants()
     chassis.setDriveConstants(
         1.0,  // Kp
         0.0,  // Ki
-        16.0,  // Kd
+        14.0,  // Kd
         0.5,  // Settle Error
         200,  // Time to Settle
         5000  // End Time
@@ -618,6 +620,18 @@ void keepBottomThreeMatchLoad(){
 }
 //void match loader to goal
 
+void longGoalWingPush(){
+  chassis.turnToAngle(0);
+  chassis.turnToAngle(280);
+  chassis.driveDistance(20);
+  // chassis.driveDistance(-10);
+  // chassis.turnToAngle(215);
+  // toggleWings();
+  // chassis.driveDistance(10);
+  // toggleWings();
+
+}
+
 
 
 
@@ -627,17 +641,16 @@ void keepBottomThreeMatchLoad(){
 /// @brief Auton Slot 1 - Write code for route within this function.
 void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
 {   
-  chassis.driveMotors(12, 12);
-  wait(500, msec);
+  chassis.setSCurveConstants(60.0f, 120.0f, 600.0f);
+  chassis.setDriveKff(12.0f / 78.9891f *.2f);
+  chassis.setDriveKs(1.0f);
+  chassis.setStallDetection(0.05f, 500.0f);
+  chassis.setPosition(0,0,270);
+  // chassis.driveDistance(24);
+  longGoalWingPush();
 
-  // Sample position over 500ms window
-  float p1 = chassis.getCurrentMotorPosition();
-  wait(500, msec);
-  float p2 = chassis.getCurrentMotorPosition();
-  chassis.brake();
-
-  float maxSpeed = (p2 - p1) / 0.5f;  // in/s
-  std::cout << "Max speed: " << maxSpeed << " in/s" << std::endl;
+  std::cout << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
+    
 
 }
 
@@ -649,15 +662,14 @@ void Auton_2() // Wheel Diameter Calibration
     chassis.setDriveKff(12.0f / 78.9891f *.2f);
     chassis.setDriveKs(1.0f);
     chassis.setStallDetection(0.05f, 500.0f);
-
-  
      chassis.setPosition(0,0,0);
+
+
     chassis.driveDistance(42);
     chassis.turnToAngle(270);
     matchLoad.set(true);
     intake.spin(forward, 100, pct);
     colorSortIntake.spin(forward, 100, percent);
-    chassis.setSCurveConstants(60.0f, 120.0f, 400.0f);
     chassis.driveDistance(-12);
     keepBottomThreeMatchLoad();
     chassis.driveDistance(5);
