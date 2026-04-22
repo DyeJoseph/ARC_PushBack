@@ -13,7 +13,12 @@
 #include "Drive.h"
 #include "semiPIDTuner.h"
 #include "images.h"
+<<<<<<< Updated upstream
 #include "sensorConversion.h"
+=======
+#include "pidTests.h"
+
+>>>>>>> Stashed changes
 
 using namespace vex;
 
