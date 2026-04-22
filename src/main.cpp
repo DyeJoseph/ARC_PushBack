@@ -166,66 +166,57 @@ void autonomous()
   // rotation2.resetPosition();
   // inertial1.resetHeading();
 
-  int port = 9;
-  vexGenericSerialEnable(port, 0);
-  vexGenericSerialBaudrate(port, 115200);
+  // int port = 9;
+  // vexGenericSerialEnable(port, 0);
+  // vexGenericSerialBaudrate(port, 115200);
 
-  uint8_t buf[64];
-  float enc1;
-  float enc2;
-  float heading;
+  // uint8_t buf[64];
+  // float enc1;
+  // float enc2;
+  // float heading;
 
-  while (true) {
-    int n = vexGenericSerialReceive(port, buf, sizeof(buf));
+  // while (true) {
+  //   int n = vexGenericSerialReceive(port, buf, sizeof(buf));
 
-    getSensorReading(buf, n, enc1, enc2, heading);
+  //   getSensorReading(buf, n, enc1, enc2, heading);
 
-    wait(10, msec);
-  }
+  //   wait(10, msec);
+  // }
 
   wait(100, msec);
 
-  // setDriveTrainConstants();
+  setDriveTrainConstants();
 
-  // chassis.setPosition(0, 0, 0);
-  // chassis.moveable();
 
-  // switch (lastPressed) 
-  // {
-  //   case 0:
-  //     Auton_1();
-  //     break;
-  //   case 1:
-  //     Auton_2();
-  //     break;
-  //   case 2:
-  //     Auton_3();
-  //     break;
-  //   case 3:
-  //     Auton_4();
-  //     break;
-  //   case 4:
-  //     Auton_5();
-  //     break;
-  //   case 5:
-  //     Auton_6();
-  //     break;
-  //   case 6:
-  //     Auton_7();
-  //     break;
-  //   case 7:
-  //     Auton_8();
-  //     break;
-  //   default:
-  //     break;
-  // }
-
-  //autoPIDTest();
-    // runStepResponseTest(12.0, 1);
-    // vex::wait(5000, vex::msec); // let it settle between runs
-    // runStepResponseTest(8.0,  2);
-    // vex::wait(5000, vex::msec);
-    // runStepResponseTest(4.0,  3);
+  switch (lastPressed) 
+  {
+    case 0:
+      Auton_1();
+      break;
+    case 1:
+      Auton_2();
+      break;
+    case 2:
+      Auton_3();
+      break;
+    case 3:
+      Auton_4();
+      break;
+    case 4:
+      Auton_5();
+      break;
+    case 5:
+      Auton_6();
+      break;
+    case 6:
+      Auton_7();
+      break;
+    case 7:
+      Auton_8();
+      break;
+    default:
+      break;
+  }
 }
 
 /// @brief Runs during the UserControl section of the competition
@@ -233,6 +224,8 @@ void usercontrol()
 {
   //REMOVE "//" BELOW to run Semi-Automatic PID Test
   // semiPIDTest();
+  /////////////////////////////////////
+
   drawLogo();
 
   // User control code here, inside the loop

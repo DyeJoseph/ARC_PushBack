@@ -10,20 +10,16 @@
 
 /// @brief Creates a array that holds the distances that the drive PID can be tuned for
 /// @param distance The distance to drive in inches
-std::array<float, 5> kDistances = {3.0f, /*6.0f*/ 12.0f, /*18.0f*/ 24.0f, /*30.0f*/ 36.0f, 48.0f /*72.0f*/};
+std::array<float, 5> kDistances = {3.0f, 12.0f, 24.0f, 36.0f, 48.0f};
 
 // Tuned drive profiles are stored globally so the tuner can update one bucket at runtime.
 std::array<PID, 5> drivePIDProfiles = {{
     // PID(Kp, Ki, Kd, settleError, timeToSettle, endTime)
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 3 inches
-    //PID(1.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 6 inches
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 12 inches
-    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 18 inches
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 24 inches
-    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 30 inches
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 36 inches
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 48 inches
-    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f)   // 72 inches
 }};
 
 /// @brief Selects the PID array index that is closest to the target distance
@@ -54,19 +50,16 @@ const std::array<PID, 5>& getDrivePIDProfiles() {
 
 /// @brief Creates a array that holds the angles that the turn PID can be tuned for
 /// @param angle The angle to turn in degrees
-std::array<float, 5> kTurnAngles = {5.0f, /*10.0f,*/ 30.0f, 45.0f, 90.0f, 180.0f, /*270.0f, 360.0f*/};
+std::array<float, 5> kTurnAngles = {5.0f, 30.0f, 45.0f, 90.0f, 180.0f};
 
 // Tuned turn profiles are stored globally so the tuner can update one bucket at runtime.
 std::array<PID, 5> turnPIDProfiles = {{
     // PID(Kp, Ki, Kd, settleError, timeToSettle, endTime)
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 5 degrees
-    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 10 degrees
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 30 degrees
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 45 degrees
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 90 degrees
     PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 180 degrees
-    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f),  // 270 degrees
-    //PID(0.0f, 0.0000f, 0.0f, 0.0f, 0.0f, 0.0f)   // 360 degrees
 }};
 
 /// @brief Selects the PID array index that is closest to the target angle
@@ -94,7 +87,9 @@ const std::array<PID, 5>& getTurnPIDProfiles() {
     return turnPIDProfiles;
 }
 
-
+/* ============ */
+/*  CONSTRUCTOR */
+/* ============ */
 
 
 
@@ -929,143 +924,6 @@ void Drive::movetopos(float x, float y, float targetHeading) {
         vex::task::sleep(dt_ms);
     }
 
-    brake();
-}
-
-/// @brief Drive to a specific X and Y coordinate and ends at a target heading
-/// @param x Target X position
-/// @param y Target Y position
-/// @param targetHeading Target heading position to end facing towards
-void Drive::moveToTarget(float x, float y, float targetHeading){
-    const float settleDist = driveSettleError; //Drive error
-    const float settleAng  = turnSettleError; //Turn error
-    const float turnOnlyAngle = 38.0f; //If robot is more than ___ deg away from angle it will turn first, prevent backward arching
-
-    const float dt_ms = 10.0f;                      //Loop Timing
-    const int timeout_ms = 10000;            //Timeout Time
-
-    const float maxDrive = driveMaxVoltage;         //Max Drive Volt
-    const float maxTurn  = turnMaxVoltage;          //Max Turn Volt
-
-    //PID Constants
-    PID drivePID(0.6, 0.0001, 1.7, settleDist, driveTimeToSettle, driveEndTime);
-    PID turnPID (0.4, 0.0001, 1.5, settleAng,  driveTimeToSettle, driveEndTime);
-
-    int elapsed = 0;
-
-    //Main Loop
-    while(elapsed < timeout_ms){
-        updatePosition();
-
-        //CURRENT POSITION
-        const float currX = chassisOdometry.getXPosition();
-        const float currY = chassisOdometry.getYPosition();
-        const float currHeading = chassisOdometry.getHeading();
-        
-        //TARGET POSITION
-        const float dx = x - currX;
-        const float dy = y - currY;
-        const float dist = hypot(dx, dy);
-
-        //TARGET DIRECTION
-        const float targetAngle = atan2(dx, dy) * (180.0f / M_PI);
-        float headingError = inTermsOfNegative180To180(targetAngle - currHeading);
-
-        //check if robot is opposite of our target and drive reverse
-        bool reverse = false;
-        if (fabs(headingError) > 90.0f) {
-            reverse = true;
-            headingError = inTermsOfNegative180To180(headingError + 180.0f);
-        }
-
-        //Which direction I want to end facing
-        float finalHeadingErr = inTermsOfNegative180To180(targetHeading - currHeading);
-        if (reverse){
-            finalHeadingErr = inTermsOfNegative180To180(finalHeadingErr);
-        }
-
-         //SETTLE CONDITION
-        if (dist < settleDist && fabs(finalHeadingErr) < settleAng) {
-                std::cout << "MoveToTarget Settled"
-                        << " , CurrPos(" << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << ")"
-                        << " , Dist: " << dist
-                        << " , HeadErr: " << finalHeadingErr
-                        << " , Time: " << elapsed << "ms" << std::endl;
-                driveMotors(0, 0);
-                break;
-            }
-
-        float driveOut = 0;
-        float turnOut  = 0;
-        
-        //How far to drive, reverse if needed
-        float forward = dist * cos(degToRad(headingError)); //
-        if (reverse){
-            forward = -forward;
-        }
-
-        //Turn only, prevents arcs
-        if (dist < settleDist * 2 && fabs(finalHeadingErr) > settleAng){
-            driveOut = 0;
-            turnOut  = turnPID.compute(finalHeadingErr);
-        }
-        else if (fabs(headingError) > turnOnlyAngle && dist > settleDist *2){
-            driveOut = 0;
-            turnOut = turnPID.compute(headingError);
-        }else{
-            driveOut = drivePID.compute(forward);
-            turnOut  = turnPID.compute(headingError);
-        }
-        
-
-        //Slow down when closer to target(Precision)
-        /*float slowScale = clamp(dist / 20.0f, 0.15f, 1.0f);
-        if (dist >= settleDist * 2.0f) {
-            driveOut *= slowScale;
-            turnOut  *= slowScale;
-        }*/
-
-        /*float slowScale = clamp(dist / 10.0f, 0.15f, 1.0f);
-        float turnScale  = clamp(fabs(finalHeadingErr) / 100.0f, 0.25f, 1.0f);
-        driveOut *= slowScale;
-        turnOut  *= turnScale;*/
-
-        //Clamping 
-        driveOut = clamp(driveOut, -maxDrive, maxDrive);
-        turnOut  = clamp(turnOut,  -maxTurn,  maxTurn);
-
-        //Minimum Voltage
-        // if (fabs(driveOut) > 0 && fabs(driveOut) < minDrive)
-        //     driveOut = sgn(driveOut) * minDrive;
-        // if (fabs(turnOut) > 0 && fabs(turnOut) < minTurn)
-        //     turnOut = sgn(turnOut) * minTurn;
-
-        //Mix drive and turn to adjust how robot will drive
-        const float left  = driveOut + turnOut;      
-        const float right = driveOut - turnOut;
-
-        //Drive the Motors of the robot
-        driveMotors(left, right);        
-        // std::cout << "\nValues "
-        //           << " , CurrPos(" << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << ")"
-        //           << " , Target: " << dist
-        //           << " , DriveVolts(" << driveOut << ", " << turnOut << ")"
-        //           << " , Heading: " << chassisOdometry.getHeading();
-
-        //Adds to Elapsed time for timeout
-        elapsed += dt_ms;  
-        vex::task::sleep(dt_ms);
-
-    }
-    //TIMEOUT
-    if (elapsed >= timeout_ms) {
-            std::cout << "\nMoveToTarget TIMEOUT"
-                    << " , Target(" << x << ", " << y << ")"
-                    << " , Actual(" << chassisOdometry.getXPosition() << ", " << chassisOdometry.getYPosition() << ")"
-                    << " , FinalHeading: " << targetHeading
-                    << " , ActualHeading: " << chassisOdometry.getHeading() << std::endl;
-
-        }
     brake();
 }
 
