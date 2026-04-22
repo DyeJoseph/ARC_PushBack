@@ -51,7 +51,7 @@ digital_out midGoalBlocking = digital_out(Brain.ThreeWirePort.H);
 digital_out odomRetraction = digital_out(Brain.ThreeWirePort.D);
 
 //Inertial
-inertial inertial1 = inertial(PORT10);
+inertial inertial1 = inertial(PORT8);
 
 
 

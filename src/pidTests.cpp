@@ -6,14 +6,18 @@
 /// @param chassis Reference to the drivetrain class to used to control the robots movement.
 void smallDrivingTest(Drive& chassis){
   if (chassis.getOdomType() != NO_ODOM){
-    for (int d = 10; d < 0; d--){
+    for (int d = 10; d > 0; d--){
       chassis.driveDistanceWithOdom(d);
+      wait(100, msec);
       chassis.driveDistanceWithOdom(-d);
+      wait(100, msec);
     }
   }else{
-    for (int d = 10; d < 0; d--){
+    for (int d = 10; d > 0; d--){
       chassis.driveDistance(d);
+      wait(100, msec);
       chassis.driveDistance(-d);
+      wait(100, msec);
     }
   }
 }
@@ -26,12 +30,16 @@ void largeDrivingTest(Drive& chassis){
   if (chassis.getOdomType() != NO_ODOM){
     for (int d = 10; d < 72; d+= 6){
       chassis.driveDistanceWithOdom(d);
+      wait(100, msec);
       chassis.driveDistanceWithOdom(-d);
+      wait(100, msec);
     }
   }else{
     for (int d = 10; d < 72; d+= 6){
       chassis.driveDistance(d);
+      wait(100, msec);
       chassis.driveDistance(-d);
+      wait(100, msec);
     }
 }
 }

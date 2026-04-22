@@ -13,12 +13,8 @@
 #include "Drive.h"
 #include "semiPIDTuner.h"
 #include "images.h"
-<<<<<<< Updated upstream
 #include "sensorConversion.h"
-=======
 #include "pidTests.h"
-
->>>>>>> Stashed changes
 
 using namespace vex;
 
@@ -27,7 +23,7 @@ using namespace vex;
   // Competition Instance
   competition Competition;
 
-  int odomType = TWO_AT_45;
+  int odomType = NO_ODOM;
 
   bool isColorSorting = true;
   bool odomDebugEnabled = true;
@@ -48,12 +44,12 @@ using namespace vex;
   (
     motor_group(LT1, LT2, LT3, LT4, LT5), // Left drive train motors
     motor_group(RT1, RT2, RT3, RT4, RT5), // Right drive train motors
-    PORT20,               // Inertial Sensor Port
-    2.66,              // The diameter size of the wheel in inches 2.66
+    PORT8,               // Inertial Sensor Port
+    2.40,              // The diameter size of the wheel in inches 2.66
     1,                   // 
     12,                   // The maximum amount of the voltage used in the drivebase (1 - 12)
     odomType,
-    1.955,                  //Odometry wheel diameter (set to zero if no odom) (1.96 robot behind by .2)
+    0.0,                  //Odometry wheel diameter (set to zero if no odom) (1.96 robot behind by .2)
     -1.280,               //Odom pod1 offset -3.867
     -1.280                //Odom pod2 offset -3.867
   );
@@ -62,7 +58,7 @@ using namespace vex;
 
 ///////////////////////// Prototypes /////////////////////////////////
 
-// void setDriveTrainConstants();
+void setDriveTrainConstants();
 void Auton_1();
 void Auton_2();
 void Auton_3();
@@ -90,7 +86,7 @@ void autonFireClock();
 /// @brief Runs before the competition starts
 void preAuton() 
 {
-  // setDriveTrainConstants();
+  setDriveTrainConstants();
   bottomColorSort.integrationTime(10);
   bottomColorSort.setLight(ledState::on);
   bottomColorSort.brightness(true);
@@ -189,10 +185,11 @@ void autonomous()
   // }
 
   wait(100, msec);
+  Auton_2();
 
   //setDriveTrainConstants();
 
-
+/*
   switch (lastPressed) 
   {
     case 0:
@@ -221,14 +218,15 @@ void autonomous()
       break;
     default:
       break;
-  }
+  }*/
 }
 
 /// @brief Runs during the UserControl section of the competition
 void usercontrol() 
 {
   //REMOVE "//" BELOW to run Semi-Automatic PID Test
-  // semiPIDTest();
+  //chassis.setDriveSlew(.5f);
+  //semiPIDTest();
   /////////////////////////////////////
 
   drawLogo();
@@ -544,50 +542,96 @@ int main()
   }
 }
 
-//Can be removed
 /// @brief Sets the PID values for the DriveTrain
-// void setDriveTrainConstants()
-// {
-//     // Set the Drive PID values for the DriveTrain
-//     chassis.setDriveConstants(
-//         .9,  // Kp - Proportion Constant
-//         0.0, // Ki - Integral Constant
-//         2.5, // Kd - Derivative Constant
-//         .5, // Settle Error
-//         200, // Time to Settle
-//         2500 // End Time 5000
-//     );  
+void setDriveTrainConstants()
+{
+    chassis.setDriveConstants(
+        1.2,  // Kp
+        0.00005,  // Ki
+        4.6,  // Kd
+        0.5,  // Settle Error
+        200,  // Time to Settle
+        5000  // End Time
+    );
 
-//     // Set the Turn PID values for the DriveTrain
-//     chassis.setTurnConstants(
-//         0.22,    // Kp - Proportion Constant
-//         0.0,      // Ki - Integral Constant
-//         1.5,      // Kd - Derivative Constant 
-//         .75, //1.25    // Settle Error
-//         200,    // Time to Settle
-//         2500    // End Time
-//     );
-    
-// }
+    chassis.setTurnConstants(
+        0.22,  // Kp
+        0.0,   // Ki
+        1.5,   // Kd
+        0.75,  // Settle Error
+        200,   // Time to Settle
+        2500   // End Time
+    );
+}
+
+//Easy use functions for auton
+//void unloadMatchLoader
+//void drive from long goal to match loader
+//void match loader to goal
+
+
+
+
+
 
 //Auton Route Functions
 /// @brief Auton Slot 1 - Write code for route within this function.
 void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
 {   
-  /*  Plan for matchloading:
-    Take in all balls (no color sort, just full intake)
-    Prime catapult (separates/traps 4 red in top intake)
-    Reverse entire intake (slowly reverse color sort motor so it still goes out to front)
-    Once all ejected, take in 3-4 more balls
-    Score (spin out 2 then fire clock at high speed)
-  */
+  chassis.driveMotors(12, 12);
+  wait(500, msec);
+
+  // Sample position over 500ms window
+  float p1 = chassis.getCurrentMotorPosition();
+  wait(500, msec);
+  float p2 = chassis.getCurrentMotorPosition();
+  chassis.brake();
+
+  float maxSpeed = (p2 - p1) / 0.5f;  // in/s
+  std::cout << "Max speed: " << maxSpeed << " in/s" << std::endl;
 
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.
-void Auton_2() // UCF Route
-{
+void Auton_2() // Wheel Diameter Calibration
+{   
 
+    chassis.setSCurveConstants(60.0f, 120.0f, 200.0f);
+    chassis.setDriveKff(12.0f / 200.0f);
+    chassis.setDriveKs(1.0f);
+    chassis.setPosition(0,0,0);
+    chassis.driveDistance(24);
+    chassis.driveDistance(24);
+    chassis.driveDistance(-48);
+
+    //smallDrivingTest(chassis);
+    //largeDrivingTest(chassis);
+    std::cout << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
+    
+    // const float SET_DIAMETER = 2.49f;
+
+    // float startPos = chassis.getCurrentMotorPosition();
+
+    // // Drive open-loop at 6V for 3 seconds, then measure
+    // chassis.driveMotors(6, 6);
+    // wait(1500, msec);
+    // chassis.brake();
+    // wait(250, msec);
+
+    // float reportedInches = chassis.getCurrentMotorPosition() - startPos;
+
+    // Brain.Screen.clearScreen();
+    // Brain.Screen.setCursor(1, 1);
+    // Brain.Screen.print("Reported: %.2f in", reportedInches);
+    // Brain.Screen.newLine();
+    // Brain.Screen.print("Measure actual dist.");
+    // Brain.Screen.newLine();
+    // Brain.Screen.print("Corrected diam =");
+    // Brain.Screen.newLine();
+    // Brain.Screen.print("(actual / %.2f) * %.2f", reportedInches, SET_DIAMETER);
+
+    // std::cout << "Reported: " << reportedInches << " in" << std::endl;
+    // std::cout << "Corrected diam = (actual / " << reportedInches << ") * " << SET_DIAMETER << std::endl;
 }
 
 /// @brief Auton Slot 3 - Write code for route within this function.

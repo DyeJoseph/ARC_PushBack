@@ -16,11 +16,18 @@ class Drive
 
         float driveMaxVoltage;
         float turnMaxVoltage;
+        float driveSlew = 1.0f; // max voltage increase per 10ms tick
 
         float wheelRatio, wheelDiameter;
 
         float driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime;
         float turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime;
+
+        float scurveMaxVel   = 0.0f;  // in/s   — 0 disables the profile
+        float scurveMaxAccel = 0.0f;  // in/s^2
+        float scurveMaxJerk  = 0.0f;  // in/s^3 — primary slip-reduction knob
+        float driveKff       = 0.0f;  // V / (in/s) feedforward gain
+        float driveKs        = 0.0f;  // V — static friction compensation (min voltage to move)
         
         int odomType;
             
@@ -33,11 +40,15 @@ class Drive
 
         void setDriveMaxVoltage(float maxVoltage);
         void setTurnMaxVoltage(float maxVoltage);
+        void setDriveSlew(float slew);
 
         void setDriveConstants(float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
         void setTurnConstants(float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
-        void setDriveProfileForDistance(float distance, float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
-        void setTurnProfileForAngle(float angle, float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
+        void setSCurveConstants(float maxVel, float maxAccel, float maxJerk);
+        void setDriveKff(float kff);
+        void setDriveKs(float ks);
+        // void setDriveProfileForDistance(float distance, float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
+        // void setTurnProfileForAngle(float angle, float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
         
         void arcade();
         void tank();

@@ -26,6 +26,7 @@ class PID
     float computeDebug(float error);
 
     bool isSettled();
+    void resetSettle();
 
     float getTimeSpentSettled(){return timeSpentSettled;}
 };

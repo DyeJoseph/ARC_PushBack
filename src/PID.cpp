@@ -102,6 +102,11 @@ float PID::computeDebug(float error)
     return output;
 }
 
+void PID::resetSettle()
+{
+    timeSpentSettled = 0;
+}
+
 /// @brief Determines if the current PID state is completely settled
 /// @return Returns TRUE if settled, Returns FALSE if not settled
 bool PID::isSettled()
@@ -112,7 +117,7 @@ bool PID::isSettled()
     }
         
     if(timeSpentSettled > timeToSettle){
-        std::cout << "SETTLED-----------------" << std::endl;
+        std::cout << "SETTLED-----------------" << runTime << std::endl;
         return true;
     }
         
