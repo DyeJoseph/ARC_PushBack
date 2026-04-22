@@ -82,7 +82,7 @@ void toggleWings();
 int fireClock();
 void splitPrimeClock();
 void splitReleaseClock();
-void autonFireClock();
+void autonFireClock(int fireSpeed);
 
 //////////////////////////////////////////////////////////////////////
 
@@ -418,41 +418,26 @@ int fireClock(){
 }
 
 /// @brief Non-threaded function to fire the clock in autonomous
-void autonFireClock(){
-  intakeFlap.set(true);
+void autonFireClock(int fireSpeed = 100){
   int timeout = 0;
   int spinSpeed = 100;
   isPrimed = false;
-  if(liftState){
-    //Hood is up
-    while(clockRotationSensor.position(degrees) <= 530.0 && timeout <= 750){ //Avg time to complete is ~550ms
-      catapult.spin(forward, 100, percent);
-      timeout += 10;
-      wait(10, msec);
-    }
-  }else{
-    //Hood is down
-    while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1250){ //Avg time to complete is ~1000ms
-      if(clockRotationSensor.position(degrees) >= 250.0){
-        //Decrease speed after first stage is complete
-        spinSpeed = 20.0;
-      } 
-      catapult.spin(forward, spinSpeed, percent);
-      timeout += 10;
-      wait(10, msec);
-    }
+  while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1250){ //Avg time to complete is ~1000ms
+    if(clockRotationSensor.position(degrees) >= 250.0){
+      spinSpeed = fireSpeed;
+    } 
+    catapult.spin(forward, spinSpeed, percent);
+    timeout += 10;
+    wait(10, msec);
   }
   timeout = 0;
   while(clockRotationSensor.position(degrees) >= 45.0 || fabs(catapult.velocity(vex::rpm)) >= 5){
     catapult.spin(reverse, 100, percent);
     timeout += 10;
-    if(timeout >= 500)
-      intakeFlap.set(false);
     if(timeout >= 2000)
       break;
     wait(10, msec);
   }
-  intakeFlap.set(false);
   clockRotationSensor.resetPosition();
   catapult.stop();
 }
