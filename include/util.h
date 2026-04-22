@@ -4,7 +4,6 @@
 #include <cmath>
 #include <fstream>
 
-
 /// @brief Clamps the input in between the min and max value
 /// @param input The value being clamped
 /// @param min The minimum value that the output can be

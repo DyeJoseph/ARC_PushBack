@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <vector>
 
 float getLeftRotation(uint8_t* b);
 float getRightRotation(uint8_t* b);

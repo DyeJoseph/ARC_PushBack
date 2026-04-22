@@ -57,7 +57,7 @@ using namespace vex;
 
 ///////////////////////// Prototypes /////////////////////////////////
 
-void setDriveTrainConstants();
+// void setDriveTrainConstants();
 void Auton_1();
 void Auton_2();
 void Auton_3();
@@ -85,7 +85,7 @@ void autonFireClock();
 /// @brief Runs before the competition starts
 void preAuton() 
 {
-  setDriveTrainConstants();
+  // setDriveTrainConstants();
   bottomColorSort.integrationTime(10);
   bottomColorSort.setLight(ledState::on);
   bottomColorSort.brightness(true);
@@ -185,7 +185,7 @@ void autonomous()
 
   wait(100, msec);
 
-  // setDriveTrainConstants();
+  //setDriveTrainConstants();
 
   // chassis.setPosition(0, 0, 0);
   // chassis.moveable();
@@ -329,6 +329,23 @@ void usercontrol()
       }else{
         intakeFlap.set(false);
       }
+
+      //TESTING
+      if(Controller1.ButtonX.pressing())
+        odomRetraction.set(true);
+      else
+        odomRetraction.set(false);
+      
+      if(Controller1.ButtonY.pressing())
+        frontIntake.set(true);
+      else
+        frontIntake.set(false);
+
+      if(Controller1.ButtonB.pressing())
+        midGoalBlocking.set(true);
+      else
+        midGoalBlocking.set(false);
+
     timeSinceSeenWrong += 20;
     wait(20, msec);
   }

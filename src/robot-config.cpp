@@ -42,12 +42,13 @@ motor leftCata = motor(PORT5, ratio18_1, true);
 motor_group catapult = motor_group(leftCata, rightCata);
 
 //Pneumatics
-digital_out intakeFlap = digital_out(Brain.ThreeWirePort.F); //Correct
-digital_out wings = digital_out(Brain.ThreeWirePort.G);
-digital_out intakeLift = digital_out(Brain.ThreeWirePort.A);
-digital_out frontIntake = digital_out(Brain.ThreeWirePort.A);
-digital_out matchLoad = digital_out(Brain.ThreeWirePort.E); //Correct
-digital_out midGoalBlocking = digital_out(Brain.ThreeWirePort.A);
+digital_out intakeFlap = digital_out(Brain.ThreeWirePort.G);
+digital_out wings = digital_out(Brain.ThreeWirePort.F);
+digital_out intakeLift = digital_out(Brain.ThreeWirePort.C);
+digital_out frontIntake = digital_out(Brain.ThreeWirePort.E);
+digital_out matchLoad = digital_out(Brain.ThreeWirePort.B);
+digital_out midGoalBlocking = digital_out(Brain.ThreeWirePort.H);
+digital_out odomRetraction = digital_out(Brain.ThreeWirePort.D);
 
 //Inertial
 inertial inertial1 = inertial(PORT10);

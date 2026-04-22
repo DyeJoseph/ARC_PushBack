@@ -53,5 +53,6 @@ extern digital_out intakeLift;
 extern digital_out frontIntake;
 extern digital_out matchLoad;
 extern digital_out midGoalBlocking;
+extern digital_out odomRetraction;
 
 extern inertial inertial1;

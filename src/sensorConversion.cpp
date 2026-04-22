@@ -77,3 +77,29 @@ void getSensorReading(uint8_t *buf, int n, float &enc1, float &enc2, float &head
       }
     }
 }
+
+float getMotorEncoderPosition(vex::motor m1, vex::motor m2, vex::motor m3, vex::motor m4, vex::motor m5){
+  vex::motor motorArr[5] = {m1, m2, m3, m4, m5};
+  std::vector<double> motorList = {m1.position(degrees), m2.position(degrees), m3.position(degrees), m4.position(degrees), m5.position(degrees)};
+  float position = 0.0;
+  int minIndex = 0, maxIndex = 0;
+
+  for(int i=1;i<motorList.size();i++){
+    if(motorList.at(i) > motorList.at(maxIndex))
+      maxIndex = i;
+    else if(motorList.at(i) < motorList.at(minIndex))
+      minIndex = i;
+  }
+  motorList.erase(motorList.begin() + maxIndex);
+  motorList.erase(motorList.begin() + minIndex);
+
+  position += motorList.at(1);
+  position += motorList.at(2);
+  position += motorList.at(3);
+  position /= 3;
+
+  motorArr[maxIndex].setPosition(position, degrees);
+  motorArr[minIndex].setPosition(position, degrees);
+
+  return position;
+}
