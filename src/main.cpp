@@ -59,6 +59,10 @@ using namespace vex;
 ///////////////////////// Prototypes /////////////////////////////////
 
 void setDriveTrainConstants();
+void longToMatch();
+void prime();
+void unprime();
+void keepBottomThreeMatchLoad();
 void Auton_1();
 void Auton_2();
 void Auton_3();
@@ -431,7 +435,7 @@ void autonFireClock(){
     while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1250){ //Avg time to complete is ~1000ms
       if(clockRotationSensor.position(degrees) >= 250.0){
         //Decrease speed after first stage is complete
-        spinSpeed = 50.0;
+        spinSpeed = 20.0;
       } 
       catapult.spin(forward, spinSpeed, percent);
       timeout += 10;
@@ -555,7 +559,7 @@ void setDriveTrainConstants()
     );
 
     chassis.setTurnConstants(
-        0.22,  // Kp
+        0.4,  // Kp
         0.0,   // Ki
         1.5,   // Kd
         0.75,  // Settle Error
@@ -566,7 +570,52 @@ void setDriveTrainConstants()
 
 //Easy use functions for auton
 //void unloadMatchLoader
-//void drive from long goal to match loader
+void prime(){
+  int timeout = 0;
+  clockRotationSensor.setPosition(0, degrees);
+  while(clockRotationSensor.position(degrees) <= 180.0 && timeout <= 500){
+      catapult.spin(forward, 100, percent);
+      timeout += 10;
+      wait(10, msec);
+    }
+    catapult.stop();
+    catapult.setStopping(coast);
+}
+
+void unprime(){
+  int timeout = 0;
+    //Reset catapult
+    while(clockRotationSensor.position(degrees) >= 45.0 || fabs(catapult.velocity(vex::rpm)) >= 5){
+      catapult.spin(reverse, 100, percent);
+      timeout += 10;
+      if(timeout >= 2000)
+        break;
+      wait(10, msec);
+    }
+
+    //Stop motor function
+    catapult.stop();
+    clockRotationSensor.resetPosition();
+}
+void longToMatch(){
+  matchLoad.set(true);
+  intake.spin(reverse, 50, pct);
+  colorSortIntake.spin(forward, 100, percent);
+  chassis.driveDistance(-27);
+}
+
+void keepBottomThreeMatchLoad(){
+  // matchLoad.set(true);
+  // intake.spin(forward, 50, pct);
+  // colorSortIntake.spin(forward, 100, percent);
+  // chassis.driveDistance(-27);
+  wait(900, msec);
+  prime();
+  intake.spin(reverse, 10, percent);
+  colorSortIntake.spin(forward, 15, percent);
+  wait(1000, msec);
+  intake.stop();
+}
 //void match loader to goal
 
 
@@ -599,13 +648,31 @@ void Auton_2() // Wheel Diameter Calibration
     chassis.setSCurveConstants(60.0f, 120.0f, 200.0f);
     chassis.setDriveKff(12.0f / 200.0f);
     chassis.setDriveKs(1.0f);
-    chassis.setPosition(0,0,0);
-    chassis.driveDistance(24);
-    chassis.driveDistance(24);
-    chassis.driveDistance(-48);
 
+    //chassis.driveDistance(12);
+    //keepBottomThreeMatchLoad();
+    // longToMatch();
+    chassis.setPosition(0,0,0);
+    chassis.driveDistance(41);
+    chassis.turnToAngle(270);
+    matchLoad.set(true);
+    intake.spin(forward, 100, pct);
+    colorSortIntake.spin(forward, 100, percent);
+    chassis.driveDistance(-11.5);
+    keepBottomThreeMatchLoad();
+    chassis.driveDistance(5);
+    chassis.turnToAngle(275);
+    chassis.driveDistance(22);
+    autonFireClock();
+
+
+    // chassis.setPosition(0,0,0);
+    // chassis.driveDistance(24);
+    // chassis.driveDistance(24);
+    // chassis.driveDistance(-48);
     //smallDrivingTest(chassis);
     //largeDrivingTest(chassis);
+
     std::cout << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
     
     // const float SET_DIAMETER = 2.49f;

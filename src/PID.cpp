@@ -117,7 +117,7 @@ bool PID::isSettled()
     }
         
     if(timeSpentSettled > timeToSettle){
-        std::cout << "SETTLED-----------------" << runTime << std::endl;
+        std::cout << "SETTLED-----------------" << std::endl;
         return true;
     }
         

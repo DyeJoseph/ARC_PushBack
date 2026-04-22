@@ -550,8 +550,7 @@ void Drive::driveDistance(float distance, float maxVoltage)
         linearOutput  = clamp(linearOutput,  -maxVoltage, maxVoltage);
         angularOutput = clamp(angularOutput, -maxVoltage, maxVoltage);
 
-        driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
-        std::cout << pidError << std::endl;
+        driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);;
         wait(10, msec);
     }
 
