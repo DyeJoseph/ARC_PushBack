@@ -40,6 +40,11 @@ using namespace vex;
   bool isSPRunning = false;
   bool isPrimed = false;
 
+  //Auton globals
+  bool autonColorSorting = false;
+  bool autonLastSeen;
+  bool unjamActive = false;
+
 
   // Define Values for the Chassis here:
   Drive chassis
@@ -63,7 +68,7 @@ using namespace vex;
 void setDriveTrainConstants();
 void longToMatch();
 int prime();
-void unprime();
+int unprime();
 void keepBottomThreeMatchLoad();
 void longGoalWingPush();
 void Auton_1();
@@ -192,7 +197,7 @@ void autonomous()
   // }
 
   wait(100, msec);
-  Auton_3();
+  Auton_5();
   //Auton_1();
 
   //setDriveTrainConstants();
@@ -427,7 +432,7 @@ void autonFireClock(int fireSpeed = 100){
   int timeout = 0;
   int spinSpeed = 100;
   isPrimed = false;
-  while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1000){ //Avg time to complete is ~1000ms
+  while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1500){ //Avg time to complete is ~1000ms
     if(clockRotationSensor.position(degrees) >= 250.0){
       spinSpeed = fireSpeed;
     } 
@@ -444,6 +449,22 @@ void autonFireClock(int fireSpeed = 100){
     wait(10, msec);
   }
   clockRotationSensor.resetPosition();
+  catapult.stop();
+}
+
+/// @brief Non-threaded function to fire the clock in autonomous
+void autonFireClockNoUnprime(int fireSpeed = 100){
+  int timeout = 0;
+  int spinSpeed = 100;
+  isPrimed = false;
+  while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1500){ //Avg time to complete is ~1000ms
+    if(clockRotationSensor.position(degrees) >= 250.0){
+      spinSpeed = fireSpeed;
+    } 
+    catapult.spin(forward, spinSpeed, percent);
+    timeout += 10;
+    wait(10, msec);
+  }
   catapult.stop();
 }
 
@@ -580,9 +601,12 @@ int prime(){
     return 0;
 }
 
-void unprime(){
+int unprime(){
   int timeout = 0;
     //Reset catapult
+    if(clockRotationSensor.position(degrees) < 100){
+      clockRotationSensor.setPosition(100, degrees);
+    }
     while(clockRotationSensor.position(degrees) >= 45.0 || fabs(catapult.velocity(vex::rpm)) >= 5){
       catapult.spin(reverse, 100, percent);
       timeout += 10;
@@ -594,6 +618,7 @@ void unprime(){
     //Stop motor function
     catapult.stop();
     clockRotationSensor.resetPosition();
+    return 0;
 }
 void longToMatch(){
   matchLoad.set(true);
@@ -602,21 +627,11 @@ void longToMatch(){
   chassis.driveDistance(-27);
 }
 
-void keepBottomThreeMatchLoad(){
-  while(1){
-    int hue = bottomColorSort.hue();
-  }
- 
-  vex::thread primeThread(prime);
-  intake.spin(reverse, 10, percent);
-  colorSortIntake.spin(forward, 15, percent);
-  intake.stop();
-}
 //void match loader to goal
 
 void longGoalWingPush(){
   chassis.turnToAngle(315);
-  chassis.driveDistance(-6);
+  chassis.driveDistance(-5);
   chassis.turnToAngle(275);
   chassis.driveDistance(28);
   // chassis.driveDistance(-10);
@@ -627,9 +642,31 @@ void longGoalWingPush(){
 
 }
 
+int autonColorSort(){
+  int blueMinHue = 200;
+  while(1){
+    if(autonColorSorting){
+      int seenHue = bottomColorSort.hue();
+      if(seenHue < 20){
+        autonLastSeen = RED;
+      }else if(seenHue > blueMinHue && seenHue < 250){
+        autonLastSeen = BLUE;
+      }
+    }
+  }
+  return 0;
+}
 
-
-
+int unjamColorSortIntake(){
+  while(unjamActive){
+    colorSortIntake.spin(reverse, 100, percent);
+    bottomIntake.spin(reverse, 100, percent);
+    wait(0.25, sec);
+    colorSortIntake.stop();
+    bottomIntake.stop();
+  }
+  return 1;
+}
 
 
 //Auton Route Functions
@@ -687,36 +724,18 @@ void Auton_2() // Wheel Diameter Calibration
 
 
     std::cout << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
-    
-    // const float SET_DIAMETER = 2.49f;
-
-    // float startPos = chassis.getCurrentMotorPosition();
-
-    // // Drive open-loop at 6V for 3 seconds, then measure
-    // chassis.driveMotors(6, 6);
-    // wait(1500, msec);
-    // chassis.brake();
-    // wait(250, msec);
-
-    // float reportedInches = chassis.getCurrentMotorPosition() - startPos;
-
-    // Brain.Screen.clearScreen();
-    // Brain.Screen.setCursor(1, 1);
-    // Brain.Screen.print("Reported: %.2f in", reportedInches);
-    // Brain.Screen.newLine();
-    // Brain.Screen.print("Measure actual dist.");
-    // Brain.Screen.newLine();
-    // Brain.Screen.print("Corrected diam =");
-    // Brain.Screen.newLine();
-    // Brain.Screen.print("(actual / %.2f) * %.2f", reportedInches, SET_DIAMETER);
-
-    // std::cout << "Reported: " << reportedInches << " in" << std::endl;
-    // std::cout << "Corrected diam = (actual / " << reportedInches << ") * " << SET_DIAMETER << std::endl;
 }
 
 /// @brief Auton Slot 3 - Write code for route within this function.
 void Auton_3() //1 MINUTE SKI
 {   
+  Brain.resetTimer();
+
+  static vex::thread autonColor = vex::thread(autonColorSort);
+  autonColorSorting = true;
+  int loopTime = 0;
+  chassis.setDriveMaxVoltage(12);
+
   chassis.setSCurveConstants(60.0f, 120.0f, 400.0f);
   chassis.setDriveKff(12.0f / 78.9891f *.2f);
   chassis.setDriveKs(1.0f);
@@ -724,32 +743,198 @@ void Auton_3() //1 MINUTE SKI
   chassis.setPosition(0,0,0);
 
 
-  chassis.driveDistance(41);
+  chassis.driveDistance(42); //41
   chassis.turnToAngle(270);
   matchLoad.set(true);
   intake.spin(forward, 100, pct);
   colorSortIntake.spin(forward, 100, percent);
   chassis.driveDistance(-12);
-  keepBottomThreeMatchLoad();
-  // chassis.driveDistance(5);
-  chassis.turnToAngle(274);
+
+  while(loopTime <= 1000){
+    if(autonLastSeen == !teamColor){
+      vex::thread primeThread(prime);
+      break;
+    }
+
+    loopTime += 5;
+    wait(5, msec);
+  }
+  loopTime = 0;
+  matchLoad.set(false);
+
+  intake.stop();
+  colorSortIntake.stop();
+  
+  // chassis.turnToAngle(274);
   chassis.driveDistance(28);
   intakeFlap.set(true);
-  autonFireClock(30);
+  autonFireClockNoUnprime(30);
+  vex::thread unprimeThread(unprime);
+
   longGoalWingPush();
   intakeFlap.set(false);
+
+  double time = Brain.timer(seconds);
+  std::cout << "TIME: " << time << " seconds\n";
 }
 
 /// @brief Auton Slot 4 - Write code for route within this function.
 void Auton_4()
-{
+{  
+  Brain.resetTimer();
 
+  vex::thread autonColor = vex::thread(autonColorSort);
+  autonColorSorting = true;
+  int loopTime = 0;
+  chassis.setDriveMaxVoltage(12);
+
+  chassis.setSCurveConstants(60.0f, 120.0f, 400.0f);
+  chassis.setDriveKff(12.0f / 78.9891f *.2f);
+  chassis.setDriveKs(1.0f);
+  chassis.setStallDetection(0.05f, 300.0f);
+  chassis.setPosition(0,0,0);
+
+
+  chassis.driveDistance(42); //41
+  chassis.turnToAngle(270);
+  matchLoad.set(true);
+  intake.spin(forward, 100, pct);
+  colorSortIntake.spin(forward, 100, percent);
+  chassis.driveDistance(-12);
+
+  while(loopTime <= 1000){
+    if(autonLastSeen == !teamColor){
+      vex::thread primeThread(prime);
+      break;
+    }
+
+    loopTime += 5;
+    wait(5, msec);
+  }
+  loopTime = 0;
+
+  topIntake.spin(reverse, 100, percent);
+  bottomIntake.spin(reverse, 25, percent);
+  colorSortIntake.spin(reverse, 10, percent);
+  wait(250, msec);
+  colorSortIntake.spin(forward, 100, percent);
+  wait(1500, msec);
+
+  while(loopTime <= 1000){
+    if(autonLastSeen == teamColor){
+      vex::thread unprimeThread(unprime);
+      break;
+    }
+
+    loopTime += 5;
+    wait(5, msec);
+  }
+  loopTime = 0;
+  topIntake.spin(forward);
+  bottomIntake.spin(forward, 25, percent);
+  colorSortIntake.spin(forward, 100, percent);
+  
+  // chassis.turnToAngle(274);
+  chassis.driveDistance(28);
+  intake.stop();
+  colorSortIntake.stop();
+  intakeFlap.set(true);
+  
+  autonFireClock(30);
+
+  intake.spin(forward, 100, percent);
+  colorSortIntake.spin(forward, 100, percent);
+  wait(1000, msec);
+
+  autonFireClockNoUnprime(30);
+  vex::thread unprimeThread(unprime);
+
+  longGoalWingPush();
+  intakeFlap.set(false);
+
+  double time = Brain.timer(seconds);
+  std::cout << "TIME: " << time << " seconds\n";
 }
 
 /// @brief Auton Slot 5 - Write code for route within this function.
 void Auton_5() //PARK
 {
+  Brain.resetTimer();
+  clockRotationSensor.resetPosition();
 
+  static vex::thread autonColor = vex::thread(autonColorSort);
+  autonColorSorting = true;
+  int loopTime = 0;
+  chassis.setDriveMaxVoltage(12);
+
+  chassis.setSCurveConstants(60.0f, 120.0f, 400.0f);
+  chassis.setDriveKff(12.0f / 78.9891f *.2f);
+  chassis.setDriveKs(1.0f);
+  chassis.setStallDetection(0.05f, 300.0f);
+  chassis.setPosition(0,0,0);
+
+  chassis.driveDistance(42); //41
+  chassis.turnToAngle(270);
+  matchLoad.set(true);
+  intake.spin(forward, 100, pct);
+  colorSortIntake.spin(forward, 100, percent);
+  chassis.driveDistance(-12);
+
+  wait(1250, msec);
+  matchLoad.set(false);
+  topIntake.spin(forward, 25, percent);
+
+  unjamActive = true;
+  vex::thread unjam1(unjamColorSortIntake);
+  unjamActive = false;
+  intake.spin(forward, 100, pct);
+  colorSortIntake.spin(forward, 100, percent);
+
+  chassis.driveDistance(28);
+  intakeFlap.set(true);
+  autonFireClockNoUnprime(30);
+  vex::thread unprimeThread1(unprime);
+  intakeFlap.set(false);
+
+  matchLoad.set(true);
+  topIntake.spin(forward, 100, percent);
+  chassis.driveDistance(-20);
+
+  intakeFlap.set(true);
+  autonFireClockNoUnprime(100);
+  vex::thread unprimeThread4(unprime);
+
+  chassis.driveDistance(-8);
+  intakeFlap.set(false);
+
+  wait(500, msec);
+  bottomIntake.spin(reverse, 15, percent);
+  wait(1000, msec);
+  bottomIntake.spin(forward, 100, percent);
+
+  unjamActive = true;
+  vex::thread unjam2(unjamColorSortIntake);
+  unjamActive = false;
+  intake.spin(forward, 100, pct);
+  colorSortIntake.spin(forward, 100, percent);
+
+  chassis.driveDistance(28);  
+  intakeFlap.set(true);
+  autonFireClockNoUnprime(30);
+  vex::thread unprimeThread2(unprime);
+
+  wait(1000, msec);
+  autonFireClockNoUnprime(20);
+  vex::thread unprimeThread3(unprime);
+
+  chassis.driveDistance(-5);
+  intakeFlap.set(false);
+  chassis.driveDistance(5);
+  intake.stop();
+  colorSortIntake.stop();
+
+  double time = Brain.timer(seconds);
+  std::cout << "TIME: " << time << " seconds\n";
 }
 
 /// @brief Auton Slot 6 - Write code for route within this function.
