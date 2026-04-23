@@ -197,7 +197,7 @@ void autonomous()
   // }
 
   wait(100, msec);
-  Auton_2();
+  Auton_1();
   //Auton_1();
 
   //setDriveTrainConstants();
@@ -678,11 +678,32 @@ void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
   chassis.setDriveKs(1.0f);
   chassis.setStallDetection(0.05f, 500.0f);
   chassis.setPosition(0,0,0);
+  chassis.setTurnConstants(
+        1.6,    // Kp - Proportion Constant
+        0.0,      // Ki - Integral Constant
+        4.5,      // Kd - Derivative Constant 
+        .75, //1.25    // Settle Error
+        200, 
+        1500 
+    );
   chassis.turnToAngle(0);
   chassis.turnToAngle(5);
-  chassis.turnToAngle(0);
-  chassis.turnToAngle(90);
-  chassis.turnToAngle(0);
+  chassis.turnToAngle(10);
+  chassis.turnToAngle(15);
+  chassis.turnToAngle(20);
+  chassis.turnToAngle(45);
+
+  chassis.setTurnConstants(
+        0.95,    // Kp - Proportion Constant
+        0.0,      // Ki - Integral Constant
+        5.0,      // Kd - Derivative Constant 
+        1.0, //1.25    // Settle Error
+        200, 
+        1500 
+    );
+    chassis.turnToAngle(90);
+    chassis.turnToAngle(180);
+    chassis.turnToAngle(0);
   // chassis.driveDistance(24);
   //longGoalWingPush();
   
@@ -771,7 +792,7 @@ void Auton_3() //FAST 4
 
 
   chassis.driveDistance(42); //41
-  chassis.turnToAngle(270);
+  chassis.turnToAngle(269);
   matchLoad.set(true);
   intake.spin(forward, 100, pct);
   colorSortIntake.spin(forward, 100, percent);

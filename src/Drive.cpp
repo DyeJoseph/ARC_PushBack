@@ -354,7 +354,7 @@ void Drive::turnToAngle(float angle, float maxVoltage)
         float output = turnPID.compute(error);
 
         float absOutput = fabs(output);
-        if      (absOutput < 1.5f) output = copysign(1.0f,  output);
+        if      (absOutput < 1.15f) output = copysign(1.0f,  output);
         else                        output = clamp(output, -maxVoltage, maxVoltage);
 
         driveMotors(-output, output);
