@@ -353,24 +353,9 @@ void Drive::turnToAngle(float angle, float maxVoltage)
         float error = inTermsOfNegative180To180(inertial1.heading()-angle);
         float output = turnPID.compute(error);
 
-        //Minimum output threshold for turning
-        if(fabs(output) < 0.85)
-            if(output < 0)
-                output = -1.4;
-            else
-                output = 1.4;
-        else if (fabs(output) < 1.5)
-             if(output < 0)
-                output = -3.4;
-            else
-                output = 3.4;
-        else if (fabs(output) < 5)
-            if(output < 0)
-                output = -5.4;
-            else
-                output = 5.4;
-        else
-            output = clamp(output, -maxVoltage, maxVoltage);
+        float absOutput = fabs(output);
+        if      (absOutput < 1.5f) output = copysign(1.0f,  output);
+        else                        output = clamp(output, -maxVoltage, maxVoltage);
 
         driveMotors(-output, output);
         task::sleep(10);
@@ -563,7 +548,7 @@ void Drive::driveDistance(float distance, float maxVoltage)
 
         driveMotors(linearOutput + angularOutput, linearOutput - angularOutput);
         float pidContrib = linearOutput - feedforward;
-        std::cout << "pid:" << pidContrib << " ff:" << feedforward << " total:" << linearOutput << std::endl;
+        //std::cout << "pid:" << pidContrib << " ff:" << feedforward << " total:" << linearOutput << std::endl;
 
         // Stall detection: reset the reference whenever the robot moves enough,
         // otherwise accumulate time. Exit if stalled too long.

@@ -16,6 +16,8 @@
 #include "sensorConversion.h"
 #include "pidTests.h"
 
+
+
 using namespace vex;
 
 ////////////////////////// GLOBAL VARIABLES //////////////////////////
@@ -301,6 +303,7 @@ void usercontrol()
         if((lastSeen == teamColor || timeSinceSeenWrong >= 1250) && isColorSorting){
           colorSortIntake.spin(forward);
         }else{
+
           colorSortIntake.spin(reverse);
         }
       }else if(Controller1.ButtonR2.pressing()){
@@ -424,7 +427,7 @@ void autonFireClock(int fireSpeed = 100){
   int timeout = 0;
   int spinSpeed = 100;
   isPrimed = false;
-  while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1250){ //Avg time to complete is ~1000ms
+  while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1000){ //Avg time to complete is ~1000ms
     if(clockRotationSensor.position(degrees) >= 250.0){
       spinSpeed = fireSpeed;
     } 
@@ -553,12 +556,12 @@ void setDriveTrainConstants()
         // 200,   // Time to Settle
         // 2500   // End Time
 
-        0.22,    // Kp - Proportion Constant
+        1.0,    // Kp - Proportion Constant
         0.0,      // Ki - Integral Constant
-        1.5,      // Kd - Derivative Constant 
+        3.5,      // Kd - Derivative Constant 
         .75, //1.25    // Settle Error
         200, 
-        1000 
+        1500 
     );
 }
 
@@ -600,11 +603,10 @@ void longToMatch(){
 }
 
 void keepBottomThreeMatchLoad(){
-  // matchLoad.set(true);
-  // intake.spin(forward, 50, pct);
-  // colorSortIntake.spin(forward, 100, percent);
-  // chassis.driveDistance(-27);
-  wait(900, msec);
+  while(1){
+    int hue = bottomColorSort.hue();
+  }
+ 
   vex::thread primeThread(prime);
   intake.spin(reverse, 10, percent);
   colorSortIntake.spin(forward, 15, percent);
@@ -613,9 +615,10 @@ void keepBottomThreeMatchLoad(){
 //void match loader to goal
 
 void longGoalWingPush(){
-  chassis.turnToAngle(0);
-  chassis.turnToAngle(280);
-  chassis.driveDistance(20);
+  chassis.turnToAngle(315);
+  chassis.driveDistance(-6);
+  chassis.turnToAngle(275);
+  chassis.driveDistance(28);
   // chassis.driveDistance(-10);
   // chassis.turnToAngle(215);
   // toggleWings();
@@ -637,9 +640,15 @@ void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
   chassis.setDriveKff(12.0f / 78.9891f *.2f);
   chassis.setDriveKs(1.0f);
   chassis.setStallDetection(0.05f, 500.0f);
-  chassis.setPosition(0,0,270);
+  chassis.setPosition(0,0,0);
+  chassis.turnToAngle(0);
+  chassis.turnToAngle(5);
+  chassis.turnToAngle(0);
+  chassis.turnToAngle(90);
+  chassis.turnToAngle(0);
   // chassis.driveDistance(24);
-  longGoalWingPush();
+  //longGoalWingPush();
+  
 
   std::cout << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
     
@@ -657,7 +666,7 @@ void Auton_2() // Wheel Diameter Calibration
      chassis.setPosition(0,0,0);
 
 
-    chassis.driveDistance(42);
+    chassis.driveDistance(40);
     chassis.turnToAngle(270);
     matchLoad.set(true);
     intake.spin(forward, 100, pct);
@@ -666,7 +675,7 @@ void Auton_2() // Wheel Diameter Calibration
     keepBottomThreeMatchLoad();
     chassis.driveDistance(5);
     chassis.turnToAngle(275);
-    chassis.driveDistance(22);
+    chassis.driveDistance(25);
     intakeFlap.set(true);
     autonFireClock();
     intakeFlap.set(false);
@@ -711,32 +720,24 @@ void Auton_3() //1 MINUTE SKI
   chassis.setSCurveConstants(60.0f, 120.0f, 400.0f);
   chassis.setDriveKff(12.0f / 78.9891f *.2f);
   chassis.setDriveKs(1.0f);
-  chassis.setStallDetection(0.05f, 500.0f);
+  chassis.setStallDetection(0.05f, 300.0f);
   chassis.setPosition(0,0,0);
 
 
-  chassis.driveDistance(42);
+  chassis.driveDistance(41);
   chassis.turnToAngle(270);
   matchLoad.set(true);
   intake.spin(forward, 100, pct);
   colorSortIntake.spin(forward, 100, percent);
   chassis.driveDistance(-12);
   keepBottomThreeMatchLoad();
-  chassis.driveDistance(5);
-  chassis.turnToAngle(275);
-  chassis.driveDistance(22);
+  // chassis.driveDistance(5);
+  chassis.turnToAngle(274);
+  chassis.driveDistance(28);
   intakeFlap.set(true);
-  autonFireClock(20);
-  intakeFlap.set(false);
-  wait(1, sec);
-
-  chassis.setSCurveConstants(60.0f, 120.0f, 600.0f);
-  chassis.setDriveKff(12.0f / 78.9891f *.2f);
-  chassis.setDriveKs(1.0f);
-  chassis.setStallDetection(0.05f, 500.0f);
-  chassis.setPosition(0,0,270);
-  // chassis.driveDistance(24);
+  autonFireClock(30);
   longGoalWingPush();
+  intakeFlap.set(false);
 }
 
 /// @brief Auton Slot 4 - Write code for route within this function.
