@@ -197,7 +197,7 @@ void autonomous()
   // }
 
   wait(100, msec);
-  Auton_1();
+  Auton_6();
   //Auton_1();
 
   //setDriveTrainConstants();
@@ -432,7 +432,7 @@ void autonFireClock(int fireSpeed = 100){
   int timeout = 0;
   int spinSpeed = 100;
   isPrimed = false;
-  while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 1500){ //Avg time to complete is ~1000ms
+  while(clockRotationSensor.position(degrees) <= 540.0 && timeout <= 750){ //Avg time to complete is ~1000ms
     if(clockRotationSensor.position(degrees) >= 250.0){
       spinSpeed = fireSpeed;
     } 
@@ -667,7 +667,6 @@ int unjamColorSortIntake(){
   }
   return 1;
 }
-
 
 //Auton Route Functions
 /// @brief Auton Slot 1 - Write code for route within this function.
@@ -968,7 +967,70 @@ void Auton_5() //PARK
 /// @brief Auton Slot 6 - Write code for route within this function.
 void Auton_6() //DOUBLE LOAD TOP
 {
- 
+ Brain.resetTimer();
+  clockRotationSensor.resetPosition();
+
+  static vex::thread autonColor = vex::thread(autonColorSort);
+  autonColorSorting = true;
+  int loopTime = 0;
+  chassis.setDriveMaxVoltage(12);
+  chassis.setTurnMaxVoltage(10);
+
+  chassis.setSCurveConstants(60.0f, 120.0f, 400.0f);
+  chassis.setDriveKff(12.0f / 78.9891f *.2f);
+  chassis.setDriveKs(1.0f);
+  chassis.setStallDetection(0.05f, 300.0f);
+  chassis.setPosition(0,0,0);
+
+  //Go to match loader
+  chassis.driveDistance(42); //41
+  chassis.turnToAngle(270);
+  matchLoad.set(true);
+  intake.spin(forward, 100, pct);
+  colorSortIntake.spin(forward, 100, percent);
+  chassis.driveDistance(-12);
+
+  //Fire twice (clear matchloader)
+  intakeFlap.set(true);
+  wait(250, msec);
+  unjamActive = true;
+  vex::thread unjam1(unjamColorSortIntake);
+  unjamActive = false;
+  intake.spin(forward, 100, pct);
+  colorSortIntake.spin(forward, 100, percent);
+  wait(250, msec);
+
+  autonFireClock();
+  autonFireClockNoUnprime(100);
+  vex::thread unprimeThread2(unprime);
+
+  wait(250, msec);
+  intakeFlap.set(false);
+
+  //Grab 6 matchloads
+  wait(500, msec);
+  unjamActive = true;
+  vex::thread unjam2(unjamColorSortIntake);
+  unjamActive = false;
+  intake.spin(forward, 100, pct);
+  colorSortIntake.spin(forward, 100, percent);
+  wait(750, msec);
+
+  //Score
+  chassis.driveDistance(28);  
+  intakeFlap.set(true);
+  autonFireClock(40);
+  wait(250, msec);
+  
+  autonFireClockNoUnprime(30);
+  vex::thread unprimeThread4(unprime);
+
+  //Wing scrape
+  longGoalWingPush();
+  intakeFlap.set(false);
+
+  double time = Brain.timer(seconds);
+  std::cout << "TIME: " << time << " seconds\n";
 }
 
 /// @brief Auton Slot 7 - Write code for route within this function.
