@@ -371,7 +371,7 @@ void Drive::turnToAngle(float angle, float maxVoltage)
 void Drive::turnToAngle(float angle, float maxVoltage, float endTime){
     updatePosition();
     angle = inTermsOfNegative180To180(angle);
-    PID turnPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, turnEndTime);
+    PID turnPID(turnKp, turnKi, turnKd, turnSettleError, turnTimeToSettle, endTime);
     do
     {
         float error = inTermsOfNegative180To180(inertial1.heading()-angle);

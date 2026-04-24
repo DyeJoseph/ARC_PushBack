@@ -39,6 +39,8 @@ using namespace vex;
   bool isFiring = 0;
   bool isSPRunning = false;
   bool isPrimed = false;
+  bool wingState = false;
+
 
   //Auton globals
   bool autonColorSorting = false;
@@ -87,6 +89,7 @@ void toggleIntakeFlap();
 void toggleFrontIntake();
 void toggleColorSort();
 void toggleWings();
+void toggleWingsDown();
 int fireClock();
 void splitPrimeClock();
 void splitReleaseClock();
@@ -266,9 +269,8 @@ void usercontrol()
 
   //Pressed functions
   Controller1.ButtonL1.pressed(toggleLift);
-  // Controller1.ButtonL2.pressed(toggleFrontIntake);
   Controller1.ButtonL2.pressed(toggleWings);
-  Controller1.ButtonL2.released(toggleWings);
+  Controller1.ButtonL2.released(toggleWingsDown);
   Controller1.ButtonLeft.pressed(splitPrimeClock);
   Controller1.ButtonRight.pressed(splitReleaseClock);
 
@@ -298,7 +300,7 @@ void usercontrol()
           timeSinceSeenWrong = 0;
       }
 
-      if(Controller1.ButtonR1.pressing()){
+      if(Controller1.ButtonR1.pressing() && !Controller1.ButtonR2.pressing()){
         if(isColorSorting)
           topIntake.spin(forward, 50, percent);
         else
@@ -311,7 +313,7 @@ void usercontrol()
 
           colorSortIntake.spin(reverse);
         }
-      }else if(Controller1.ButtonR2.pressing()){
+      }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
         intake.spin(reverse);
         colorSortIntake.spin(forward, 10, percent);
       }else{
@@ -340,21 +342,11 @@ void usercontrol()
         intakeFlap.set(false);
       }
 
-      //TESTING
-      if(Controller1.ButtonX.pressing())
-        odomRetraction.set(true);
-      else
-        odomRetraction.set(false);
-      
-      if(Controller1.ButtonY.pressing())
+      if(Controller1.ButtonL2.pressing() && Controller1.ButtonR2.pressing()){
         frontIntake.set(true);
-      else
+      }else{
         frontIntake.set(false);
-
-      if(Controller1.ButtonB.pressing())
-        midGoalBlocking.set(true);
-      else
-        midGoalBlocking.set(false);
+      }
 
     timeSinceSeenWrong += 20;
     wait(20, msec);
@@ -376,9 +368,15 @@ void toggleFrontIntake(){
 
 /// @brief Driver control function to toggle the descore mechanism
 void toggleWings(){
-  static bool wingState = false;
-  wingState = !wingState;
-  wings.set(wingState);
+  if(!Controller1.ButtonR2.pressing() || wingState == true){
+    wingState = !wingState;
+    wings.set(wingState);
+  }
+}
+
+void toggleWingsDown(){
+  wings.set(false);
+  liftState = false;
 }
 
 /// @brief Driver control function to fire the clock (threaded) 
@@ -389,7 +387,8 @@ int fireClock(){
       int timeout = 0;
       int spinSpeed = 100;
       isPrimed = false;
-      if(liftState){
+      std::cout << liftState << std::endl;
+      if(!liftState){
         //Hood is up
         while(clockRotationSensor.position(degrees) <= 530.0 && timeout <= 750){ //Avg time to complete is ~550ms
           catapult.spin(forward, 100, percent);
@@ -630,9 +629,9 @@ void longToMatch(){
 //void match loader to goal
 
 void longGoalWingPush(){
-  chassis.turnToAngle(315);
+  chassis.turnToAngle(315, 12);
   chassis.driveDistance(-5);
-  chassis.turnToAngle(275);
+  chassis.turnToAngle(275, 12);
   chassis.driveDistance(28);
   // chassis.driveDistance(-10);
   // chassis.turnToAngle(215);
@@ -670,7 +669,7 @@ int unjamColorSortIntake(){
 
 //Auton Route Functions
 /// @brief Auton Slot 1 - Write code for route within this function.
-void Auton_1() //EMPTY (UPDATE WHEN CHANGED)
+void Auton_1() //EMPTY (UPDATE WHEN CHANGED)-
 {   
   chassis.setSCurveConstants(60.0f, 120.0f, 600.0f);
   chassis.setDriveKff(12.0f / 78.9891f *.2f);
@@ -884,7 +883,7 @@ void Auton_4() // Speed 10
 }
 
 /// @brief Auton Slot 5 - Write code for route within this function.
-void Auton_5() //PARK
+void Auton_5() //10 BALL
 {
   Brain.resetTimer();
   clockRotationSensor.resetPosition();
@@ -965,7 +964,7 @@ void Auton_5() //PARK
 }
 
 /// @brief Auton Slot 6 - Write code for route within this function.
-void Auton_6() //DOUBLE LOAD TOP
+void Auton_6() //speed 6
 {
  Brain.resetTimer();
   clockRotationSensor.resetPosition();
@@ -976,6 +975,7 @@ void Auton_6() //DOUBLE LOAD TOP
   chassis.setDriveMaxVoltage(12);
   chassis.setTurnMaxVoltage(10);
 
+  setDriveTrainConstants();
   chassis.setSCurveConstants(60.0f, 120.0f, 400.0f);
   chassis.setDriveKff(12.0f / 78.9891f *.2f);
   chassis.setDriveKs(1.0f);
@@ -983,22 +983,20 @@ void Auton_6() //DOUBLE LOAD TOP
   chassis.setPosition(0,0,0);
 
   //Go to match loader
-  chassis.driveDistance(42); //41
-  chassis.turnToAngle(270);
+  chassis.driveDistance(40); //41
+  chassis.turnToAngle(272);
   matchLoad.set(true);
   intake.spin(forward, 100, pct);
-  colorSortIntake.spin(forward, 100, percent);
+  colorSortIntake.spin(forward, 100, percent); 
   chassis.driveDistance(-12);
 
   //Fire twice (clear matchloader)
   intakeFlap.set(true);
-  wait(250, msec);
-  unjamActive = true;
-  vex::thread unjam1(unjamColorSortIntake);
-  unjamActive = false;
-  intake.spin(forward, 100, pct);
-  colorSortIntake.spin(forward, 100, percent);
-  wait(250, msec);
+  wait(100, msec);
+  colorSortIntake.spin(reverse, 100, percent);
+  wait(100, msec);
+  colorSortIntake.spin(forward,100, percent);
+  wait(300, msec);
 
   autonFireClock();
   autonFireClockNoUnprime(100);
@@ -1008,20 +1006,19 @@ void Auton_6() //DOUBLE LOAD TOP
   intakeFlap.set(false);
 
   //Grab 6 matchloads
-  wait(500, msec);
-  unjamActive = true;
-  vex::thread unjam2(unjamColorSortIntake);
-  unjamActive = false;
-  intake.spin(forward, 100, pct);
-  colorSortIntake.spin(forward, 100, percent);
-  wait(750, msec);
+  wait(400, msec);
+  colorSortIntake.spin(reverse, 100, percent);
+  wait(100, msec);
+  colorSortIntake.spin(forward,100, percent);
+  wait(300, msec);
 
   //Score
   chassis.driveDistance(28);  
   intakeFlap.set(true);
-  autonFireClock(40);
-  wait(250, msec);
-  
+  bottomIntake.stop();
+  autonFireClock(30);
+  wait(100, msec);
+
   autonFireClockNoUnprime(30);
   vex::thread unprimeThread4(unprime);
 
