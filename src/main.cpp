@@ -773,15 +773,27 @@ void Auton_2() // Win Point with Scrape
   unjamActive = true;
   chassis.driveDistance(-11.5);
 
-  wait(1000, msec);
-  chassis.driveDistance(28);  
+  toggleWings(); // up
+  chassis.turnToAngle(255); //283
+  chassis.driveDistance(29.5); // 29
+  chassis.turnToAngle(290);
+  chassis.driveDistance(14); // 19
+
+  toggleWings(); // down
+  chassis.turnToAngle(270);
+  chassis.driveDistance(-33);
+  chassis.turnToAngle(330); // 225
+  chassis.driveDistance(12);
+  chassis.turnToAngle(270);
+  chassis.driveDistance(10);
+
   intakeFlap.set(true);
-  bottomIntake.stop();
   autonFireClock(30);
-  //chassis.driveDistance(-10);
-  //toggleFrontIntake();
-  //intake.stop();
-  
+  intake.spin(forward, 100, percent);
+  colorSortIntake.spin(forward, 100, percent);
+  wait(1000, msec);
+  autonFireClockNoUnprime(30);
+  vex::thread unprimeThread(unprime);
 
   intake.stop();
   colorSortIntake.stop();
