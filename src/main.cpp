@@ -119,8 +119,8 @@ void preAuton()
 
   vex::color colors[8] = {vex::color::red, vex::color::red, vex::color::red, vex::color::red, 
                           vex::color::blue, vex::color::blue, vex::color::blue, vex::color::blue};
-  std::string names[8] = {"NONE", "UCF", "SPD4", "WPSCP", 
-                          "BALL10", "SPD6", "TopMid7", "LowMid7"};
+  std::string names[8] = {"NONE", "NONE", "SPD4", "WinScp", 
+                          "BALL10", "SPD6", "NONE", "NONE"};
   Button buttons[9];
   createAutonButtons(colors, names, buttons);
   buttons[0].setChosen(true);
@@ -180,31 +180,13 @@ void autonomous()
   drawLogo();
   // rotation1.resetPosition();
   // rotation2.resetPosition();
-  // inertial1.resetHeading();
-
-  // int port = 9;
-  // vexGenericSerialEnable(port, 0);
-  // vexGenericSerialBaudrate(port, 115200);
-
-  // uint8_t buf[64];
-  // float enc1;
-  // float enc2;
-  // float heading;
-
-  // while (true) {
-  //   int n = vexGenericSerialReceive(port, buf, sizeof(buf));
-
-  //   getSensorReading(buf, n, enc1, enc2, heading);
-
-  //   wait(10, msec);
-  // }
+  inertial1.resetHeading();
 
   wait(100, msec);
   Auton_4();
 
-  //setDriveTrainConstants();
+  setDriveTrainConstants();
 
-/*
   switch (lastPressed) 
   {
     case 0:
@@ -233,7 +215,7 @@ void autonomous()
       break;
     default:
       break;
-  }*/
+  }
 }
 
 /// @brief Runs during the UserControl section of the competition
@@ -800,12 +782,37 @@ void Auton_4() //Counter Scrape Win Point
   bottomIntake.spin(reverse, 25, percent);
   colorSortIntake.spin(reverse, 10, percent);
   wait(1000, msec);
+  topIntake.spin(forward, 100, percent);
+  bottomIntake.spin(forward, 100, percent);
+  wait(150, msec);
+  topIntake.spin(reverse, 100, percent);
+  bottomIntake.spin(reverse, 25, percent);
+  colorSortIntake.spin(reverse, 10, percent);
+
+  intake.stop();
+  chassis.driveDistance(-49);
+  chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
+  chassis.turnToAngle(273);
+  setDriveTrainConstants();
+  matchLoad.set(true);
+  intake.spin(forward, 100, pct);
+  colorSortIntake.spin(forward, 100, percent); 
+  unjamActive = true;
+  chassis.driveDistance(-11.5);
+
+  wait(1000, msec);
+  chassis.driveDistance(28);  
+  intakeFlap.set(true);
+  bottomIntake.stop();
+  autonFireClock(30);
   //chassis.driveDistance(-10);
   //toggleFrontIntake();
   //intake.stop();
   
 
-
+  intake.stop();
+  colorSortIntake.stop();
+  unjamActive = false;
   double time = Brain.timer(seconds);
   std::cout << "TIME: " << time << " seconds\n";
 }
@@ -909,7 +916,7 @@ void Auton_6() //speed 6
   autonFireClockNoUnprime(100);
   intakeFlap.set(false);
   vex::thread unprimeThread2(unprime);
-  autonLastSeen = BLUE;
+  autonLastSeen = !teamColor;
   loopTime = 0;
   while(loopTime <= 10000){
     if(autonLastSeen == teamColor){
@@ -948,8 +955,48 @@ void Auton_6() //speed 6
 /// @brief Auton Slot 7 - Write code for route within this function.
 void Auton_7() //SCORES TOP MIDDLE REAL
 {
+  std::cout << "AUTON 7" << std::endl;
+  /*
   autonSetupConstants();
   int loopTime = 0;
+
+  startAutonToLongGoal();
+  wait(1000, msec);
+
+  chassis.driveDistance(28);
+  intakeFlap.set(true);
+  autonFireClock(30);
+  autonFireClockNoUnprime(20);
+  vex::thread unprimeThread3(unprime);
+  chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
+  chassis.turnToAngle(225, 12);
+  chassis.driveDistance(5);
+  intakeFlap.set(false);
+  chassis.turnToAngle(90);
+  chassis.driveDistance(28);
+  chassis.turnToAngle(245);
+  chassis.driveDistance(20.5);
+  chassis.turnToAngle(180);
+  chassis.driveDistance(19);
+  chassis.turnToAngle(270);
+  chassis.driveDistance(30);
+  chassis.turnToAngle(0);
+  chassis.driveDistance(17);
+  chassis.turnToAngle(90);
+  chassis.driveDistance(12);
+  intakeFlap.set(true);
+  autonFireClock(30);
+  autonFireClockNoUnprime(20);
+  vex::thread unprimeThread1(unprime);
+  chassis.driveDistance(-28);
+  wait(1000, msec);
+  setDriveTrainConstants();
+  toggleLift(); //DOWN
+  chassis.driveDistance(10);
+  intake.spin(forward, 100, percent);
+  colorSortIntake.spin(forward, 100, percent)*/
+
+
 
 
   double time = Brain.timer(seconds);
