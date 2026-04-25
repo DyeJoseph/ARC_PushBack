@@ -675,21 +675,21 @@ void startAutonToLongGoal(){
 void Auton_1() //TESTING RN DO NOT USE
 {   
   std::cout << "AUTON 1" << std::endl;
-  chassis.setSCurveConstants(60.0f, 120.0f, 600.0f);
-  chassis.setDriveKff(12.0f / 78.9891f *.2f);
-  chassis.setDriveKs(1.0f);
-  chassis.setStallDetection(0.05f, 500.0f);
-  chassis.setPosition(0,0,0);
+  // chassis.setSCurveConstants(60.0f, 120.0f, 600.0f);
+  // chassis.setDriveKff(12.0f / 78.9891f *.2f);
+  // chassis.setDriveKs(1.0f);
+  // chassis.setStallDetection(0.05f, 500.0f);
+  // chassis.setPosition(0,0,0);
 
-  //BELOW 25 DEG
-  chassis.setTurnConstants(1.6, 0.0, 4.5, .75, 200, 1500);
+  // //BELOW 25 DEG
+  // chassis.setTurnConstants(1.6, 0.0, 4.5, .75, 200, 1500);
 
-  //ABOVE 25 DEG
-  chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
+  // //ABOVE 25 DEG
+  // chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
 
-  toggleFrontIntake();
-  // chassis.driveDistance(24);
-  //longGoalWingPush();
+  // toggleFrontIntake();
+  // // chassis.driveDistance(24);
+  // //longGoalWingPush();
   
 
   std::cout << chassis.chassisOdometry.getXPosition() << ", " << chassis.chassisOdometry.getYPosition() << std::endl;
@@ -698,13 +698,13 @@ void Auton_1() //TESTING RN DO NOT USE
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.
-void Auton_2() // WIN POINT Wing
+void Auton_2() // NONE
 {   
   std::cout << "AUTON 2" << std::endl;
   autonSetupConstants();
   int loopTime = 0;
 
-  startAutonToLongGoal();
+  // startAutonToLongGoal();
 
   double time = Brain.timer(seconds);
   std::cout << "TIME: " << time << " seconds\n";
