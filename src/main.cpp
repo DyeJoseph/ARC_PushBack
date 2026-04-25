@@ -46,6 +46,7 @@ using namespace vex;
   bool autonColorSorting = false;
   bool autonLastSeen;
   bool unjamActive = false;
+  bool unjamActiveFullIntake = false;
 
 
   // Define Values for the Chassis here:
@@ -73,6 +74,7 @@ int unprime();
 void startAutonToLongGoal();
 void autonSetupConstants();
 void longGoalWingPush();
+void matchLoaderToMiddleLowOuttake();
 void Auton_1();
 void Auton_2();
 void Auton_3();
@@ -119,7 +121,7 @@ void preAuton()
 
   vex::color colors[8] = {vex::color::red, vex::color::red, vex::color::red, vex::color::red, 
                           vex::color::blue, vex::color::blue, vex::color::blue, vex::color::blue};
-  std::string names[8] = {"NONE", "NONE", "SPD4", "WinScp", 
+  std::string names[8] = {"NONE", "WPWSC", "SPD4", "WPNOSC", 
                           "BALL10", "SPD6", "NONE", "NONE"};
   Button buttons[9];
   createAutonButtons(colors, names, buttons);
@@ -640,11 +642,26 @@ int colorUnjam(){
   return 0;
 }
 
+int fullIntakeUnjam(){
+  while(1){
+    if(fabs(bottomIntake.velocity(rpm)) <= 5 && unjamActiveFullIntake || fabs(topIntake.velocity(rpm) <= 5 && unjamActiveFullIntake)){
+      intake.spin(reverse, 100, percent);
+      std::cout << "UNJAMMED INTAKE INTAKE INTAKEEEEEE SO HARD" << std::endl;
+      wait(250, msec);
+      intake.spin(forward, 100, percent);
+    } else {
+      wait(20, msec);
+    }
+  }
+  return 0;
+}
+
 void autonSetupConstants(){
   Brain.resetTimer();
   
   static vex::thread autonColor = vex::thread(autonColorSort);
   static vex::thread colorIsSpinningUnjam = vex::thread(colorUnjam);
+  static vex::thread intakeIsSpinningUnjam = vex::thread(fullIntakeUnjam);
   autonColorSorting = true;
   chassis.setDriveMaxVoltage(12);
   chassis.setTurnMaxVoltage(12);
@@ -669,6 +686,31 @@ void startAutonToLongGoal(){
   colorSortIntake.spin(forward, 100, percent); 
   unjamActive = true;
   chassis.driveDistance(-11.5);
+}
+
+void matchLoaderToMiddleLowOuttake(){
+    matchLoad.set(false);
+    chassis.driveDistance(12);
+    chassis.turnToAngle(225);
+    colorSortIntake.spin(reverse, 50, pct);
+    chassis.driveDistance(49);
+    toggleFrontIntake();
+    unjamActiveFullIntake = true;
+    vex::thread unprimeThread(unprime);
+    wait(100, msec);
+    topIntake.spin(reverse, 100, percent);
+    bottomIntake.spin(reverse, 25, percent);
+    colorSortIntake.spin(reverse, 10, percent);
+    // wait(1000, msec);
+    // topIntake.spin(forward, 100, percent);
+    // bottomIntake.spin(forward, 100, percent);
+    // wait(150, msec);
+    // topIntake.spin(reverse, 100, percent);
+    // bottomIntake.spin(reverse, 25, percent);
+    // colorSortIntake.spin(reverse, 10, percent);
+    wait(2500, msec);
+    unjamActiveFullIntake = false;
+    toggleFrontIntake();
 }
 //Auton Route Functions
 /// @brief Auton Slot 1 - Write code for route within this function.
@@ -698,14 +740,52 @@ void Auton_1() //TESTING RN DO NOT USE
 }
 
 /// @brief Auton Slot 2 - Write code for route within this function.
-void Auton_2() // NONE
+void Auton_2() // Win Point with Scrape
 {   
   std::cout << "AUTON 2" << std::endl;
   autonSetupConstants();
   int loopTime = 0;
 
-  // startAutonToLongGoal();
+  startAutonToLongGoal();
+  while(loopTime <= 1000){
+    if(autonLastSeen == !teamColor){
+      vex::thread primeThread(prime);
+      //bottomIntake.spin(reverse, 15, percent); 
 
+      break;
+    }
+    loopTime += 5;
+    wait(5, msec);
+  }
+
+  matchLoaderToMiddleLowOuttake();
+
+
+
+  intake.stop();
+  chassis.driveDistance(-49);
+  chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
+  chassis.turnToAngle(273);
+  setDriveTrainConstants();
+  matchLoad.set(true);
+  intake.spin(forward, 100, pct);
+  colorSortIntake.spin(forward, 100, percent); 
+  unjamActive = true;
+  chassis.driveDistance(-11.5);
+
+  wait(1000, msec);
+  chassis.driveDistance(28);  
+  intakeFlap.set(true);
+  bottomIntake.stop();
+  autonFireClock(30);
+  //chassis.driveDistance(-10);
+  //toggleFrontIntake();
+  //intake.stop();
+  
+
+  intake.stop();
+  colorSortIntake.stop();
+  unjamActive = false;
   double time = Brain.timer(seconds);
   std::cout << "TIME: " << time << " seconds\n";
 }
@@ -750,7 +830,7 @@ void Auton_3() //FAST 4
 }
 
 /// @brief Auton Slot 4 - Write code for route within this function.
-void Auton_4() //Counter Scrape Win Point
+void Auton_4() // Win Point No Scrape
 {  
   std::cout << "AUTON 4" << std::endl;
   autonSetupConstants();
@@ -768,26 +848,7 @@ void Auton_4() //Counter Scrape Win Point
     wait(5, msec);
   }
 
-  matchLoad.set(false);
-  chassis.driveDistance(12);
-  chassis.turnToAngle(225);
-  colorSortIntake.spin(reverse, 50, pct);
-  chassis.driveDistance(49);
-  toggleFrontIntake();
-
-
-  vex::thread unprimeThread(unprime);
-  wait(100, msec);
-  topIntake.spin(reverse, 100, percent);
-  bottomIntake.spin(reverse, 25, percent);
-  colorSortIntake.spin(reverse, 10, percent);
-  wait(1000, msec);
-  topIntake.spin(forward, 100, percent);
-  bottomIntake.spin(forward, 100, percent);
-  wait(150, msec);
-  topIntake.spin(reverse, 100, percent);
-  bottomIntake.spin(reverse, 25, percent);
-  colorSortIntake.spin(reverse, 10, percent);
+  matchLoaderToMiddleLowOuttake();
 
   intake.stop();
   chassis.driveDistance(-49);
