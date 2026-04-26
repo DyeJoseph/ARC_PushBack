@@ -312,7 +312,7 @@ void usercontrol()
           colorSortIntake.spin(reverse);
         }
       }else if(Controller1.ButtonR2.pressing() && !Controller1.ButtonR1.pressing()){
-        intake.spin(reverse);
+        intake.spin(reverse, 100, percent);
         colorSortIntake.spin(forward, 10, percent);
       }else{
         if(isSPRunning){
