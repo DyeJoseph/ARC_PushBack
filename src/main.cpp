@@ -194,7 +194,7 @@ void autonomous()
   // Auton_5();
   // Auton_6();
    //Auton_2();
-  //  Auton_4();
+  // Auton_4();
 
   switch (lastPressed) 
   {
@@ -730,14 +730,14 @@ void matchLoaderToMiddleLowOuttake(){
     wait(100, msec);
     topIntake.spin(reverse, 100, percent);
     bottomIntake.spin(reverse, 50, percent);
-    colorSortIntake.spin(forward, 10, percent);
+    colorSortIntake.spin(forward, 15, percent);
     wait(500, msec);
     topIntake.spin(forward, 100, percent);
     bottomIntake.spin(forward, 100, percent);
     wait(150, msec);
     topIntake.spin(reverse, 100, percent);
-    bottomIntake.spin(reverse, 25, percent);
-    colorSortIntake.spin(forward, 10, percent);
+    bottomIntake.spin(reverse, 25,  percent);
+    colorSortIntake.spin(forward, 15, percent);
     wait(2500, msec);
     unjamActiveFullIntakeReverse = false;
     toggleFrontIntake();
@@ -912,6 +912,8 @@ void Auton_4() // Win Point No Scrape
   chassis.driveDistance(-12.5);
   wait(1000, msec);
 
+  intake.spin(forward, 100, percent);
+  colorSortIntake.spin(forward, 100, percent);
   chassis.driveDistance(28);  
   intakeFlap.set(true);
   bottomIntake.stop();
