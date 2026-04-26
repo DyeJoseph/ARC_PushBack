@@ -87,6 +87,7 @@ void Auton_8();
 void odomDebugThread();
 void semiPIDTest();
 
+void swapTeamColor();
 void toggleLift();
 void toggleIntakeFlap();
 void toggleFrontIntake();
@@ -194,7 +195,7 @@ void autonomous()
   // Auton_5();
   // Auton_6();
    //Auton_2();
-  // Auton_4();
+  // Auton_5();
 
   switch (lastPressed) 
   {
@@ -231,7 +232,8 @@ void autonomous()
 void usercontrol() 
 {
   intakeFlap.set(false);
-  wings.set(false);
+  wings.set(true);
+  wingState = true;
   frontIntake.set(false);
   matchLoad.set(false);
   midGoalBlocking.set(false);
@@ -271,6 +273,7 @@ void usercontrol()
   Controller1.ButtonL2.released(toggleWingsDown);
   Controller1.ButtonLeft.pressed(splitPrimeClock);
   Controller1.ButtonRight.pressed(splitReleaseClock);
+  Controller1.ButtonY.pressed(swapTeamColor);
 
   int blueMinHue = 200;
   while (1) {
@@ -355,6 +358,18 @@ void usercontrol()
 void toggleLift(){
   liftState = !liftState;
   intakeLift.set(liftState);
+  toggleWings();
+}
+
+void swapTeamColor(){
+  teamColor = !teamColor;
+  Controller1.Screen.setCursor(1,1);
+  Controller1.Screen.clearLine();
+  if (teamColor == 'RED'){
+    Controller1.Screen.print("Red");
+  }else{
+    Controller1.Screen.print("Blue");
+  }
 }
 
 /// @brief Driver control function to toggle the front intake
@@ -366,15 +381,15 @@ void toggleFrontIntake(){
 
 /// @brief Driver control function to toggle the descore mechanism
 void toggleWings(){
-  if(!Controller1.ButtonR2.pressing() || wingState == true){
+  if(!Controller1.ButtonR2.pressing() || wingState == false){
     wingState = !wingState;
     wings.set(wingState);
   }
 }
 
 void toggleWingsDown(){
-  wings.set(false);
-  wingState = false;
+  wings.set(true);
+  wingState = true;
 }
 
 /// @brief Driver control function to fire the clock (threaded) 
@@ -697,7 +712,7 @@ void autonSetupConstants(){
   chassis.setTurnMaxVoltage(12);
 
   //chassis.setSCurveConstants(60.0f, 120.0f, 400.0f);
-  chassis.setSCurveConstants(120.0f, 240.0f, 1200.0f);
+  chassis.setSCurveConstants(120.0f, 240.0f, 1000.0f);
   chassis.setDriveKff(12.0f / 78.9891f *.2f);
   chassis.setDriveKs(1.0f);
   chassis.setStallDetection(0.05f, 300.0f);
@@ -723,14 +738,16 @@ void matchLoaderToMiddleLowOuttake(){
     chassis.driveDistance(12);
     chassis.turnToAngle(225);
     //colorSortIntake.spin(reverse, 50, pct);
-    chassis.driveDistance(49);
-    toggleFrontIntake();
+    frontIntake.set(true);
+    chassis.driveDistance(51); //49
     //unjamActiveFullIntakeReverse = true;
+    unjamActive = false;
     vex::thread unprimeThread(unprime);
     wait(100, msec);
     topIntake.spin(reverse, 100, percent);
-    bottomIntake.spin(reverse, 50, percent);
+    bottomIntake.spin(reverse, 35, percent);
     colorSortIntake.spin(forward, 15, percent);
+    chassis.driveDistance(-2);
     wait(500, msec);
     topIntake.spin(forward, 100, percent);
     bottomIntake.spin(forward, 100, percent);
@@ -738,9 +755,16 @@ void matchLoaderToMiddleLowOuttake(){
     topIntake.spin(reverse, 100, percent);
     bottomIntake.spin(reverse, 25,  percent);
     colorSortIntake.spin(forward, 15, percent);
-    wait(2500, msec);
+    wait(1000, msec);
+    topIntake.spin(forward, 100, percent);
+    bottomIntake.spin(forward, 100, percent);
+    wait(150, msec);
+    topIntake.spin(reverse, 100, percent);
+    bottomIntake.spin(reverse, 25,  percent);
+    colorSortIntake.spin(forward, 15, percent);
+    wait(1500, msec);
     unjamActiveFullIntakeReverse = false;
-    toggleFrontIntake();
+    unjamActive = true;
 }
 //Auton Route Functions
 /// @brief Auton Slot 1 - Write code for route within this function.
@@ -794,6 +818,7 @@ void Auton_2() // Win Point with Scrape
 
   intake.stop();
   chassis.driveDistance(-50);
+  frontIntake.set(false);
   chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
   chassis.turnToAngle(273);
   setDriveTrainConstants();
@@ -888,6 +913,7 @@ void Auton_4() // Win Point No Scrape
   while(loopTime <= 1000){
     if(autonLastSeen == !teamColor){
       vex::thread primeThread(prime);
+      wait(400, msec);
       //bottomIntake.spin(reverse, 15, percent); 
 
       break;
@@ -901,7 +927,10 @@ void Auton_4() // Win Point No Scrape
 
 
   intake.stop();
-  chassis.driveDistance(-50);
+  chassis.setDriveMaxVoltage(9);
+  chassis.driveDistance(-52);
+  frontIntake.set(false);
+  std::cout << chassis.chassisOdometry.getXPosition() << " , " << chassis.chassisOdometry.getYPosition() << std::endl;
   chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
   chassis.turnToAngle(273);
   setDriveTrainConstants();
@@ -914,12 +943,12 @@ void Auton_4() // Win Point No Scrape
 
   intake.spin(forward, 100, percent);
   colorSortIntake.spin(forward, 100, percent);
+  chassis.turnToAngle(269);
   chassis.driveDistance(28);  
   intakeFlap.set(true);
-  bottomIntake.stop();
-  autonFireClock(30);
-  autonFireClockNoUnprime(40);
-  vex::thread unprimeThread(unprime);
+  autonFireClock(40);
+  autonFireClock(40);
+  autonFireClock(40);
 
   //chassis.driveDistance(-10);
   //toggleFrontIntake();
@@ -946,7 +975,7 @@ void Auton_5() //10 BALL
     if(autonLastSeen == !teamColor){
       vex::thread primeThread(prime);
       bottomIntake.spin(reverse, 15, percent); 
-      wait(150, msec);
+      wait(300, msec);
 
       break;
     }
@@ -968,6 +997,7 @@ void Auton_5() //10 BALL
   matchLoad.set(true);
   topIntake.spin(forward, 100, percent);
   bottomIntake.spin(forward, 100, percent);
+  chassis.turnToAngle(268);
   chassis.driveDistance(-20);
 
   intakeFlap.set(true);
@@ -979,12 +1009,12 @@ void Auton_5() //10 BALL
 
   wait(500, msec);
   bottomIntake.spin(reverse, 15, percent);
-  wait(1000, msec);
+  wait(1250, msec);
   bottomIntake.spin(forward, 100, percent);
 
   intake.spin(forward, 100, pct);
 
-  chassis.driveDistance(28);  
+  chassis.driveDistance(30);  
   intakeFlap.set(true);
   autonFireClock(30);
   autonFireClockNoUnprime(20);
