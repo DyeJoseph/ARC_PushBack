@@ -47,6 +47,7 @@ using namespace vex;
   bool autonLastSeen;
   bool unjamActive = false;
   bool unjamActiveFullIntake = false;
+  bool unjamActiveFullIntakeReverse = false;
 
 
   // Define Values for the Chassis here:
@@ -183,11 +184,17 @@ void autonomous()
   // rotation1.resetPosition();
   // rotation2.resetPosition();
   inertial1.resetHeading();
+  leftDrive.resetPosition();
+  rightDrive.resetPosition();
+
 
   wait(100, msec);
-  Auton_4();
-
   setDriveTrainConstants();
+  //Auton_3();
+  // Auton_5();
+  // Auton_6();
+   //Auton_2();
+  //  Auton_4();
 
   switch (lastPressed) 
   {
@@ -223,6 +230,14 @@ void autonomous()
 /// @brief Runs during the UserControl section of the competition
 void usercontrol() 
 {
+  intakeFlap.set(false);
+  wings.set(false);
+  frontIntake.set(false);
+  matchLoad.set(false);
+  midGoalBlocking.set(false);
+  
+
+
   //REMOVE "//" BELOW to run Semi-Automatic PID Test
   //chassis.setDriveSlew(.5f);
   //semiPIDTest();
@@ -359,7 +374,7 @@ void toggleWings(){
 
 void toggleWingsDown(){
   wings.set(false);
-  liftState = false;
+  wingState = false;
 }
 
 /// @brief Driver control function to fire the clock (threaded) 
@@ -548,7 +563,7 @@ void setDriveTrainConstants()
         10.0,  // Kd
         0.5,  // Settle Error
         200,  // Time to Settle
-        5000  // End Time
+        3000  // End Time
     );
 
     chassis.setTurnConstants(
@@ -564,7 +579,7 @@ void setDriveTrainConstants()
         3.5,      // Kd - Derivative Constant 
         .75, //1.25    // Settle Error
         200, 
-        1500 
+        1150 
     );
 }
 
@@ -656,12 +671,27 @@ int fullIntakeUnjam(){
   return 0;
 }
 
+int fullIntakeUnjamReverse(){
+  while(1){
+    if(fabs(bottomIntake.velocity(rpm)) <= 5 && unjamActiveFullIntakeReverse || fabs(topIntake.velocity(rpm) <= 5 && unjamActiveFullIntakeReverse)){
+      intake.spin(forward, 100, percent);
+      std::cout << "UNJAMMED INTAKE INTAKE INTAKEEEEEE SO HARD" << std::endl;
+      wait(250, msec);
+      intake.spin(reverse, 100, percent);
+    } else {
+      wait(20, msec);
+    }
+  }
+  return 0;
+}
+
 void autonSetupConstants(){
   Brain.resetTimer();
   
   static vex::thread autonColor = vex::thread(autonColorSort);
   static vex::thread colorIsSpinningUnjam = vex::thread(colorUnjam);
-  static vex::thread intakeIsSpinningUnjam = vex::thread(fullIntakeUnjam);
+  //static vex::thread intakeIsSpinningUnjam = vex::thread(fullIntakeUnjam);
+  static vex::thread intakeIsSpinningUnjamReverse = vex::thread(fullIntakeUnjamReverse);
   autonColorSorting = true;
   chassis.setDriveMaxVoltage(12);
   chassis.setTurnMaxVoltage(12);
@@ -670,7 +700,7 @@ void autonSetupConstants(){
   chassis.setSCurveConstants(120.0f, 240.0f, 1200.0f);
   chassis.setDriveKff(12.0f / 78.9891f *.2f);
   chassis.setDriveKs(1.0f);
-  chassis.setStallDetection(0.05f, 200.0f);
+  chassis.setStallDetection(0.05f, 300.0f);
   chassis.setPosition(0,0,0);
 
   static bool frontIntakeState = false;
@@ -685,31 +715,31 @@ void startAutonToLongGoal(){
   intake.spin(forward, 100, pct);
   colorSortIntake.spin(forward, 100, percent); 
   unjamActive = true;
-  chassis.driveDistance(-11.5);
+  chassis.driveDistance(-12.5);
 }
 
 void matchLoaderToMiddleLowOuttake(){
     matchLoad.set(false);
     chassis.driveDistance(12);
     chassis.turnToAngle(225);
-    colorSortIntake.spin(reverse, 50, pct);
+    //colorSortIntake.spin(reverse, 50, pct);
     chassis.driveDistance(49);
     toggleFrontIntake();
-    unjamActiveFullIntake = true;
+    //unjamActiveFullIntakeReverse = true;
     vex::thread unprimeThread(unprime);
     wait(100, msec);
     topIntake.spin(reverse, 100, percent);
+    bottomIntake.spin(reverse, 50, percent);
+    colorSortIntake.spin(forward, 10, percent);
+    wait(500, msec);
+    topIntake.spin(forward, 100, percent);
+    bottomIntake.spin(forward, 100, percent);
+    wait(150, msec);
+    topIntake.spin(reverse, 100, percent);
     bottomIntake.spin(reverse, 25, percent);
-    colorSortIntake.spin(reverse, 10, percent);
-    // wait(1000, msec);
-    // topIntake.spin(forward, 100, percent);
-    // bottomIntake.spin(forward, 100, percent);
-    // wait(150, msec);
-    // topIntake.spin(reverse, 100, percent);
-    // bottomIntake.spin(reverse, 25, percent);
-    // colorSortIntake.spin(reverse, 10, percent);
+    colorSortIntake.spin(forward, 10, percent);
     wait(2500, msec);
-    unjamActiveFullIntake = false;
+    unjamActiveFullIntakeReverse = false;
     toggleFrontIntake();
 }
 //Auton Route Functions
@@ -751,7 +781,7 @@ void Auton_2() // Win Point with Scrape
     if(autonLastSeen == !teamColor){
       vex::thread primeThread(prime);
       //bottomIntake.spin(reverse, 15, percent); 
-
+      wait(200,msec);
       break;
     }
     loopTime += 5;
@@ -763,7 +793,7 @@ void Auton_2() // Win Point with Scrape
 
 
   intake.stop();
-  chassis.driveDistance(-49);
+  chassis.driveDistance(-50);
   chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
   chassis.turnToAngle(273);
   setDriveTrainConstants();
@@ -771,10 +801,13 @@ void Auton_2() // Win Point with Scrape
   intake.spin(forward, 100, pct);
   colorSortIntake.spin(forward, 100, percent); 
   unjamActive = true;
-  chassis.driveDistance(-11.5);
+  chassis.driveDistance(-12.5);
+  wait(1000, msec);
+
 
   toggleWings(); // up
-  chassis.turnToAngle(255); //283
+  chassis.setTurnConstants(1.6, 0.0, 4.5, .75, 200, 1500);
+  chassis.turnToAngle(253); //283
   chassis.driveDistance(29.5); // 29
   chassis.turnToAngle(290);
   chassis.driveDistance(14); // 19
@@ -782,22 +815,25 @@ void Auton_2() // Win Point with Scrape
   toggleWings(); // down
   chassis.turnToAngle(270);
   chassis.driveDistance(-33);
+  chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
   chassis.turnToAngle(330); // 225
   chassis.driveDistance(12);
   chassis.turnToAngle(270);
+  setDriveTrainConstants();
   chassis.driveDistance(10);
 
   intakeFlap.set(true);
-  autonFireClock(30);
+  autonFireClock(40);
   intake.spin(forward, 100, percent);
   colorSortIntake.spin(forward, 100, percent);
   wait(1000, msec);
-  autonFireClockNoUnprime(30);
+  autonFireClockNoUnprime(40);
   vex::thread unprimeThread(unprime);
 
   intake.stop();
   colorSortIntake.stop();
   unjamActive = false;
+
   double time = Brain.timer(seconds);
   std::cout << "TIME: " << time << " seconds\n";
 }
@@ -862,8 +898,10 @@ void Auton_4() // Win Point No Scrape
 
   matchLoaderToMiddleLowOuttake();
 
+
+
   intake.stop();
-  chassis.driveDistance(-49);
+  chassis.driveDistance(-50);
   chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
   chassis.turnToAngle(273);
   setDriveTrainConstants();
@@ -871,13 +909,16 @@ void Auton_4() // Win Point No Scrape
   intake.spin(forward, 100, pct);
   colorSortIntake.spin(forward, 100, percent); 
   unjamActive = true;
-  chassis.driveDistance(-11.5);
-
+  chassis.driveDistance(-12.5);
   wait(1000, msec);
+
   chassis.driveDistance(28);  
   intakeFlap.set(true);
   bottomIntake.stop();
   autonFireClock(30);
+  autonFireClockNoUnprime(40);
+  vex::thread unprimeThread(unprime);
+
   //chassis.driveDistance(-10);
   //toggleFrontIntake();
   //intake.stop();
@@ -928,7 +969,7 @@ void Auton_5() //10 BALL
   chassis.driveDistance(-20);
 
   intakeFlap.set(true);
-  autonFireClockNoUnprime(100);
+  autonFireClockNoUnprime(50);
   vex::thread unprimeThread2(unprime);
 
   chassis.driveDistance(-8);
@@ -981,12 +1022,12 @@ void Auton_6() //speed 6
     wait(5, msec);
   }
   intakeFlap.set(true);
-  autonFireClockNoUnprime();
+  autonFireClockNoUnprime(50);
   vex::thread unprimeThread1(unprime);
   intake.spin(forward, 100, percent);
   wait(800, msec);
   topIntake.stop();
-  autonFireClockNoUnprime(100);
+  autonFireClockNoUnprime(50);
   intakeFlap.set(false);
   vex::thread unprimeThread2(unprime);
   autonLastSeen = !teamColor;
