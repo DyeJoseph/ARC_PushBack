@@ -122,8 +122,8 @@ void preAuton()
 
   vex::color colors[8] = {vex::color::red, vex::color::red, vex::color::red, vex::color::red, 
                           vex::color::blue, vex::color::blue, vex::color::blue, vex::color::blue};
-  std::string names[8] = {"NONE", "WPWSC", "SPD4", "WPNOSC", 
-                          "BALL10", "SPD6", "NONE", "NONE"};
+  std::string names[8] = {"NONE", "WPSC", "SPD4", "WPNOSC", 
+                          "BALL10", "SPD6", "WPPUSH", "NONE"};
   Button buttons[9];
   createAutonButtons(colors, names, buttons);
   buttons[0].setChosen(true);
@@ -1072,49 +1072,56 @@ void Auton_6() //speed 6
 void Auton_7() //SCORES TOP MIDDLE REAL
 {
   std::cout << "AUTON 7" << std::endl;
-  /*
+  std::cout << "AUTON 4" << std::endl;
   autonSetupConstants();
   int loopTime = 0;
 
   startAutonToLongGoal();
-  wait(1000, msec);
+  while(loopTime <= 1000){
+    if(autonLastSeen == !teamColor){
+      vex::thread primeThread(prime);
+      //bottomIntake.spin(reverse, 15, percent); 
 
-  chassis.driveDistance(28);
-  intakeFlap.set(true);
-  autonFireClock(30);
-  autonFireClockNoUnprime(20);
-  vex::thread unprimeThread3(unprime);
+      break;
+    }
+    loopTime += 5;
+    wait(5, msec);
+  }
+
+  matchLoaderToMiddleLowOuttake();
+
+
+
+  intake.stop();
+  chassis.driveDistance(-50);
   chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
-  chassis.turnToAngle(225, 12);
-  chassis.driveDistance(5);
-  intakeFlap.set(false);
-  chassis.turnToAngle(90);
-  chassis.driveDistance(28);
-  chassis.turnToAngle(245);
-  chassis.driveDistance(20.5);
-  chassis.turnToAngle(180);
-  chassis.driveDistance(19);
-  chassis.turnToAngle(270);
-  chassis.driveDistance(30);
-  chassis.turnToAngle(0);
-  chassis.driveDistance(17);
-  chassis.turnToAngle(90);
-  chassis.driveDistance(12);
-  intakeFlap.set(true);
-  autonFireClock(30);
-  autonFireClockNoUnprime(20);
-  vex::thread unprimeThread1(unprime);
-  chassis.driveDistance(-28);
-  wait(1000, msec);
+  chassis.turnToAngle(273);
   setDriveTrainConstants();
-  toggleLift(); //DOWN
-  chassis.driveDistance(10);
+  matchLoad.set(true);
+  intake.spin(forward, 100, pct);
+  colorSortIntake.spin(forward, 100, percent); 
+  unjamActive = true;
+  chassis.driveDistance(-12.5);
+  wait(1000, msec);
+
   intake.spin(forward, 100, percent);
-  colorSortIntake.spin(forward, 100, percent)*/
+  colorSortIntake.spin(forward, 100, percent);
+  chassis.driveDistance(28);  
+  intakeFlap.set(true);
+  bottomIntake.stop();
+  autonFireClock(30);
+  autonFireClockNoUnprime(40);
+  vex::thread unprimeThread(unprime);
+  longGoalWingPush();
 
+  //chassis.driveDistance(-10);
+  //toggleFrontIntake();
+  //intake.stop();
+  
 
-
-
+  intake.stop();
+  colorSortIntake.stop();
+  unjamActive = false;
   double time = Brain.timer(seconds);
   std::cout << "TIME: " << time << " seconds\n";
 }
