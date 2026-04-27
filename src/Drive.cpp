@@ -258,20 +258,42 @@ void Drive::arcade()
 
 /// @brief Tank drive control, uses the left joystick for the left side of the drive train and the right joystick for the right side of the drive train
 void Drive::tank(){
+
+    //CODE FOR POWER OF 1.5
+    // int leftY = 0;
+    // int rightX = 0;
+    // if(Controller1.Axis3.position(percent) >= 0)
+    //     leftY = pow(fabs(Controller1.Axis3.position(percent)),1.5)/10;
+    //     //leftY = Controller1.Axis3.position(percent);
+    // else
+    //     leftY = pow(fabs(Controller1.Axis3.position(percent)),1.5)/-10;
+    //     //leftY = Controller1.Axis3.position(percent);
+    
+    // if(Controller1.Axis2.position(percent) >= 0)
+    //     rightX = pow(fabs(Controller1.Axis2.position(percent)),1.5)/10;
+    //     //rightX = Controller1.Axis2.position(percent);
+    // else
+    //     rightX = pow(fabs(Controller1.Axis2.position(percent)),1.5)/-10;
+    //     //rightX = Controller1.Axis2.position(percent);
+
+    // leftDrive.spin(forward, leftY, percent);
+    // rightDrive.spin(forward, rightX, percent);
+
+    //CODE FOR POWER OF 2.5
     int leftY = 0;
     int rightX = 0;
     if(Controller1.Axis3.position(percent) >= 0)
-        leftY = pow(fabs(Controller1.Axis3.position(percent)),1.5)/10;
+        leftY = pow(fabs(Controller1.Axis3.position(percent)),2.5)/1000;
         //leftY = Controller1.Axis3.position(percent);
     else
-        leftY = pow(fabs(Controller1.Axis3.position(percent)),1.5)/-10;
+        leftY = pow(fabs(Controller1.Axis3.position(percent)),2.5)/-1000;
         //leftY = Controller1.Axis3.position(percent);
     
     if(Controller1.Axis2.position(percent) >= 0)
-        rightX = pow(fabs(Controller1.Axis2.position(percent)),1.5)/10;
+        rightX = pow(fabs(Controller1.Axis2.position(percent)),2.5)/1000;
         //rightX = Controller1.Axis2.position(percent);
     else
-        rightX = pow(fabs(Controller1.Axis2.position(percent)),1.5)/-10;
+        rightX = pow(fabs(Controller1.Axis2.position(percent)),2.5)/-1000;
         //rightX = Controller1.Axis2.position(percent);
 
     leftDrive.spin(forward, leftY, percent);
