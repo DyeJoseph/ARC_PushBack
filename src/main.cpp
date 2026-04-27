@@ -40,6 +40,8 @@ using namespace vex;
   bool isSPRunning = false;
   bool isPrimed = false;
   bool wingState = false;
+  int selectedTankSpeed = 0;
+
 
 
   //Auton globals
@@ -98,6 +100,9 @@ int fireClock();
 void splitPrimeClock();
 void splitReleaseClock();
 void autonFireClock(int fireSpeed);
+void incTankSpeed();
+void decTankSpeed();
+
 
 //////////////////////////////////////////////////////////////////////
 
@@ -274,13 +279,28 @@ void usercontrol()
   Controller1.ButtonLeft.pressed(splitPrimeClock);
   Controller1.ButtonRight.pressed(splitReleaseClock);
   Controller1.ButtonY.pressed(swapTeamColor);
+  Controller1.ButtonUp.pressed(incTankSpeed);
+  Controller1.ButtonDown.pressed(decTankSpeed);
 
   int blueMinHue = 200;
   while (1) {
-      if(driver)
-        chassis.tank();
-      else
-        chassis.arcade();
+      switch (selectedTankSpeed){
+        case 0: //1
+          chassis.tank10();
+          break;
+        case 1: //1.5
+          chassis.tank15();
+          break;
+        case 2: //2
+          chassis.tank20();
+          break;
+        case 3: //2.5
+          chassis.tank25();
+          break;
+        case 4: //3
+          chassis.tank30();
+          break;
+      }
 
       // OLD COLOR SORT
       // if(bottomColorSort.color() == vex::color::red){
@@ -352,6 +372,29 @@ void usercontrol()
     timeSinceSeenWrong += 20;
     wait(20, msec);
   }
+}
+
+void incTankSpeed(){
+  if(selectedTankSpeed == 4){
+    selectedTankSpeed = 0;
+  }else{
+    selectedTankSpeed++;
+  }
+  Controller1.Screen.setCursor(1,1);
+  Controller1.Screen.clearLine();
+  Controller1.Screen.print("%d", selectedTankSpeed);
+}
+void decTankSpeed(){
+  if(selectedTankSpeed == 0){
+    selectedTankSpeed = 4;
+  }else{
+    selectedTankSpeed--;
+  }
+  Controller1.Screen.setCursor(1,1);
+  Controller1.Screen.clearLine();
+  Controller1.Screen.print("%d", selectedTankSpeed);
+
+  
 }
 
 /// @brief Driver control function to toggle the intake hood

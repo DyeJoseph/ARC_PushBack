@@ -56,7 +56,11 @@ class Drive
         // void setTurnProfileForAngle(float angle, float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime);
         
         void arcade();
-        void tank();
+        void tank10();
+        void tank15();
+        void tank20();
+        void tank25();
+        void tank30();
 
         float getCurrentMotorPosition();
         int getOdomType() const {return odomType;}
