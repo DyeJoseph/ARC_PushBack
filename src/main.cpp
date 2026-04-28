@@ -913,7 +913,7 @@ void Auton_4() // Win Point No Scrape
   while(loopTime <= 1000){
     if(autonLastSeen == !teamColor){
       vex::thread primeThread(prime);
-      wait(400, msec);
+      wait(600, msec);
       //bottomIntake.spin(reverse, 15, percent); 
 
       break;
@@ -928,7 +928,7 @@ void Auton_4() // Win Point No Scrape
 
   intake.stop();
   chassis.setDriveMaxVoltage(9);
-  chassis.driveDistance(-52);
+  chassis.driveDistance(-50.7);
   frontIntake.set(false);
   std::cout << chassis.chassisOdometry.getXPosition() << " , " << chassis.chassisOdometry.getYPosition() << std::endl;
   chassis.setTurnConstants(0.95, 0.0, 5.0, 1.0, 200, 1500);
@@ -938,12 +938,14 @@ void Auton_4() // Win Point No Scrape
   intake.spin(forward, 100, pct);
   colorSortIntake.spin(forward, 100, percent); 
   unjamActive = true;
+  chassis.setDriveMaxVoltage(6);
   chassis.driveDistance(-12.5);
-  wait(1000, msec);
+  wait(2000, msec);
 
   intake.spin(forward, 100, percent);
   colorSortIntake.spin(forward, 100, percent);
   chassis.turnToAngle(269);
+  chassis.setDriveMaxVoltage(9);
   chassis.driveDistance(28);  
   intakeFlap.set(true);
   autonFireClock(40);
