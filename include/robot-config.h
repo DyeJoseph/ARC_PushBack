@@ -56,3 +56,8 @@ extern digital_out midGoalBlocking;
 extern digital_out odomRetraction;
 
 extern inertial inertial1;
+
+extern rotation rotation1;
+extern rotation rotation2;
+extern rotation rotation3;
+

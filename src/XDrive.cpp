@@ -1,5 +1,34 @@
 #include "XDrive.h"
 
+
+XDrive::XDrive(motor_group FL, motor_group FR, motor_group BL, motor_group BR, float wheelDiameter, float wheelRatio, float maxVoltage, int odomType, float odomWheelDiameter, float odomPod1Offset, float odomPod2Offset){
+    frontLeft = FL;
+    frontRight = FR;
+    backLeft = BL;
+    backRight = BR;
+
+    this->wheelDiameter = wheelDiameter;
+    this->wheelRatio = wheelRatio;
+    driveMaxVoltage = maxVoltage;
+    turnMaxVoltage = maxVoltage;
+    this->odomType = odomType;
+
+    switch(odomType){
+        case NO_ODOM:
+            this->chassisOdometry = Odom(wheelDiameter, wheelDiameter, 0, odomPod1Offset, odomPod2Offset, 0);
+            break;
+        case HORIZONTAL_AND_VERTICAL:
+            this->chassisOdometry = Odom(odomWheelDiameter, odomWheelDiameter, odomPod1Offset, odomPod2Offset);
+            break;
+        case TWO_VERTICAL:
+            // TODO
+            break;
+        case TWO_AT_45:
+            this->chassisOdometry = Odom(odomWheelDiameter, odomPod1Offset, odomPod2Offset);
+            break;
+    }
+}
+
 void XDrive::xDriveControls(){
     //Calculate motor values (do not reverse motors in robot-config, keep all spinning fwd)
     // FL = y + x + r
@@ -41,7 +70,7 @@ void XDrive::xMoveToPosition(float *target){
     float yDiff = tarY - curY;
 
     //Calculate distance
-    float distance = sqrt(pow(xDiff, 2) + pow(yDiff, 2));
+    //float distance = sqrt(pow(xDiff, 2) + pow(yDiff, 2));
 
     //Create PID objects
     PID xPID(driveKp, driveKi, driveKd, driveSettleError, driveTimeToSettle, driveEndTime);
@@ -100,4 +129,83 @@ void XDrive::xMoveToPosition(float *target){
     }
     //Brake motors
 
+}
+
+void XDrive::setDriveMaxVoltage(float maxVoltage){ driveMaxVoltage = maxVoltage; }
+void XDrive::setTurnMaxVoltage(float maxVoltage){ turnMaxVoltage = maxVoltage; }
+
+void XDrive::setDriveConstants(float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime){
+    driveKp = Kp;
+    driveKi = Ki;
+    driveKd = Kd;
+    driveSettleError = settleError;
+    driveTimeToSettle = timeToSettle;
+    driveEndTime = endTime;
+}
+
+void XDrive::setTurnConstants(float Kp, float Ki, float Kd, float settleError, float timeToSettle, float endTime){
+    turnKp = Kp;
+    turnKi = Ki;
+    turnKd = Kd;
+    turnSettleError = settleError;
+    turnTimeToSettle = timeToSettle;
+    turnEndTime = endTime;
+}
+
+void XDrive::brake(vex::brakeType type = hold){
+    frontLeft.stop(type);
+    frontRight.stop(type);
+    backLeft.stop(type);
+    backRight.stop(type);
+}
+
+void XDrive::movable(){
+    while (true) {
+        brake(coast);
+        updatePostion();
+        float x = chassisOdometry.getXPosition();
+        float y = chassisOdometry.getYPosition();
+        float heading = chassisOdometry.getHeading();
+
+        Brain.Screen.clearScreen();
+        Brain.Screen.setCursor(1,1);
+        Brain.Screen.print("X: ");
+        Brain.Screen.print(x);
+        Brain.Screen.newLine();
+        Brain.Screen.print("Y: ");
+        Brain.Screen.print(y);
+        Brain.Screen.print("Heading: ");
+        Brain.Screen.print(heading);
+        wait(50, msec); 
+    }
+}
+
+void XDrive::updatePostion(){
+    switch(odomType){
+        float left, right, heading;
+        case NO_ODOM:
+            left = leftDrive.position(degrees);
+            right = rightDrive.position(degrees);
+            heading = inertial1.heading();
+            chassisOdometry.updatePositionTwoForward(right, left, heading);
+            break;
+        case HORIZONTAL_AND_VERTICAL:
+            left = rotation1.position(degrees);
+            right = rotation2.position(degrees);
+            heading = inertial1.heading();
+            chassisOdometry.updatePositionOneForward(left, right, heading);
+            break;
+        case TWO_VERTICAL:
+            left = rotation1.position(degrees);
+            right = rotation2.position(degrees);
+            heading = inertial1.heading();
+            chassisOdometry.updatePositionTwoForward(right, left, heading);
+            break;
+        case TWO_AT_45:
+            left = rotation1.position(degrees);
+            right = rotation2.position(degrees);
+            heading = inertial1.heading();
+            chassisOdometry.updatePositionTwoAt45(left, right, heading);
+            break;
+    }
 }
