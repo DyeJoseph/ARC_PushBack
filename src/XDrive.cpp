@@ -53,7 +53,8 @@ void XDrive::xDriveControls(){
     backLeft.spin(fwd, backLeftVal, percent);
     backRight.spin(fwd, backRightVal, percent);
 }
-
+/// @brief Move to pos for XDrive
+/// @param target x,y,heading vector for desired position
 void XDrive::xMoveToPosition(float *target){
     //Get current positions
     float curX = chassisOdometry.getXPosition();
