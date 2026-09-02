@@ -93,9 +93,12 @@ void XDrive::xMoveToPosition(float *target){
         float curHeadRad = degToRad(curHead);
 
         //2D rotation matrix for robot-centric controls
-        //[cos(theta) -sin(theta)] [x], [sin(theta) cos(theta)] [y]
+        //[cos(theta) -sin(theta)] [x]
+        //[sin(theta) cos(theta) ] [y]
         float robotX = (cos(curHeadRad) * xDiff) - (sin(curHeadRad) * yDiff);
         float robotY = (sin(curHeadRad) * xDiff) + (cos(curHeadRad) * yDiff);
+
+        //Kalman filter stuff here
 
         //Compute PIDs
         float xOutput = xPID.compute(robotX);
